@@ -1,0 +1,18 @@
+{
+  "name": "灵境 AI · 多模型创作平台",
+  "short_name": "灵境 AI",
+  "description": "全能 AI 助手 + 多模型接入 + 创作工坊 + 智能体广场",
+  "start_url": "/ai-director-canvas/",
+  "scope": "/ai-director-canvas/",
+  "display": "standalone",
+  "background_color": "#0b0b12",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "/ai-director-canvas/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
