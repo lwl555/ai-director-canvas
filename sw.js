@@ -29,6 +29,17 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return
   const url = new URL(req.url)
   if (url.origin !== self.location.origin) return
+
+  // SPA 导航：离线 / 深链冷启动时回退到缓存的 index.html，保证「已安装的 APP」可打开。
+  if (req.mode === 'navigate') {
+    e.respondWith(
+      fetch(req).catch(() =>
+        caches.match('/ai-director-canvas/index.html').then((r) => r || caches.match('/ai-director-canvas/'))
+      )
+    )
+    return
+  }
+
   e.respondWith(
     caches.open(CACHE).then(async (c) => {
       const cached = await c.match(req)
