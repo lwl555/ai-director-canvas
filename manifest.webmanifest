@@ -2,17 +2,26 @@
   "name": "灵境 AI · 多模型创作平台",
   "short_name": "灵境 AI",
   "description": "全能 AI 助手 + 多模型接入 + 创作工坊 + 智能体广场",
+  "lang": "zh-CN",
+  "dir": "ltr",
   "start_url": "/ai-director-canvas/",
   "scope": "/ai-director-canvas/",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
   "background_color": "#0b0b12",
   "theme_color": "#6366f1",
+  "categories": ["productivity", "utilities", "education"],
   "icons": [
-    {
-      "src": "/ai-director-canvas/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    }
+    { "src": "/ai-director-canvas/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/ai-director-canvas/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/ai-director-canvas/icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/ai-director-canvas/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/ai-director-canvas/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "新建对话", "url": "/ai-director-canvas/", "description": "开始一段新对话" },
+    { "name": "智能体广场", "url": "/ai-director-canvas/agents", "description": "浏览并使用智能体" },
+    { "name": "创作工坊", "url": "/ai-director-canvas/create", "description": "生图 / 生视频" }
   ]
 }
