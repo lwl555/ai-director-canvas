@@ -1,63 +1,76 @@
-import { useState } from 'react'
 import { useStore } from '../store'
-import type { CanvasNode } from '../types'
+import type { VideoNode } from '../types'
 
 export default function Timeline() {
-  const { project, updateNode, select } = useStore()
-  const [dragId, setDragId] = useState<string | null>(null)
+  const { project, updateVideo, select } = useStore()
+  const videos = project.videos.filter((v) => v.inTimeline)
 
-  const shots = project.nodes
-    .filter((n) => n.type === 'video')
-    .sort((a, b) => (a.shotIndex || 0) - (b.shotIndex || 0))
+  // 按时间轴顺序排列：用户拖动的 timelineStart 优先，否则按分镜 index 兜底
+  const sortKey = (v: VideoNode) =>
+    v.timelineStart ?? (project.shots.find((s) => s.id === v.shotId)?.index ?? 0) * 10
+  const ordered = [...videos].sort((a, b) => sortKey(a) - sortKey(b))
 
-  const total = shots.reduce((s, n) => s + (n.durationSec || 0), 0)
+  const total = ordered.reduce((sum, v) => sum + v.durationSec, 0)
 
-  const reorder = (fromId: string, toId: string) => {
-    if (fromId === toId) return
-    const ids = shots.map((s) => s.id)
-    const from = ids.indexOf(fromId)
-    const to = ids.indexOf(toId)
-    if (from < 0 || to < 0) return
-    ids.splice(to, 0, ids.splice(from, 1)[0])
-    ids.forEach((id, i) => updateNode(id, { shotIndex: i + 1 }))
+  const move = (id: string, dir: -1 | 1) => {
+    const idx = ordered.findIndex((v) => v.id === id)
+    const swap = ordered[idx + dir]
+    if (!swap) return
+    // 交换 shotId 对应的 index 顺序：通过 timelineStart 调整
+    const aStart = ordered[idx].timelineStart ?? idx * 10
+    const bStart = swap.timelineStart ?? (idx + dir) * 10
+    updateVideo(ordered[idx].id, { timelineStart: bStart })
+    updateVideo(swap.id, { timelineStart: aStart })
   }
 
   return (
     <div className="timeline">
-      <div className="tl-head">
-        <span className="tl-title">🎞️ 分镜时间轴</span>
-        <span className="tl-total">共 {shots.length} 镜 · {total}s</span>
-        <span className="tl-hint">拖动卡片调整顺序（即梦式故事板）</span>
+      <div className="timeline-head">
+        <span>时间轴</span>
+        <span className="tl-total">总长 {total}s · {ordered.length} 段</span>
       </div>
-      <div className="tl-track">
-        {shots.length === 0 && <div className="tl-empty">还没有分镜。用「智能导演」生成，或在左侧添加「分镜（视频）」节点。</div>}
-        {shots.map((s: CanvasNode) => (
-          <div
-            key={s.id}
-            className={`tl-card ${dragId === s.id ? 'dragging' : ''} ${s.status === 'done' ? 'done' : ''}`}
-            draggable
-            onDragStart={() => setDragId(s.id)}
-            onDragEnd={() => setDragId(null)}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={() => reorder(dragId!, s.id)}
-            onClick={() => select(s.id)}
-          >
-            <div className="tl-idx">{s.shotIndex || '·'}</div>
-            <div className="tl-thumb">
-              {s.videoUrl ? (
-                <video src={s.videoUrl} muted preload="metadata" />
-              ) : s.imageUrl ? (
-                <img src={s.imageUrl} alt={s.title} />
-              ) : (
-                <span className="tl-ph">{s.status === 'processing' ? '⏳' : s.status === 'failed' ? '⚠' : '🎬'}</span>
-              )}
-            </div>
-            <div className="tl-meta">
-              <div className="tl-name">{s.title}</div>
-              <div className="tl-dur">{s.durationSec || 0}s</div>
-            </div>
-          </div>
+      <div className="timeline-track">
+        {ordered.length === 0 && <div className="tl-empty">生成的视频会自动进入时间轴，可在此调序、导出。</div>}
+        {ordered.map((v, i) => (
+          <TimelineClip key={v.id} node={v} index={i} onSelect={() => select(v.id)} onMoveLeft={() => move(v.id, -1)} onMoveRight={() => move(v.id, 1)} />
         ))}
+      </div>
+    </div>
+  )
+}
+
+function TimelineClip({
+  node,
+  index,
+  onSelect,
+  onMoveLeft,
+  onMoveRight
+}: {
+  node: VideoNode
+  index: number
+  onSelect: () => void
+  onMoveLeft: () => void
+  onMoveRight: () => void
+}) {
+  const active = (node.variants ?? []).find((v) => v.id === node.activeVariantId) || (node.variants ?? [])[0]
+  const widthPct = Math.min(Math.max(node.durationSec * 4, 60), 400)
+  return (
+    <div className="tl-clip" style={{ width: widthPct }} onClick={onSelect}>
+      <div className="tl-clip-head">
+        <span className="tl-idx">{index + 1}</span>
+        <span className="tl-title">{node.title}</span>
+      </div>
+      <div className="tl-clip-body">
+        {active?.videoUrl ? (
+          <video src={active.videoUrl} muted preload="metadata" />
+        ) : (
+          <div className="tl-ph">{active?.status === 'processing' ? '渲染中' : '未生成'}</div>
+        )}
+      </div>
+      <div className="tl-clip-foot">
+        <button onClick={(e) => { e.stopPropagation(); onMoveLeft() }}>◀</button>
+        <span>{node.durationSec}s</span>
+        <button onClick={(e) => { e.stopPropagation(); onMoveRight() }}>▶</button>
       </div>
     </div>
   )

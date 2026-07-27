@@ -1,155 +1,127 @@
 import { useStore } from '../store'
 import { useGenerator } from '../hooks/useGenerator'
-import { CAMERA_LABEL, IMAGE_MODELS, SIZE_OPTIONS, REF_TYPE_LABEL, type CameraMotion, type RefType } from '../types'
+import { CAMERA_LABEL, REF_TYPE_LABEL, type RefNode, type ShotNode, type VideoNode } from '../types'
 
 export default function Inspector() {
-  const { project, selectedId, selectedNode, updateNode, removeNode } = useStore()
-  const { generateImage, generateVideo, translateToZh } = useGenerator()
+  const { selectedNode, project, updateRef, updateShot, updateVideo, setMainRef, removeRef, removeShot, removeVideo } = useStore()
+  const { generateRef, generateShotImage, generateVideoForShot, retryVariant } = useGenerator()
 
   if (!selectedNode) {
     return (
       <aside className="inspector">
         <div className="inspector-empty">
-          <div className="ie-icon">🎞️</div>
-          <p>选中画布上的节点进行编辑</p>
-          <p className="hint">提示：从参考图右侧端口拖到分镜左侧「首 / 尾」端口，可设置关键帧保证角色一致性。</p>
+          <div>属性面板</div>
+          <p>选中画布上的节点查看与编辑详情。</p>
         </div>
       </aside>
     )
   }
 
-  const n = selectedNode
-  const frameCandidates = project.nodes.filter((x) => x.type === 'reference' || x.type === 'image')
+  if (selectedNode.type === 'reference') {
+    const r = selectedNode as RefNode
+    return (
+      <aside className="inspector">
+        <div className="insp-head">
+          <span className="tag tag-ref">{REF_TYPE_LABEL[r.refType]}</span>
+          <button className="btn-ghost" onClick={() => removeRef(r.id)}>删除</button>
+        </div>
+        <label>标签</label>
+        <input value={r.label} onChange={(e) => updateRef(r.id, { label: e.target.value })} />
+        {r.refType === 'character' && (
+          <>
+            <label>绑定角色名</label>
+            <input value={r.characterName || ''} onChange={(e) => updateRef(r.id, { characterName: e.target.value })} placeholder="如：小明" />
+            <button className={`btn ${r?.isMainRef ? 'btn-active' : 'btn-primary'}`} onClick={() => setMainRef(r.id)}>
+              {r?.isMainRef ? '已是主参考' : '设为主参考'}
+            </button>
+          </>
+        )}
+        <label>英文提示词</label>
+        <textarea rows={6} value={r.prompt} onChange={(e) => updateRef(r.id, { prompt: e.target.value })} />
+        <button className="btn btn-primary" onClick={() => generateRef(r)} disabled={r.status === 'processing'}>
+          {r.status === 'done' ? '重新生成图片' : '生成图片'}
+        </button>
+        {r.error && <div className="err">{r.error}</div>}
+      </aside>
+    )
+  }
 
+  if (selectedNode.type === 'shot') {
+    const s = selectedNode as ShotNode
+    const refs = project.refs
+    return (
+      <aside className="inspector">
+        <div className="insp-head">
+          <span className="tag tag-shot">分镜 {s.index}</span>
+          <button className="btn-ghost" onClick={() => removeShot(s.id)}>删除</button>
+        </div>
+        <label>标题</label>
+        <input value={s.title} onChange={(e) => updateShot(s.id, { title: e.target.value })} />
+        <label>镜头运动</label>
+        <select value={s.cameraMotion} onChange={(e) => updateShot(s.id, { cameraMotion: e.target.value as any })}>
+          {Object.entries(CAMERA_LABEL).map(([k, v]) => (
+            <option key={k} value={k}>{v}</option>
+          ))}
+        </select>
+        <label>时长(秒)</label>
+        <input type="number" value={s.durationSec} onChange={(e) => updateShot(s.id, { durationSec: Number(e.target.value) })} />
+        <label>首帧关键帧</label>
+        <select value={s.firstFrameRefId || ''} onChange={(e) => updateShot(s.id, { firstFrameRefId: e.target.value || undefined })}>
+          <option value="">无</option>
+          {refs.filter(Boolean).map((r) => (
+            <option key={r.id} value={r.id}>{r.label}{r?.isMainRef ? ' ★' : ''}</option>
+          ))}
+        </select>
+        <label>尾帧关键帧</label>
+        <select value={s.lastFrameRefId || ''} onChange={(e) => updateShot(s.id, { lastFrameRefId: e.target.value || undefined })}>
+          <option value="">无</option>
+          {refs.filter(Boolean).map((r) => (
+            <option key={r.id} value={r.id}>{r.label}{r?.isMainRef ? ' ★' : ''}</option>
+          ))}
+        </select>
+        <label>英文提示词</label>
+        <textarea rows={6} value={s.promptEn} onChange={(e) => updateShot(s.id, { promptEn: e.target.value })} />
+        <label>中文描述</label>
+        <textarea rows={3} value={s.promptZh || ''} onChange={(e) => updateShot(s.id, { promptZh: e.target.value })} />
+        <button className="btn btn-primary" onClick={() => generateShotImage(s)} disabled={s.status === 'processing'}>
+          {s.status === 'done' ? '重新生成定格' : '生成定格图'}
+        </button>
+          <button className="btn" onClick={() => generateVideoForShot(s)} style={{ marginTop: 8 }}>
+          生成视频
+        </button>
+        {s.error && <div className="err">{s.error}</div>}
+      </aside>
+    )
+  }
+
+  // video
+  const v = selectedNode as VideoNode
+  const active = (v.variants ?? []).find((vt) => vt.id === v.activeVariantId) || (v.variants ?? [])[0]
   return (
     <aside className="inspector">
       <div className="insp-head">
-        <span className={`type-pill t-${n.type}`}>{typeLabel(n.type)}</span>
-        <button className="icon-btn" title="删除节点" onClick={() => removeNode(n.id)}>🗑</button>
+        <span className="tag tag-video">视频</span>
+        <button className="btn-ghost" onClick={() => removeVideo(v.id)}>删除</button>
       </div>
-
-      <label className="field">
-        <span>标题</span>
-        <input value={n.title} onChange={(e) => updateNode(n.id, { title: e.target.value })} />
-      </label>
-
-      {(n.type === 'reference' || n.type === 'image') && (
-        <>
-          {n.type === 'reference' && (
-            <label className="field">
-              <span>参考类型</span>
-              <select value={n.refType || 'character'} onChange={(e) => updateNode(n.id, { refType: e.target.value as RefType })}>
-                {Object.entries(REF_TYPE_LABEL).map(([k, v]) => (
-                  <option key={k} value={k}>{v}</option>
-                ))}
-              </select>
-            </label>
-          )}
-          <label className="field">
-            <span>生成提示词</span>
-            <textarea rows={4} value={n.prompt} onChange={(e) => updateNode(n.id, { prompt: e.target.value })} placeholder="描述这张参考图…" />
-          </label>
-          <label className="field">
-            <span>模型</span>
-            <select value={n.model || 'agnes-image-2.1-flash'} onChange={(e) => updateNode(n.id, { model: e.target.value })}>
-              {IMAGE_MODELS.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
-            </select>
-          </label>
-          <label className="field">
-            <span>尺寸</span>
-            <select value={n.size || '1024x768'} onChange={(e) => updateNode(n.id, { size: e.target.value })}>
-              {SIZE_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
-          </label>
-          <div className="insp-actions">
-            <button className="btn primary" onClick={() => generateImage(n)} disabled={n.status === 'pending' || !n.prompt?.trim()}>
-              {n.status === 'pending' ? '生成中…' : '生成 / 重生成图片'}
-            </button>
+      <label>标题</label>
+      <input value={v.title} onChange={(e) => updateVideo(v.id, { title: e.target.value })} />
+      <label>时长(秒)</label>
+      <input type="number" value={v.durationSec} onChange={(e) => updateVideo(v.id, { durationSec: Number(e.target.value) })} />
+      <label>版本 ({v.variants?.length ?? 0})</label>
+      <div className="variant-list">
+        {v.variants.map((vt, i) => (
+          <div key={vt.id} className={`variant-row ${vt.id === active?.id ? 'on' : ''}`}>
+            <button className="btn-xs" onClick={() => updateVideo(v.id, { activeVariantId: vt.id })}>选为成片</button>
+            <span>v{i + 1} · {vt.status === 'done' ? '完成' : vt.status === 'failed' ? '失败' : '渲染中'}</span>
+            {vt.status === 'failed' && (
+              <button className="btn-xs ghost" onClick={() => retryVariant(v, vt.id)}>重试</button>
+            )}
           </div>
-        </>
-      )}
-
-      {n.type === 'video' && (
-        <>
-          <label className="field">
-            <span>英文视频提示词（promptEn）</span>
-            <textarea rows={5} value={n.promptEn || ''} onChange={(e) => updateNode(n.id, { promptEn: e.target.value, prompt: n.prompt || e.target.value })} placeholder="英文提示词，含角色外貌/动作/场景/光影/镜头运动" />
-          </label>
-          <div className="insp-actions">
-            <button className="btn ghost sm" onClick={() => translateToZh(n)}>译中文</button>
-          </div>
-          {n.prompt && <div className="zh-preview">中文：{n.prompt}</div>}
-
-          <div className="field-row">
-            <label className="field">
-              <span>时长(秒)</span>
-              <input type="number" min={1} max={16} value={n.durationSec || 8} onChange={(e) => updateNode(n.id, { durationSec: Number(e.target.value) })} />
-            </label>
-            <label className="field">
-              <span>镜头运动</span>
-              <select value={n.cameraMotion || 'none'} onChange={(e) => updateNode(n.id, { cameraMotion: e.target.value as CameraMotion })}>
-                {Object.entries(CAMERA_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-              </select>
-            </label>
-          </div>
-
-          <div className="field-row">
-            <label className="field">
-              <span>尺寸</span>
-              <select value={n.size || '768x1152'} onChange={(e) => updateNode(n.id, { size: e.target.value })}>
-                {SIZE_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </label>
-            <label className="field">
-              <span>Seed</span>
-              <input type="number" value={n.seed || 0} onChange={(e) => updateNode(n.id, { seed: Number(e.target.value) })} />
-            </label>
-          </div>
-
-          <label className="field">
-            <span>首帧关键帧</span>
-            <select value={n.firstFrameNodeId || ''} onChange={(e) => updateNode(n.id, { firstFrameNodeId: e.target.value || undefined })}>
-              <option value="">无</option>
-              {frameCandidates.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
-            </select>
-          </label>
-          <label className="field">
-            <span>尾帧关键帧</span>
-            <select value={n.lastFrameNodeId || ''} onChange={(e) => updateNode(n.id, { lastFrameNodeId: e.target.value || undefined })}>
-              <option value="">无</option>
-              {frameCandidates.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
-            </select>
-          </label>
-
-          <label className="field">
-            <span>声音/音乐提示</span>
-            <input value={n.audioHint || ''} onChange={(e) => updateNode(n.id, { audioHint: e.target.value })} placeholder="如：轻快钢琴" />
-          </label>
-
-          <div className="insp-actions">
-            <button className="btn primary" onClick={() => generateVideo(n)} disabled={n.status === 'processing' || !n.promptEn?.trim()}>
-              {n.status === 'processing' ? '生成中…' : n.videoUrl ? '重新生成视频' : '生成视频'}
-            </button>
-          </div>
-        </>
-      )}
-
-      {n.type === 'text' && (
-        <label className="field">
-          <span>文本内容</span>
-          <textarea rows={5} value={n.text || ''} onChange={(e) => updateNode(n.id, { text: e.target.value })} />
-        </label>
-      )}
-
-      {n.error && <div className="err-box">⚠ {n.error}</div>}
-      {n.status && <div className="status-line">状态：{statusLabel(n.status)}</div>}
+        ))}
+      </div>
+      <button className="btn btn-primary" onClick={() => { const shot = project.shots.find((s) => s.id === v.shotId); if (shot) generateVideoForShot(shot) }} style={{ marginTop: 8 }}>
+        ＋ 生成新版本
+      </button>
     </aside>
   )
-}
-
-function typeLabel(t: string) {
-  return { image: '文生图', video: '分镜视频', reference: '参考图', text: '文本' }[t] || t
-}
-function statusLabel(s: string) {
-  return { idle: '待生成', pending: '图片生成中', processing: '视频生成中', done: '已完成', failed: '失败' }[s] || s
 }

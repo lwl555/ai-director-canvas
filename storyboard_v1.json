@@ -1,0 +1,79 @@
+{
+  "project": "末班车的第七分钟",
+  "version": "storyboard_v1",
+  "global": {
+    "model": "agnes-video-v2.0",
+    "frame_rate": 24,
+    "height": 1024,
+    "width": 768,
+    "seedBase": "末班车的第七分钟 render14",
+    "negative_prompt": "no extra people, no additional person, no bystander, no third character, no crowd, no identity change, no face change, no face swap, no different person, no outfit change, no clothing change, no hairstyle change, no hair color change, no laughing, no grin, no smiling, no open-mouth laugh, no exaggerated expression, no creepy smile, no plastic skin, no uncanny valley, no distorted face, no oversized eyes, no weird teeth, no deformed hands, no extra fingers, no extra limbs, no twisted limbs, no sudden movement, no abrupt motion, no pose change, no jumping, no style drift, no watermark, no text overlay, no logo, no jitter, no flicker, low resolution, blurry, washed out, oversaturated."
+  },
+  "shots": [
+    {
+      "id": "s1",
+      "title": "巷口候车",
+      "durationFrames": 121,
+      "shotSize": "wide establishing",
+      "cameraHint": "slow dolly-in, tiny",
+      "description": "雨夜老城区巷口公交站，林晚撑透明伞独站，陈默从右入画站定斜前方。两人无交流。",
+      "dialogue": null,
+      "firstFrameKey": "render11_out/shot_1_巷口独候.txt",
+      "lastFrameKey": "render11_out/shot_2_站台相遇.txt",
+      "transition": "cut",
+      "videoPrompt": "[PARAMS] cinematic, photorealistic, high detail, 24fps, smooth subtle camera move\n[SCENE] rainy night old alley, wet stone pavement, amber streetlamp left, cold blue neon puddle reflections\n[SUBJECT] the two characters EXACTLY as shown in the first frame: a young Chinese woman in a BEIGE double-breasted knee-length wool trench coat (left ear tiny silver stud), and a Chinese man in a DARK GREY ankle-length wool overcoat — no other people present\n[ACTION] extremely slow dolly-in, tiny amplitude; rain falling diagonally, slight fabric sway; the man walks in from the right and stops two steps ahead of her, both quiet, NO eye contact, NO new characters\n[CONSISTENCY] lock exact character identity, face, clothing, hair, earring to the first frame; the same two people only; no identity change, no extra person\n[REALISM] natural skin texture, real-world wet-night lighting\n[DELIVERY] calm, neutral, no expression change, no smile\n[ENDING] the frame must settle exactly onto the locked last frame composition\n[SPEAKING] No spoken dialogue in this shot."
+    },
+    {
+      "id": "s2",
+      "title": "并肩",
+      "durationFrames": 121,
+      "shotSize": "medium two-shot",
+      "cameraHint": "slow horizontal pan",
+      "description": "两人并肩站间距一步，互不看。林晚侧脸望雨，陈默低头熄屏放袋。",
+      "dialogue": null,
+      "firstFrameKey": "render11_out/shot_2_站台相遇.txt",
+      "lastFrameKey": "render11_out/shot_3_欲言又止.txt",
+      "transition": "cut",
+      "videoPrompt": "[PARAMS] cinematic, photorealistic, high detail, 24fps, slow camera move\n[SCENE] rainy night bus stop, shallow DoF, rainy bokeh background, warm-cool mixed light\n[SUBJECT] the two characters EXACTLY as shown in first frame: the dark-grey-overcoat man and the beige-trench-coat woman, standing about one step apart — no third person\n[ACTION] very slow horizontal pan from man to woman, hair gently blown by wind, rain falling; no body movement, no pose change, no clothing change\n[CONSISTENCY] identical appearance, clothing, hair, lower body (trench coat covers knees), shoes as first frame; the same two people only; no extra person\n[REALISM] natural skin, real wet-night light, photorealistic\n[DELIVERY] subdued, introspective, neutral face, no smile\n[ENDING] the frame must settle exactly onto the locked last frame composition\n[SPEAKING] No spoken dialogue in this shot."
+    },
+    {
+      "id": "s3",
+      "title": "搭话",
+      "durationFrames": 145,
+      "shotSize": "over-shoulder medium close-up",
+      "cameraHint": "over-shoulder, slow push-in",
+      "description": "过肩看陈默。林晚微侧头轻声问，陈默略怔转头，嘴角微动。破冰。",
+      "dialogue": "林晚：也等末班车？",
+      "firstFrameKey": "render11_out/shot_3_欲言又止.txt",
+      "lastFrameKey": "render11_out/shot_4_同撑一伞.txt",
+      "transition": "cut",
+      "videoPrompt": "[PARAMS] cinematic, photorealistic, high detail, 24fps, slow push-in\n[SCENE] rainy night bus stop, over-shoulder from woman's left shoulder, shallow DoF, streetlamp side light, blurred rainy bokeh bg\n[SUBJECT] focus on the dark-grey-overcoat man EXACTLY as shown in first frame; the beige-trench-coat woman's shoulder/hair in soft foreground\n[ACTION] the woman turns her head slightly and asks quietly; the man, slightly startled, turns to look at her, lips barely move in a restrained almost-smile; very subtle, natural motion, no laughter\n[CONSISTENCY] identical appearance, clothing, hair as prior shots; the same two people only; no identity change\n[REALISM] natural skin, real light, photorealistic\n[DELIVERY] understated, internal, neutral, no smile, no exaggerated expression\n[ENDING] the frame must settle exactly onto the locked last frame composition\n[SPEAKING] The woman speaks in quiet, natural Mandarin Chinese: \"也等末班车？\". Understated, internal delivery — not performative. Mouth moving subtly, lip-synced, restrained expression. NO English speech."
+    },
+    {
+      "id": "s4",
+      "title": "欲言又止",
+      "durationFrames": 145,
+      "shotSize": "close-up two-face",
+      "cameraHint": "very slow intimate",
+      "description": "双人近景，陈默占主。陈默张嘴又摇头垂眼说「算了，没事。」林晚侧后虚化，眼神柔软。",
+      "dialogue": "陈默：算了，没事。",
+      "firstFrameKey": "render11_out/shot_4_同撑一伞.txt",
+      "lastFrameKey": "render11_out/shot_4_同撑一伞.txt",
+      "transition": "cut",
+      "videoPrompt": "[PARAMS] cinematic, photorealistic, high detail, 24fps, very slow, intimate\n[SCENE] rainy night, warm streetlamp on man's lit half, woman's profile in shadow, shallow DoF\n[SUBJECT] two faces in frame EXACTLY as shown in first frame: the dark-grey-overcoat man on right (main), the beige-trench-coat woman on left (soft focus)\n[ACTION] the man opens his mouth as if to speak, then shakes his head slightly and looks down, says the line with lowered eyes; the woman watches him, eyes softening; minimal, natural motion\n[CONSISTENCY] identical appearance, clothing, hair, earring as first frame; the same two people only; no identity change\n[REALISM] natural skin, real light, photorealistic\n[DELIVERY] understated, vulnerable but restrained, no exaggerated smile, no theatrical laugh\n[ENDING] the frame must settle exactly onto the locked last frame composition\n[SPEAKING] The man speaks in quiet, natural Mandarin Chinese: \"算了，没事。\". Understated, internal delivery — not performative. Mouth moving subtly, lip-synced, restrained, eyes lowered. NO English speech."
+    },
+    {
+      "id": "s5",
+      "title": "车过",
+      "durationFrames": 145,
+      "shotSize": "wide static",
+      "cameraHint": "static wide",
+      "description": "固定远景。远处车灯由远及近减速又驶离，两人静止没上。雨继续，留白收尾。",
+      "dialogue": null,
+      "firstFrameKey": "render11_out/shot_4_同撑一伞.txt",
+      "lastFrameKey": null,
+      "transition": "cut",
+      "videoPrompt": "[PARAMS] cinematic, photorealistic, high detail, 24fps, static wide, subtle\n[SCENE] rainy night old alley bus stop, warm amber + cold blue neon on wet pavement, two small figures (beige trench woman, dark-grey overcoat man) standing still from behind/side\n[ACTION] in the distance two bus headlight beams approach through rain, brighten the wet street and rain curtain, slow briefly near them, then drive away and recede; the two figures do not move, rain continues; ending on their still silhouettes\n[CONSISTENCY] identical appearance, clothing, hair as prior shots even from behind; no change; the same two people only\n[REALISM] natural rain, real light, photorealistic, cinematic depth\n[DELIVERY] calm, wistful, no expression needed, no dialogue\n[SPEAKING] No spoken dialogue in this shot."
+    }
+  ]
+}

@@ -6,8 +6,12 @@ import react from '@vitejs/plugin-react'
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   const key = env.AGNES_API_KEY || ''
+  // 网页版部署在 GitHub Pages 子目录 /ai-director-canvas/；
+  // 原生 APP（Capacitor）把静态资源 serve 在 webview 根路径，base 必须是 '/'。
+  const isCapacitor = !!process.env.CAPACITOR
   return {
     plugins: [react()],
+    base: isCapacitor ? '/' : '/ai-director-canvas/',
     server: {
       port: 5180,
       proxy: {

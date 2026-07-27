@@ -1,0 +1,8 @@
+appId: com.lingjing.ai
+productName: 灵境 AI
+directories:
+  output: dist-electron
+files:
+  - electron/**
+  - package.json
+# 不打包本地前端资源：运行时加载线上站点，桌面端即「独立电脑软件」外壳。

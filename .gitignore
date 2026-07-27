@@ -2,3 +2,9 @@ node_modules
 dist
 .env.local
 *.local
+
+# 画布时代渲染产物（大媒体，不入库）
+render*_out/
+
+# Supabase CLI 临时目录
+supabase/.temp/
