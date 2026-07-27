@@ -53,6 +53,13 @@ jobs:
             echo "name=app-debug.apk" >> "$GITHUB_OUTPUT"
           fi
 
+      # Gradle 产物固定为 app-debug.apk，按模式复制成目标名再发布
+      - name: Prepare APK asset
+        run: |
+          SRC=android/app/build/outputs/apk/debug/app-debug.apk
+          DST=android/app/build/outputs/apk/debug/${{ steps.asset.outputs.name }}
+          if [ "$SRC" != "$DST" ]; then cp "$SRC" "$DST"; fi
+
       - name: Publish APK to Release
         uses: softprops/action-gh-release@v2
         if: success()
