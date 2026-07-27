@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useStore } from '../store'
 import { agnesImage, agnesVideoCreate, agnesVideoStatus, agnesTranslate, agnesChat, AGNES_VIDEO_MODEL } from '../lib/agnes'
 import { ROUTES } from '../lib/modelRouter'
@@ -187,6 +187,9 @@ export function useGenerator() {
   // 参考图 URL、丢失角色一致性。用 projectRef.current 实时读取，避免 stale-closure。
   const projectRef = useRef(project)
   projectRef.current = project
+
+  // 批量生成进度（TopBar 显示 "生成中 2/5…"）
+  const [batchProgress, setBatchProgress] = useState<{ current: number; total: number; label: string } | null>(null)
 
   // 从提示词自动推断 2-4 个相关道具，新建 object 参考图并生成（手动路线自动补全道具）
   const autoGenProps = useCallback(
@@ -434,23 +437,40 @@ export function useGenerator() {
       const refsToGen = project.refs
         .filter((r) => !r.imageUrl && r.status !== 'done' && (r.prompt || r.label))
         .sort((a, b) => (typePriority[a.refType ?? ''] ?? 9) - (typePriority[b.refType ?? ''] ?? 9))
+      let doneRefs = 0
+      setBatchProgress({ current: 0, total: refsToGen.length, label: '参考图' })
       for (const r of refsToGen) {
         await generateRef(r).catch(() => {})
+        doneRefs++
+        setBatchProgress({ current: doneRefs, total: refsToGen.length, label: '参考图' })
       }
       // 2) 分镜定格图
       setStage('shots', '生成分镜定格图')
       const shotsToGen = project.shots.filter((s) => !genImageShots.current.has(s.id))
+      let doneShots = 0
+      setBatchProgress({ current: 0, total: shotsToGen.length, label: '定格图' })
       for (let i = 0; i < shotsToGen.length; i += 3) {
         const batch = shotsToGen.slice(i, i + 3)
-        await Promise.allSettled(batch.map((s) => generateShotImage(s)))
+        await Promise.allSettled(batch.map(async (s) => {
+          await generateShotImage(s)
+          doneShots++
+          setBatchProgress({ current: doneShots, total: shotsToGen.length, label: '定格图' })
+        }))
       }
       // 3) 视频（每批 3 个）
       setStage('videos', '生成视频')
       const shotsForVideo = project.shots.filter((s) => !genVideoShots.current.has(s.id))
+      let doneVideos = 0
+      setBatchProgress({ current: 0, total: shotsForVideo.length, label: '视频' })
       for (let i = 0; i < shotsForVideo.length; i += 3) {
         const batch = shotsForVideo.slice(i, i + 3)
-        await Promise.allSettled(batch.map((s) => generateVideoForShot(s)))
+        await Promise.allSettled(batch.map(async (s) => {
+          await generateVideoForShot(s)
+          doneVideos++
+          setBatchProgress({ current: doneVideos, total: shotsForVideo.length, label: '视频' })
+        }))
       }
+      setBatchProgress(null)
       setStage('done', '完成')
       clearHarnessRun()
     },
@@ -513,11 +533,19 @@ export function useGenerator() {
   // 生成所有视频（并行，每批 3 个；跳过正在进行/刚完成的，避免叠加）
   const generateAllVideos = useCallback(async () => {
     const shots = project.shots.filter((s) => !genVideoShots.current.has(s.id))
+    const total = shots.length
+    let done = 0
+    setBatchProgress({ current: 0, total, label: '视频' })
     for (let i = 0; i < shots.length; i += 3) {
       const batch = shots.slice(i, i + 3)
-      await Promise.allSettled(batch.map((s) => generateVideoForShot(s)))
+      await Promise.allSettled(batch.map(async (s) => {
+        await generateVideoForShot(s)
+        done++
+        setBatchProgress({ current: done, total, label: '视频' })
+      }))
     }
+    setBatchProgress(null)
   }, [project.shots, generateVideoForShot])
 
-  return { generateRef, generateShotImage, generateVideoForShot, generateAllVideos, produceAll, retryVariant, resumeStuckVideos }
+  return { generateRef, generateShotImage, generateVideoForShot, generateAllVideos, produceAll, retryVariant, resumeStuckVideos, batchProgress }
 }

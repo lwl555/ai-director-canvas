@@ -216,20 +216,35 @@ function RefCard({
   onSetMain: () => void
   onRemove: () => void
 }) {
+  const proc = node.status === 'processing'
+  const failed = node.status === 'failed'
   return (
-    <div className={`node node-ref ${selected ? 'sel' : ''} ${node?.isMainRef ? 'main' : ''}`} style={{ left: pos?.x ?? node.x, top: pos?.y ?? node.y }} onPointerDown={onPointerDown}>
+    <div className={`node node-ref ${selected ? 'sel' : ''} ${node?.isMainRef ? 'main' : ''} ${proc ? 'processing' : ''} ${failed ? 'error' : ''}`} style={{ left: pos?.x ?? node.x, top: pos?.y ?? node.y }} onPointerDown={onPointerDown}>
       <div className="node-head">
         <span className="tag tag-ref">{node?.isMainRef ? '★主参考' : '定妆'}</span>
         <span className="node-title">{node.label}</span>
         <button className="node-x" onClick={(e) => { e.stopPropagation(); onRemove() }}>×</button>
       </div>
-      <div className="node-body">
-        {node.imageUrl ? <img src={node.imageUrl} alt={node.label} draggable={false} /> : <div className="node-ph">无图</div>}
+      <div className="node-body" style={{ position: 'relative' }}>
+        {node.imageUrl ? <img src={node.imageUrl} alt={node.label} draggable={false} /> : (
+          <div className={`node-ph ${proc ? 'processing' : ''} ${failed ? 'error' : ''}`}>
+            {proc ? (
+              <>
+                <div className="gen-spinner" />
+                <span className="proc-label">生成中<span className="proc-dots" /></span>
+              </>
+            ) : failed ? (
+              <span>{node.error || '生成失败'}</span>
+            ) : (
+              <span>无图</span>
+            )}
+          </div>
+        )}
       </div>
       <div className="node-foot">
         <button className="btn-xs" onClick={(e) => { e.stopPropagation(); onSetMain() }}>{node?.isMainRef ? '取消主参考' : '设主参考'}</button>
-        <button className="btn-xs" onClick={(e) => { e.stopPropagation(); onGenerate() }} disabled={node.status === 'processing'}>
-          {node.status === 'done' ? '重生成' : '生成图'}
+        <button className="btn-xs" onClick={(e) => { e.stopPropagation(); onGenerate() }} disabled={proc}>
+          {proc ? '生成中' : node.status === 'done' ? '重生成' : '生成图'}
         </button>
       </div>
     </div>
@@ -251,19 +266,36 @@ function ShotCard({
   onGenerate: () => void
   onRemove: () => void
 }) {
+  const proc = node.status === 'processing'
+  const failed = node.status === 'failed'
   return (
-    <div className={`node node-shot ${selected ? 'sel' : ''}`} style={{ left: pos?.x ?? node.x, top: pos?.y ?? node.y }} onPointerDown={onPointerDown}>
+    <div className={`node node-shot ${selected ? 'sel' : ''} ${proc ? 'processing' : ''} ${failed ? 'error' : ''}`} style={{ left: pos?.x ?? node.x, top: pos?.y ?? node.y }} onPointerDown={onPointerDown}>
       <div className="node-head">
         <span className="tag tag-shot">分镜 {node.index}</span>
         <span className="node-title">{node.title}</span>
         <button className="node-x" onClick={(e) => { e.stopPropagation(); onRemove() }}>×</button>
       </div>
-      <div className="node-body">
-        {node.imageUrl ? <img src={node.imageUrl} alt={node.title} draggable={false} /> : <div className="node-ph">{node.status === 'processing' ? '生成中…' : '未生成'}</div>}
+      <div className="node-body" style={{ position: 'relative' }}>
+        {node.imageUrl ? <img src={node.imageUrl} alt={node.title} draggable={false} /> : (
+          <div className={`node-ph ${proc ? 'processing' : ''} ${failed ? 'error' : ''}`}>
+            {proc ? (
+              <>
+                <div className="gen-spinner" />
+                <span className="proc-label">生成定格<span className="proc-dots" /></span>
+              </>
+            ) : failed ? (
+              <span>{node.error || '生成失败'}</span>
+            ) : (
+              <span>未生成</span>
+            )}
+          </div>
+        )}
       </div>
       <div className="node-foot">
         <span className="meta">时长 {node.durationSec}s · {node.cameraMotion}</span>
-        <button className="btn-xs" onClick={(e) => { e.stopPropagation(); onGenerate() }} disabled={node.status === 'processing'}>生成定格</button>
+        <button className="btn-xs" onClick={(e) => { e.stopPropagation(); onGenerate() }} disabled={proc}>
+          {proc ? '生成中' : '生成定格'}
+        </button>
       </div>
     </div>
   )
@@ -285,32 +317,44 @@ function VideoCard({
   onRemove: () => void
 }) {
   const active = (node.variants ?? []).find((v) => v.id === node.activeVariantId) || (node.variants ?? [])[0]
+  const proc = active?.status === 'processing'
+  const failed = active?.status === 'failed'
+  const hasError = (node.variants ?? []).some((v) => v.status === 'failed' && v.error)
   return (
-    <div className={`node node-video ${selected ? 'sel' : ''}`} style={{ left: pos?.x ?? node.x, top: pos?.y ?? node.y }} onPointerDown={onPointerDown}>
+    <div className={`node node-video ${selected ? 'sel' : ''} ${proc ? 'processing' : ''} ${failed ? 'error' : ''}`} style={{ left: pos?.x ?? node.x, top: pos?.y ?? node.y }} onPointerDown={onPointerDown}>
       <div className="node-head">
         <span className="tag tag-video">视频</span>
         <span className="node-title">{node.title}</span>
         <button className="node-x" onClick={(e) => { e.stopPropagation(); onRemove() }}>×</button>
       </div>
-      <div className="node-body">
+      <div className="node-body" style={{ position: 'relative' }}>
         {active?.videoUrl ? (
           <video src={active.videoUrl} controls preload="metadata" />
-        ) : active?.status === 'processing' ? (
-          <div className="node-ph">视频生成中…</div>
+        ) : proc ? (
+          <div className="node-ph processing">
+            <div className="gen-spinner" />
+            <span className="proc-label">视频生成中<span className="proc-dots" /></span>
+          </div>
+        ) : failed ? (
+          <div className="node-ph error">
+            <span>{active?.error || '生成失败'}</span>
+          </div>
         ) : (
           <div className="node-ph">未生成</div>
         )}
         {(node.variants?.length ?? 0) > 1 && (
           <div className="variant-dots">
             {node.variants?.map((v, i) => (
-              <span key={v.id} className={`dot ${v.id === active?.id ? 'on' : ''} ${v.status === 'failed' ? 'fail' : ''}`} title={`版本${i + 1}`} />
+              <span key={v.id} className={`dot ${v.id === active?.id ? 'on' : ''} ${v.status === 'failed' ? 'fail' : ''} ${v.status === 'processing' ? 'processing' : ''}`} title={`版本${i + 1}${v.status === 'processing' ? ' (生成中)' : v.status === 'failed' ? ' (失败)' : v.status === 'done' ? ' (完成)' : ''}`} />
             ))}
           </div>
         )}
       </div>
       <div className="node-foot">
-        <span className="meta">{node.variants?.length ?? 0}版</span>
-        <button className="btn-xs" onClick={(e) => { e.stopPropagation(); onGenerate() }}>生成新版本</button>
+        <span className="meta">{node.variants?.length ?? 0}版{hasError ? ' · ⚠有失败' : ''}</span>
+        <button className="btn-xs" onClick={(e) => { e.stopPropagation(); onGenerate() }} disabled={proc}>
+          {proc ? '生成中' : '生成新版本'}
+        </button>
       </div>
     </div>
   )

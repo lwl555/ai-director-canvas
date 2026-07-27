@@ -221,7 +221,7 @@ body {
 .node-x:hover { color: var(--err); }
 .node-body { padding: 6px; background: var(--ink-900); }
 .node-body img, .node-body video { width: 100%; height: 120px; object-fit: cover; border-radius: var(--radius); background: var(--ink-800); display: block; }
-.node-ph { width: 100%; height: 120px; display: flex; align-items: center; justify-content: center; color: var(--text-faint); font-size: 11px; background: var(--ink-800); border-radius: var(--radius); }
+.node-ph { width: 100%; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-faint); font-size: 11px; background: var(--ink-800); border-radius: var(--radius); gap: 2px; }
 .node-foot { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; gap: 5px; }
 .node-foot .meta { font-size: 9.5px; color: var(--text-faint); font-family: var(--font-mono); }
 .btn-xs { background: var(--ink-800); border: 1px solid var(--line); color: var(--text-dim); border-radius: var(--radius); padding: 4px 8px; font-size: 10.5px; cursor: pointer; font-family: inherit; transition: .12s; }
@@ -232,6 +232,35 @@ body {
 .variant-dots .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--line-strong); }
 .variant-dots .dot.on { background: var(--accent); }
 .variant-dots .dot.fail { background: var(--err); }
+.variant-dots .dot.processing { background: var(--accent); animation: dot-pulse 1s ease-in-out infinite; }
+
+/* ===== Processing / Error visual states ===== */
+.node.processing { border-color: var(--accent); animation: node-glow 1.8s ease-in-out infinite; }
+.node.error { border-color: var(--err); }
+.node-ph.processing { position: relative; overflow: hidden; }
+.node-ph.processing::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(99,102,241,.12), transparent); animation: shimmer 1.5s ease-in-out infinite; }
+.node-ph.error { color: var(--err); border: 1px solid rgba(229,72,77,.25); }
+
+/* CSS spinner */
+.gen-spinner { width: 18px; height: 18px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; margin-bottom: 4px; }
+.gen-spinner.sm { width: 12px; height: 12px; border-width: 1.5px; margin-bottom: 0; }
+
+/* Processing label with animated dots */
+.proc-label { font-size: 10.5px; color: var(--text-dim); letter-spacing: .02em; }
+.proc-dots::after { content: ''; animation: dots 1.4s steps(4) infinite; }
+.proc-dots::after { content: '…'; }
+
+/* Batch progress badge in TopBar */
+.batch-badge { display: inline-flex; align-items: center; gap: 5px; background: rgba(99,102,241,.12); border: 1px solid rgba(99,102,241,.3); border-radius: var(--radius); padding: 3px 8px; font-size: 10.5px; color: var(--accent); font-family: var(--font-mono); margin-left: 6px; }
+
+/* Error mini-badge on cards */
+.node-err-badge { position: absolute; top: 4px; right: 4px; background: var(--err); color: #fff; font-size: 8px; padding: 1px 5px; border-radius: 2px; font-weight: 700; letter-spacing: .05em; z-index: 2; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+@keyframes node-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0); } 50% { box-shadow: 0 0 0 3px rgba(99,102,241,.15); } }
+@keyframes dot-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
+@keyframes dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '…'; } }
 
 .sel-box { position: absolute; border: 1px dashed var(--accent); background: var(--accent-soft); pointer-events: none; }
 
@@ -285,11 +314,14 @@ body {
 .tl-empty { color: var(--text-faint); font-size: 11px; align-self: center; }
 .tl-clip { background: var(--ink-850); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; flex: 0 0 auto; cursor: pointer; min-width: 112px; transition: border-color .12s; }
 .tl-clip:hover { border-color: var(--accent); }
+.tl-clip.processing { border-color: var(--accent); }
+.tl-clip.error { border-color: var(--err); }
 .tl-clip-head { display: flex; gap: 5px; align-items: center; padding: 5px 8px; font-size: 10.5px; }
 .tl-idx { background: var(--accent); color: #fff; width: 16px; height: 16px; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 700; font-family: var(--font-mono); }
 .tl-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tl-clip-body video, .tl-clip-body .tl-ph { width: 100%; height: 58px; object-fit: cover; background: var(--ink-950); display: block; }
-.tl-ph { display: flex; align-items: center; justify-content: center; color: var(--text-faint); font-size: 10.5px; }
+.tl-ph { display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--text-faint); font-size: 10.5px; }
+.tl-ph.processing { color: var(--accent); }
 .tl-clip-foot { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; font-size: 10px; color: var(--text-faint); font-family: var(--font-mono); }
 .tl-clip-foot button { background: transparent; border: none; color: var(--text-faint); cursor: pointer; font-size: 11px; transition: .12s; }
 .tl-clip-foot button:hover { color: var(--text); }

@@ -54,8 +54,10 @@ function TimelineClip({
 }) {
   const active = (node.variants ?? []).find((v) => v.id === node.activeVariantId) || (node.variants ?? [])[0]
   const widthPct = Math.min(Math.max(node.durationSec * 4, 60), 400)
+  const proc = active?.status === 'processing'
+  const failed = active?.status === 'failed'
   return (
-    <div className="tl-clip" style={{ width: widthPct }} onClick={onSelect}>
+    <div className={`tl-clip ${proc ? 'processing' : ''} ${failed ? 'error' : ''}`} style={{ width: widthPct }} onClick={onSelect}>
       <div className="tl-clip-head">
         <span className="tl-idx">{index + 1}</span>
         <span className="tl-title">{node.title}</span>
@@ -63,8 +65,13 @@ function TimelineClip({
       <div className="tl-clip-body">
         {active?.videoUrl ? (
           <video src={active.videoUrl} muted preload="metadata" />
+        ) : proc ? (
+          <div className="tl-ph processing">
+            <div className="gen-spinner sm" />
+            <span style={{ marginTop: 3, fontSize: '9.5px' }}>渲染中</span>
+          </div>
         ) : (
-          <div className="tl-ph">{active?.status === 'processing' ? '渲染中' : '未生成'}</div>
+          <div className="tl-ph">{failed ? '失败' : '未生成'}</div>
         )}
       </div>
       <div className="tl-clip-foot">

@@ -11,7 +11,7 @@ export default function TopBar({
   directorOpen: boolean
 }) {
   const { project, setMeta, reset, supabaseOn, load } = useStore()
-  const { generateAllVideos } = useGenerator()
+  const { generateAllVideos, batchProgress } = useGenerator()
   const [busy, setBusy] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [restoring, setRestoring] = useState(false)
@@ -73,7 +73,12 @@ export default function TopBar({
           智能导演
         </button>
         <button className="btn btn-primary" onClick={onGenAll} disabled={busy}>
-          {busy ? '生成中…' : '生成全部视频'}
+          {busy ? (
+            <>
+              {batchProgress ? `${batchProgress.label} ${batchProgress.current}/${batchProgress.total}` : '生成中'}
+              <span className="gen-spinner sm" style={{ marginLeft: 6, display: 'inline-block', borderTopColor: '#fff' }} />
+            </>
+          ) : '生成全部视频'}
         </button>
         <div className="menu-wrap">
           <button className="btn" onClick={() => setMenuOpen((v) => !v)}>
