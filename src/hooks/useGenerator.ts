@@ -457,26 +457,10 @@ export function useGenerator() {
     [project.refs, project.shots, project.brief, generateRef, generateShotImage, generateVideoForShot]
   )
 
-  // 续跑卡在 processing 的视频变体（关页面/网络中断后残留），断点续跑的核心入口
-  const resumeStuckVideos = useCallback(async () => {
-    const stuck = project.videos.flatMap((v) =>
-      v.variants.filter((vt) => vt.status === 'processing' && !vt.videoUrl).map((vt) => ({ v, vt }))
-    )
-    for (const { v, vt } of stuck) {
-      await retryVariant(v, vt.id).catch(() => {})
-    }
-  }, [project.videos, retryVariant])
-
-  // 生成所有视频（并行，每批 3 个；跳过正在进行/刚完成的，避免叠加）
-  const generateAllVideos = useCallback(async () => {
-    const shots = project.shots.filter((s) => !genVideoShots.current.has(s.id))
-    for (let i = 0; i < shots.length; i += 3) {
-      const batch = shots.slice(i, i + 3)
-      await Promise.allSettled(batch.map((s) => generateVideoForShot(s)))
-    }
-  }, [project.shots, generateVideoForShot])
-
   // 重试单个视频变体（重跑）
+  // ⚠️ 必须声明在 resumeStuckVideos 之前：后者依赖数组引用 retryVariant，
+  // 而依赖数组在每次渲染（useGenerator 执行）时求值，若 retryVariant 在其后才用 const 声明，
+  // 会触发 TDZ（Cannot access 'retryVariant' before initialization），导致整个画布渲染崩溃。
   const retryVariant = useCallback(
     async (video: VideoNode, variantId: string) => {
       const shot = project.shots.find((s) => s.id === video.shotId)
@@ -515,6 +499,25 @@ export function useGenerator() {
     },
     [project, updateVariant]
   )
+
+  // 续跑卡在 processing 的视频变体（关页面/网络中断后残留），断点续跑的核心入口
+  const resumeStuckVideos = useCallback(async () => {
+    const stuck = project.videos.flatMap((v) =>
+      v.variants.filter((vt) => vt.status === 'processing' && !vt.videoUrl).map((vt) => ({ v, vt }))
+    )
+    for (const { v, vt } of stuck) {
+      await retryVariant(v, vt.id).catch(() => {})
+    }
+  }, [project.videos, retryVariant])
+
+  // 生成所有视频（并行，每批 3 个；跳过正在进行/刚完成的，避免叠加）
+  const generateAllVideos = useCallback(async () => {
+    const shots = project.shots.filter((s) => !genVideoShots.current.has(s.id))
+    for (let i = 0; i < shots.length; i += 3) {
+      const batch = shots.slice(i, i + 3)
+      await Promise.allSettled(batch.map((s) => generateVideoForShot(s)))
+    }
+  }, [project.shots, generateVideoForShot])
 
   return { generateRef, generateShotImage, generateVideoForShot, generateAllVideos, produceAll, retryVariant, resumeStuckVideos }
 }
