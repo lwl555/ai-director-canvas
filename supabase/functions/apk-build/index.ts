@@ -98,8 +98,18 @@ async function handleGet(asset: string) {
   }
   if (run.status === 'completed') {
     if (run.conclusion === 'success') {
-      const link = `https://github.com/${REPO}/releases/download/android-build/${asset}`
-      return json({ status: 'done', url: link })
+      // 验证产物确实已发布到 Release，避免 run 成功但上传被跳过导致的假 done
+      const rel = await fetch(`${API}/releases/tags/android-build`, gh({ method: 'GET' }))
+      let assetOk = false
+      if (rel.status === 200) {
+        const rd: any = await rel.json()
+        assetOk = (rd.assets || []).some((a: any) => a.name === asset)
+      }
+      if (assetOk) {
+        const link = `https://github.com/${REPO}/releases/download/android-build/${asset}`
+        return json({ status: 'done', url: link })
+      }
+      return json({ status: 'failed', conclusion: 'missing_asset' })
     }
     return json({ status: 'failed', conclusion: run.conclusion })
   }
