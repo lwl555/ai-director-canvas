@@ -93,6 +93,19 @@ export function ApkBuildModal({ asset, mode, html, name, title, onClose, onFallb
                 ⬇ 下载并安装 APK
               </a>
             </>
+          ) : status.status === 'not_configured' ? (
+            <>
+              <div className="modal-err">⚠️ {(status as any).message || 'APK 构建流水线尚未启用'}</div>
+              <p className="muted" style={{ fontSize: 12.5, lineHeight: 1.7 }}>
+                云端打包 APK 需要仓库里的 GitHub Actions 工作流（当前账号令牌缺少 workflows 写权限，暂无法自动推送）。
+                你仍可用下方按钮下载安卓工程，本机 Android Studio 打开后 Build → Build APK(s) 即可生成可安装包。
+              </p>
+              {onFallback && (
+                <button className="btn-primary block" onClick={onFallback}>
+                  ⬇ 下载安卓工程（自行构建）
+                </button>
+              )}
+            </>
           ) : (
             <>
               <div className="apk-building">

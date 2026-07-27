@@ -4,7 +4,8 @@ const FN_URL =
   (import.meta as any).env?.VITE_SUPABASE_URL?.replace(/\/$/, '') + '/functions/v1/apk-build'
 
 export type BuildStatus =
-  | { status: 'pending' | 'queued' | 'in_progress' | string; url?: undefined }
+  | { status: 'pending' | 'queued' | 'in_progress'; url?: undefined }
+  | { status: 'not_configured'; message?: string }
   | { status: 'done'; url: string }
   | { status: 'failed'; conclusion?: string }
 

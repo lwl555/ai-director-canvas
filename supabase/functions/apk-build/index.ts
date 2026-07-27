@@ -85,6 +85,11 @@ async function handlePost(body: { mode?: string; html?: string; name?: string })
 }
 
 async function handleGet(asset: string) {
+  // 构建工作流尚未部署到 apk-build 分支时，提前告知前端（避免空转）
+  const wf = await fetch(`${API}/contents/.github/workflows/build-apk.yml?ref=${BRANCH}`, gh({ method: 'GET' }))
+  if (wf.status === 404) {
+    return json({ status: 'not_configured', message: 'APK 构建流水线尚未在仓库启用（需要 workflows 写权限）' })
+  }
   const r = await fetch(`${API}/actions/runs?branch=${BRANCH}&event=push&per_page=1`, gh({ method: 'GET' }))
   const j = await r.json()
   const run = j.workflow_runs?.[0]
