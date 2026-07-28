@@ -64,6 +64,34 @@ async function call<T = any>(
 export interface ChatMsg {
   role: 'system' | 'user' | 'assistant'
   content: string
+  /** 用户消息附带的多模态图片（data URL），随消息一起发给模型（OpenAI 兼容 image_url 形态） */
+  images?: string[]
+  /** 用户附加的文档（仅文本）：随消息一起发给模型，但不塞进气泡正文，气泡里只显示名称芯片 */
+  doc?: { name: string; text: string }
+}
+
+/**
+ * 把内部 ChatMsg 转成 OpenAI 兼容 API 的 content 形态：
+ * - 用户消息且带图片 / 文档 → 多模态 parts（text + image_url）
+ * - 其余 → 纯文本字符串
+ * 这样 agnesChat 与 chat.ts 的代理 / 直连路由都能复用同一套转换，向后兼容。
+ */
+export function toApiContent(m: ChatMsg): string | any[] {
+  if (m.role === 'user') {
+    const parts: any[] = []
+    let text = m.content || ''
+    if (m.doc) {
+      text = `【用户附加文档《${m.doc.name}》全文】\n${m.doc.text}\n【文档结束】\n\n` + (text ? `用户留言：\n${text}` : '')
+    }
+    if (text) parts.push({ type: 'text', text })
+    for (const u of (m.images || []).slice(0, 8)) {
+      parts.push({ type: 'image_url', image_url: { url: u } })
+    }
+    if (parts.length === 1 && parts[0].type === 'text') return parts[0].text
+    if (parts.length === 0) return ''
+    return parts
+  }
+  return m.content
 }
 
 export async function agnesChat(
@@ -72,7 +100,12 @@ export async function agnesChat(
   maxTokens = 4096
 ): Promise<string> {
   const data = await call('/v1/chat/completions', {
-    body: { model, messages, max_tokens: Math.min(maxTokens, 8192), stream: false }
+    body: {
+      model,
+      messages: messages.map((m) => ({ role: m.role, content: toApiContent(m) })),
+      max_tokens: Math.min(maxTokens, 8192),
+      stream: false
+    }
   })
   return data?.choices?.[0]?.message?.content ?? ''
 }

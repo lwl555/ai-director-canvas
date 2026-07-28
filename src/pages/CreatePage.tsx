@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { agnesImage, agnesVideoCreate, agnesVideoStatus, agnesChat } from '../lib/agnes'
+import { decodeFileText } from '../lib/textDecode'
 
 type Tab = 'image' | 'video' | 'doc'
 
@@ -201,19 +202,21 @@ function DocParse() {
   const [err, setErr] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
-  function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+  async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]
     if (!f) return
-    if (f.size > 100_000) {
-      setErr('文件过大（>100KB），请粘贴文本内容或使用更小的文件')
+    if (f.size > 200_000) {
+      setErr('文件过大（>200KB），请粘贴文本内容或使用更小的文件')
       return
     }
-    const reader = new FileReader()
-    reader.onload = () => {
-      setText(String(reader.result || ''))
+    try {
+      // 自动探测 UTF-8 / GBK / GB18030，避免 Windows 记事本 ANSI 中文 .txt 乱码
+      const t = await decodeFileText(f)
+      setText(t)
       setErr('')
+    } catch (err: any) {
+      setErr('读取文件失败：' + (err?.message || '未知错误'))
     }
-    reader.readAsText(f)
   }
 
   async function analyze() {
@@ -242,9 +245,9 @@ function DocParse() {
   return (
     <div className="create-panel">
       <h3>文档解析</h3>
-      <p className="muted" style={{ fontSize: 12, margin: '0 0 10px' }}>上传 .txt/.md 文件或直接粘贴文本，AI 自动总结关键要点。支持中英文。</p>
+      <p className="muted" style={{ fontSize: 12, margin: '0 0 10px' }}>上传文件或直接粘贴文本，AI 自动总结关键要点。自动识别 UTF-8 / GBK 编码，解决中文乱码；支持 .txt/.md/.csv/.json/.log/.xml/.html/.js/.ts/.py 等（≤200KB）。</p>
       <div className="create-row" style={{ marginBottom: 8 }}>
-        <input ref={fileRef} type="file" accept=".txt,.md,.text,text/*" onChange={onFile} style={{ display: 'none' }} />
+        <input ref={fileRef} type="file" accept=".txt,.md,.text,.csv,.json,.log,.xml,.html,.js,.ts,.css,.py,.yaml,.yml,text/*" onChange={onFile} style={{ display: 'none' }} />
         <button className="btn-ghost" onClick={() => fileRef.current?.click()}>📁 选择文件</button>
         <span style={{ fontSize: 11, color: 'var(--text-faint)', alignSelf: 'center' }}>{text ? `${text.length} 字` : '或直接粘贴'}</span>
       </div>

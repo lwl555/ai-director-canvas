@@ -244,6 +244,27 @@ async function post(deviceId: string, payload: SyncPayload | null) {
   return (await res.json()) as { payload?: SyncPayload }
 }
 
+// 云同步前清理：图片 data URL 体积大，绝不进云端 payload（避免撑爆 1MB 上限），
+// 仅保留在本机 localStorage；文档正文截断到安全长度。本机 cache 不被改动，
+// 因此同一设备重新加载仍能看到图片。跨设备时图片不会同步（已知取舍）。
+function sanitizeForCloud(p: SyncPayload): SyncPayload {
+  const threads: Record<string, Thread> = {}
+  for (const [k, t] of Object.entries(p.threads)) {
+    threads[k] = {
+      ...t,
+      messages: t.messages.map((m) => {
+        if (!m.images?.length && !m.doc) return m
+        return {
+          ...m,
+          images: undefined,
+          doc: m.doc ? { name: m.doc.name, text: m.doc.text.slice(0, 8000) } : undefined
+        }
+      })
+    }
+  }
+  return { ...p, threads }
+}
+
 export async function push(): Promise<void> {
   if (pushTimer) {
     clearTimeout(pushTimer)
@@ -252,7 +273,7 @@ export async function push(): Promise<void> {
   if (!FN_URL || !ANON) return
   const deviceId = getDeviceId()
   try {
-    await post(deviceId, cache)
+    await post(deviceId, sanitizeForCloud(cache))
   } catch {
     // 离线 / 函数未部署：保持本机即可
   }

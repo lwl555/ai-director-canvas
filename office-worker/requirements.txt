@@ -1,9 +1,0 @@
-fastapi
-uvicorn[standard]
-pydantic
-playwright
-requests
-python-pptx
-python-docx
-openpyxl
-Pillow
