@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { agnesImage, agnesVideoCreate, agnesVideoStatus, agnesChat } from '../lib/agnes'
 
 type Tab = 'image' | 'video' | 'doc'
@@ -76,10 +76,23 @@ function VideoGen() {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState('')
   const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const cancelledRef = useRef(false)
+  const attemptsRef = useRef(0)
+  const MAX_ATTEMPTS = 18 // 18 × 20s ≈ 6 分钟上限，超时即放弃避免无限轮询
+
+  // 卸载时彻底停止轮询，避免对已卸载组件 setstate
+  useEffect(() => {
+    return () => {
+      cancelledRef.current = true
+      if (pollRef.current) clearTimeout(pollRef.current)
+    }
+  }, [])
 
   async function gen() {
     const p = prompt.trim()
     if (!p || busy) return
+    cancelledRef.current = false
+    attemptsRef.current = 0
     setBusy(true)
     setErr('')
     setVideoUrl('')
@@ -93,8 +106,17 @@ function VideoGen() {
 
       // 轮询
       const poll = async () => {
+        if (cancelledRef.current) return
+        if (attemptsRef.current >= MAX_ATTEMPTS) {
+          setStatus('')
+          setErr('生成超时（约 6 分钟），请稍后在画布中重试')
+          setBusy(false)
+          return
+        }
+        attemptsRef.current++
         try {
           const st = await agnesVideoStatus(videoId, taskId)
+          if (cancelledRef.current) return
           if (st.status === 'completed' || st.status === 'done' || st.status === 'succeeded') {
             if (st.video_url) {
               setVideoUrl(st.video_url)
@@ -113,6 +135,7 @@ function VideoGen() {
             pollRef.current = setTimeout(poll, 20_000)
           }
         } catch (e: any) {
+          if (cancelledRef.current) return
           setStatus('')
           setErr(e?.message || '查询状态失败')
           setBusy(false)
@@ -127,6 +150,7 @@ function VideoGen() {
   }
 
   function cancel() {
+    cancelledRef.current = true
     if (pollRef.current) {
       clearTimeout(pollRef.current)
       pollRef.current = null
