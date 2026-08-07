@@ -297,6 +297,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3.5v3M16 3.5v3M7.8 14l2.2 2.2 4.2-4.4"/></svg><h3>待办日程</h3><div class="sp"><span class="mut2" id="tdCnt"></span></div></div><div class="bd"><div class="form"><input class="f2" id="td_t" placeholder="要做的事"><select class="w110 half" id="td_p"><option value="P0">P0紧急</option><option value="P1" selected>P1重要</option><option value="P2">P2常规</option></select><input class="w150 half" id="td_d" type="date"><button class="btn pri" onclick="addTodo()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>添加</button></div><div class="stats" id="tdStats"></div><div id="tdList"></div></div></div>
 </div></section>
 <section class="panel" id="p-ecom"><div class="grid">
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M13.5 6.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0z"/><path d="M17 21a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9z"/><path d="M18.5 4.5h3M20 3v3"/></svg><h3>链接解析</h3><div class="sp"><span class="mut2">粘贴淘宝/京东/拼多多/抖音/小红书链接</span></div></div><div class="bd"><div class="form"><input class="fw" id="ec_url" placeholder="粘贴商品链接（如 https://item.jd.com/...）"><button class="btn pri" onclick="parseProductLink()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>解析商品</button></div><div id="ecParse"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9H7.5z"/><path d="M6 6L5 3H2.5M9 20.5a1 1 0 1 0 0-.1M18 20.5a1 1 0 1 0 0-.1"/></svg><h3>电商文案仿写</h3><div class="sp"><span class="mut2">粘贴爆款 → AI 仿写 + 配图</span></div></div><div class="bd">
 <div class="form"><select class="w150 half" id="ec_pf"><option>小红书</option><option>抖音</option><option>淘宝天猫</option><option>拼多多</option><option>京东</option><option>视频号</option><option>公众号</option><option>亚马逊</option></select><input class="w110 half" id="ec_cnt" type="number" inputmode="numeric" value="3" min="1" max="5" title="生成版本数"></div>
 <textarea id="ec_ref" class="fw" placeholder="粘贴一段参考文案（任意平台均可），AI 会拆解出其结构套路，并仿写成目标平台风格"></textarea>
@@ -552,7 +553,7 @@ async function aiSendFromInput(){var msg=$('ai_input').value.trim();if(!msg&&!ai
   aiImages=[];renderAiAtts();
   try{var headers={'Content-Type':'application/json'};
     if(session&&session.access_token)headers['Authorization']='Bearer '+session.access_token;
-    var body={message:msg,today:todayStr(),history:D.chats.slice(-10).map(function(c){return{role:c.role,content:c.content}}),images:imgs};
+    var body={message:msg,today:todayStr(),history:D.chats.slice(-10).map(function(c){return{role:c.role,content:(c.content||'').replace(/<ACTIONS>[\s\S]*?<\/ACTIONS>/gi,'').trim()}}),images:imgs};
     var r=await fetch(AI_URL,{method:'POST',headers:headers,body:JSON.stringify(body)});
     var d=await r.json();aiHideTyping();
     if(d.reply){var ts2=new Date().toTimeString().slice(0,5);aiAddMsg('bot',d.reply,ts2);D.chats.push({role:'assistant',content:d.reply,ts:ts2});saveLocal();if(d.contextSummary)aiUpdateContext(d.contextSummary);}
@@ -560,7 +561,9 @@ async function aiSendFromInput(){var msg=$('ai_input').value.trim();if(!msg&&!ai
     if(d.actions&&d.actions.length){var res=applyActions(d.actions);
       if(res){var html='<div class="ai-act'+(res.fails.length?' fail':'')+'">'+(res.lines.length?'已为你处理：'+res.lines.join('；'):'')+(res.fails.length?((res.lines.length?'<br>':'')+'⚠ 部分失败：'+res.fails.join('；')):'')+'</div>';
         $('ai_chat').insertAdjacentHTML('beforeend',html);$('ai_chat').scrollTop=$('ai_chat').scrollHeight;}}
+    else if(looksLikeLedger(msg)){var fb=fallbackLedger(msg);if(fb){var res2=applyActions([fb]);if(res2){var html2='<div class="ai-act">已兜底处理：'+res2.lines.join('；')+'</div>';$('ai_chat').insertAdjacentHTML('beforeend',html2);$('ai_chat').scrollTop=$('ai_chat').scrollHeight;}}}
   }catch(e){aiHideTyping();aiAddMsg('bot','网络错误，请检查连接或稍后重试',new Date().toTimeString().slice(0,5));}}
+function fallbackLedger(msg){var kind=/(?:收入|到账|收款|赚了|工资|副业|理财|红包)/.test(msg)?'in':'out';var m=msg.match(/(\d+(?:\.\d+)?)/);if(!m)return null;var amt=parseFloat(m[1]);var cat='其他';var arr=kind==='in'?CATS.in:CATS.out;for(var i=0;i<arr.length;i++){if(msg.indexOf(arr[i])>=0){cat=arr[i];break;}}var note=msg.replace(/[\d元块笔,.]/g,'').trim().slice(0,20);return {type:'add_ledger',date:todayStr(),kind:kind,category:cat,amount:amt,note:note||''};}
 function renderChatHistory(){var chat=$('ai_chat');if(!D.chats||!D.chats.length){chat.innerHTML='<div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>和你的AI助手聊聊吧<br>它了解你工作台上的所有数据</div></div>';return;}chat.innerHTML='';D.chats.forEach(function(c){aiAddMsg(c.role==='assistant'?'bot':'user',c.content,c.ts,c.images);});}
 function aiUpdateContext(s){var html='<svg class="ico s" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.1"/></svg>';if(s.overdue)html+='<span>逾期 <b>'+s.overdue+'</b></span>';if(s.todos)html+='<span>待办 <b>'+s.todos+'</b></span>';if(s.topics)html+='<span>选题 <b>'+s.topics+'</b></span>';if(s.scripts)html+='<span>分镜 <b>'+s.scripts+'</b></span>';if(s.monthlyExpense!==undefined)html+='<span>月支出 <b>¥'+s.monthlyExpense+'</b></span>';if(s.monthlyIncome!==undefined)html+='<span>月收入 <b>¥'+s.monthlyIncome+'</b></span>';  if(!s.overdue&&!s.todos&&!s.topics&&!s.scripts)html+='<span>暂无需要处理的数据</span>';$('ai_ctx').innerHTML=html;}
 
@@ -573,10 +576,13 @@ function renderAiAtts(){var box=$('ai_atts');if(!aiImages.length){box.style.disp
 function aiRmImg(i){if(i>=0&&i<aiImages.length)aiImages.splice(i,1);renderAiAtts();}
 
 // ===== AI 动作执行（ACTIONS 协议）=====
+function parseAmount(v){if(v===undefined||v===null)return 0;if(typeof v==='number')return v;var s=String(v).replace(/[\s,]/g,'');var m=s.match(/(?:^|[^\d])(\d+(?:\.\d+)?)/);return m?parseFloat(m[1]):parseFloat(s)||0;}
+function normalizeKind(v){if(!v)return 'out';var s=String(v).toLowerCase();if(s==='in'||s==='income'||s==='收入'||s==='进账'||s==='到账')return 'in';if(s==='out'||s==='expense'||s==='支出'||s==='花费'||s==='消费')return 'out';return 'out';}
+function looksLikeLedger(msg){if(!msg)return false;var s=String(msg);return /记|记录|记账|支出|收入|花了|赚了|到账|消费|花了|付|转账|收款|报销|工资|红包/.test(s)&&/\d/.test(s);}
 function applyActions(actions){if(!actions||!actions.length)return null;var lines=[],fails=[];
   actions.forEach(function(a){if(!a||!a.type){return;}try{var ok=false;
     switch(a.type){
-      case 'add_ledger':{var cat=a.category||'其他';var kind=a.kind==='in'?'in':'out';if(kind==='out'&&CATS.out.indexOf(cat)<0)cat='其他';if(kind==='in'&&CATS.in.indexOf(cat)<0)cat='其他';D.ledger.push({id:uid(),d:a.date||todayStr(),t:kind,c:cat,a:Number(a.amount)||0,n:a.note||'',ct:todayStr()});ok=true;break;}
+      case 'add_ledger':{var cat=a.category||'其他';var kind=normalizeKind(a.kind);if(kind==='out'&&CATS.out.indexOf(cat)<0)cat='其他';if(kind==='in'&&CATS.in.indexOf(cat)<0)cat='其他';D.ledger.push({id:uid(),d:a.date||todayStr(),t:kind,c:cat,a:parseAmount(a.amount),n:a.note||'',ct:todayStr()});ok=true;break;}
       case 'add_todo':D.todos.push({id:uid(),t:a.title||'未命名待办',p:a.priority||'P2',d:a.due||'',st:'pending',ct:todayStr()});ok=true;break;
       case 'complete_todo':{var tt=(a.title||'').trim();var t=D.todos.find(function(x){return x.st!=='done'&&x.t.indexOf(tt)>=0;});if(t){t.st='done';ok=true;}else fails.push('没找到待办「'+tt+'」');break;}
       case 'add_topic':D.posts.push({id:uid(),t:a.title||'未命名选题',p:a.platform||'小红书',st:'idea',d:a.due||'',ct:todayStr()});ok=true;break;
@@ -648,6 +654,22 @@ async function genEcomImage(prompt){try{
 function ecCopyText(i){if(ecLast.variants[i]&&ecLast.variants[i].body){navigator.clipboard.writeText(ecLast.variants[i].body).then(function(){toast('已复制')},function(){toast('复制失败')});}}
 function ecSaveProduct(i){var v=ecLast.variants[i];if(!v)return;var name=v.title||$('ec_prod').value.trim()||v.angle||'未命名商品';D.products.push({id:uid(),n:name,p:0,c:'',f:(v.tags||[]).join('、'),ct:todayStr()});saveLocal();scheduleCloudSync();renderProducts();toast('已存为商品');}
 function ecCopyImg(){if(ecLastImg)navigator.clipboard.writeText(ecLastImg).then(function(){toast('已复制图片链接')},function(){toast('复制失败')});}
+var ecParseLast=null;
+async function parseProductLink(){var url=$('ec_url').value.trim();if(!url){toast('请输入商品链接');return;}if(!/^https?:\/\//i.test(url)){toast('链接格式不对');return;}if(isOffline||!session){toast('请登录后使用');return;}
+  $('ecParse').innerHTML='<div class="ec-load"><span class="spin"></span>正在解析链接…</div>';
+  try{var headers={'Content-Type':'application/json'};if(session&&session.access_token)headers['Authorization']='Bearer '+session.access_token;
+    var r=await fetch(STUDIO_URL,{method:'POST',headers:headers,body:JSON.stringify({mode:'parse',url:url})});
+    var d=await r.json();if(!r.ok)throw new Error(d.error||'解析失败');
+    ecParseLast=d;renderParseResult(d);
+  }catch(e){$('ecParse').innerHTML='<div class="ec-skel" style="border-color:#E4C3BD;background:var(--rust-l);color:var(--rust)">解析失败：'+esc(e.message)+'</div>';}}
+function renderParseResult(d){
+  var h='<div class="ec-var"><div class="hd2"><span class="tag clay">'+esc(d.platform||'')+'</span><span class="t" style="font-weight:700">'+esc(d.name||'')+'</span>'+(d.price?'<span style="color:var(--olive);font-weight:700">¥'+d.price+'</span>':'')+'</div>';
+  h+='<div class="bodytx">'+(d.category?'<span class="tag">'+esc(d.category)+'</span> ':'')+esc(d.features||'')+'</div>';
+  h+='<div style="display:flex;gap:8px;margin-top:8px"><button class="btn xs" onclick="ecParseToProduct()">加入商品库</button><button class="btn xs" onclick="ecParseToCopy()">生成文案</button><button class="btn xs" onclick="ecParseToImage()">生成配图</button></div></div>';
+  $('ecParse').innerHTML=h;}
+function ecParseToProduct(){if(!ecParseLast)return;var d=ecParseLast;D.products.push({id:uid(),n:d.name||'未命名',p:Number(d.price)||0,c:d.category||'',f:d.features||'',ct:todayStr()});saveLocal();scheduleCloudSync();renderProducts();toast('已加入商品库');}
+function ecParseToCopy(){if(!ecParseLast)return;$('ec_prod').value=ecParseLast.name||'';$('ec_sell').value=(ecParseLast.features||'')+' '+(ecParseLast.price?'¥'+ecParseLast.price:'');$('ec_ref').focus();toast('已填入商品信息，请粘贴参考文案后生成');}
+function ecParseToImage(){if(!ecParseLast||!ecParseLast.imagePrompt){toast('没有可用的配图提示词');return;}genEcomImage(ecParseLast.imagePrompt);}
 function addProduct(){var n=$('pd_n').value.trim();if(!n){toast('请输入商品名');return;}D.products.push({id:uid(),n:n,p:parseFloat($('pd_p').value)||0,c:$('pd_c').value.trim(),f:$('pd_f').value.trim(),ct:todayStr()});$('pd_n').value='';$('pd_p').value='';$('pd_c').value='';$('pd_f').value='';saveLocal();scheduleCloudSync();renderProducts();toast('已加入商品库');}
 function delProduct(id){D.del.products.push(id);D.products=D.products.filter(function(x){return x.id!==id});saveLocal();scheduleCloudSync();renderProducts();}
 function renderProducts(){if(!D.products.length){$('ecProducts').innerHTML='<div class="empty">商品库为空，AI 记账/仿写时可自动入库</div>';$('ecCnt').textContent='0个';return;}
