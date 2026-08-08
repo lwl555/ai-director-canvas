@@ -300,6 +300,16 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 </div>
 <div class="tip" id="tip"><svg class="ico" viewBox="0 0 24 24" style="flex:none"><path d="M12 8.5v5M12 16.6v.1"/><circle cx="12" cy="12" r="9"/></svg><div>数据已积累 <b id="tipN">0</b> 条，建议导出备份。</div><div class="x" onclick="hideTip()"><svg class="ico s" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div></div>
 <div class="today" id="todayBox" onclick="switchTab('top')" style="cursor:pointer"><div class="hd"><svg class="ico b" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.3M12 19.1v2.3M21.4 12h-2.3M4.9 12H2.6M18.6 5.4l-1.6 1.6M7 17l-1.6 1.6M18.6 18.6L17 17M7 7L5.4 5.4"/></svg><h2>今天要处理</h2><div class="cnt"><span id="todayCnt"></span><span class="mut2">点击查看今日详情 →</span></div></div><div class="bd" id="todayList"></div></div>
+<div class="card" id="dlBar" style="border:1.5px solid var(--clay)">
+  <div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.4"/><path d="M10.5 18.5h3"/></svg><h3>下载 APP（手机/电脑都可用）</h3><span class="mut2" style="margin-left:auto;cursor:pointer" onclick="document.getElementById('dlBar').style.display='none'">收起 ✕</span></div>
+  <div class="bd">
+    <div class="form" style="gap:8px">
+      <a class="btn pri" href="https://github.com/lwl555/ai-director-canvas/releases/download/app-latest/personal-hub.apk" download="personal-hub.apk" target="_blank" rel="noopener" style="text-align:center">📱 安卓下载 APK</a>
+      <a class="btn" href="https://github.com/lwl555/ai-director-canvas/releases/download/app-latest/personal-hub-windows.exe" target="_blank" rel="noopener" style="text-align:center">💻 Windows 下载</a>
+    </div>
+    <p class="mut2" style="margin-top:8px;font-size:12.5px">苹果手机：浏览器「分享 → 添加到主屏幕」。装完桌面出现「个人工作台」图标。</p>
+  </div>
+</div>
 <nav class="tabs" id="tabs">
 <button data-t="top"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.3M12 19.1v2.3M21.4 12h-2.3M4.9 12H2.6M18.6 5.4l-1.6 1.6M7 17l-1.6 1.6M18.6 18.6L17 17M7 7L5.4 5.4"/></svg>今日</button>
 <button data-t="media" class="on"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20.2l1-4.3L15.8 5.1a2 2 0 0 1 2.8 0l.4.4a2 2 0 0 1 0 2.8L8.3 19.2 4 20.2z"/><path d="M14.4 6.6l3 3"/></svg>自媒体运营</button>
@@ -919,6 +929,9 @@ window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();def
 window.addEventListener('appinstalled',function(){toast('已安装到设备，从桌面图标打开即可');closeInstall();});
 function openAppDownload(){
   var ua=navigator.userAgent;
+  if(ua.indexOf('MicroMessenger')>-1){ showInAppBrowserTip('微信'); return; }
+  showDownloadDialog(); return;
+
   var isWechat=/MicroMessenger/i.test(ua);
   var isQQ=/\\bQQ\\b/i.test(ua);
   var isWeibo=/Weibo/i.test(ua);
@@ -940,7 +953,17 @@ function openAppDownload(){
   // 安卓/鸿蒙/国产浏览器：直接给 APK 下载浮层（自动触发下载 + 显示手动下载按钮双保险）
   showApkInstallGuide(true);
 }
-var APP_VER='20260808d';
+function showDownloadDialog(){
+  var url=APK_URL||'', ex=EXE_URL||'';
+  var h='';
+  h+='<p class="inst-tip" style="color:var(--clay);font-weight:700;font-size:16px">📲 下载个人工作台 APP</p>';
+  h+='<a class="btn pri inst-btn" href="'+esc(url)+'" download="personal-hub.apk" target="_blank" rel="noopener">📱 安卓手机：下载 APK</a>';
+  h+='<a class="btn inst-btn" href="'+esc(ex)+'" target="_blank" rel="noopener">💻 Windows：下载安装包</a>';
+  h+='<p class="inst-tip" style="margin-top:12px"><b>苹果 iPhone：</b>浏览器底部「分享」→「添加到主屏幕」即获全屏 APP。</p>';
+  h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
+  var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
+}
+var APP_VER='20260808e';
 function triggerApkDownload(){
   if(!APK_URL)return;
   try{
