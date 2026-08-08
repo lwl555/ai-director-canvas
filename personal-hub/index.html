@@ -456,7 +456,12 @@ async function syncFromCloud(){if(isOffline||!session)return;setSyncStatus('sync
     if(D.del.habitLogs.length){var dl=D.del.habitLogs;for(var k in D.hLogs){var pp=k.split('|');if(dl.indexOf(pp[0]+'_'+pp[1])>=0)delete D.hLogs[k];}}
     await syncBudgetFromCloud(token);
     var cr=await fetch(SB_URL+'/rest/v1/ph_ai_chats?select=role,content,created_at&order=created_at.asc',{headers:hG});
-    if(cr.ok){var cs=await cr.json();D.chats=cs.map(function(c){return{role:c.role==='assistant'?'assistant':'user',content:c.content,ts:(c.created_at||'').slice(11,16)}});}
+    if(cr.ok){var cs=await cr.json();
+      var cloud=cs.map(function(c){return{role:c.role==='assistant'?'assistant':'user',content:String(c.content||'').replace(/^\[图片×\d+\]\s*/,''),ts:(c.created_at||'').slice(11,16)};});
+      var seen={},merged=[];
+      D.chats.forEach(function(m){var k=(m.role||'')+'|'+(m.content||'').slice(0,140)+'|'+(m.ts||'');if(!seen[k]){seen[k]=1;merged.push(m);}});
+      cloud.forEach(function(m){var k=(m.role||'')+'|'+(m.content||'').slice(0,140)+'|'+(m.ts||'');if(!seen[k]){seen[k]=1;merged.push(m);}});
+      D.chats=merged;}
     saveLocal();setSyncStatus('ok','已同步');
   }catch(e){console.error(e);setSyncStatus('err','拉取失败');}}
 async function syncHabitsToCloud(token){var hU={'apikey':SB_ANON,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'};var hD={'apikey':SB_ANON,'Authorization':'Bearer '+token};
@@ -637,14 +642,21 @@ function aiRmImg(i){if(i>=0&&i<aiImages.length)aiImages.splice(i,1);renderAiAtts
 function parseAmount(v){if(v===undefined||v===null)return 0;if(typeof v==='number')return v;var s=String(v).replace(/[\s,]/g,'');var m=s.match(/(?:^|[^\d])(\d+(?:\.\d+)?)/);return m?parseFloat(m[1]):parseFloat(s)||0;}
 function normalizeKind(v){if(!v)return 'out';var s=String(v).toLowerCase();if(s==='in'||s==='income'||s==='收入'||s==='进账'||s==='到账')return 'in';if(s==='out'||s==='expense'||s==='支出'||s==='花费'||s==='消费')return 'out';return 'out';}
 function looksLikeLedger(msg){if(!msg)return false;var s=String(msg);return /记|记录|记账|支出|收入|花了|赚了|到账|消费|花了|付|转账|收款|报销|工资|红包/.test(s)&&/\d/.test(s);}
-function findLedger(match){if(!match)return null;match=String(match).trim();var list=D.ledger.slice().sort(function(a,b){return b.d.localeCompare(a.d)});for(var i=0;i<list.length;i++){var x=list[i];var s=(x.n+' '+x.c+' '+x.a).toLowerCase();if(s.indexOf(match.toLowerCase())>=0)return x;}return null;}
+function findLedger(match){if(!match)return null;match=String(match).trim();if(!match)return null;var list=D.ledger.slice().sort(function(a,b){return b.d.localeCompare(a.d)});
+  function hay(x){return (x.n+' '+x.c+' '+x.a).toLowerCase();}
+  function norm(s){return s.toLowerCase().replace(/[\s,，。．、元块笔]/g,'');}
+  var nm=norm(match);
+  for(var i=0;i<list.length;i++){if(norm(hay(list[i])).indexOf(nm)>=0)return list[i];}
+  var tokens=match.toLowerCase().split(/[\s,，。．、元块笔0-9]+/).filter(function(t){return t.length>=1;});
+  if(tokens.length){var best=null,bs=0;for(var j=0;j<list.length;j++){var h=hay(list[j]);var sc=0;tokens.forEach(function(t){if(t&&h.indexOf(t)>=0)sc++;});if(sc>bs){bs=sc;best=list[j];}}if(best&&bs>=Math.ceil(tokens.length/2))return best;}
+  return null;}
 function findTodo(match){if(!match)return null;match=String(match).trim();var list=D.todos.filter(function(x){return x.st!=='done'});for(var i=0;i<list.length;i++){if(list[i].t.toLowerCase().indexOf(match.toLowerCase())>=0)return list[i];}list=D.todos.slice();for(var i=0;i<list.length;i++){if(list[i].t.toLowerCase().indexOf(match.toLowerCase())>=0)return list[i];}return null;}
 function applyActions(actions){if(!actions||!actions.length)return null;var lines=[],fails=[];
   actions.forEach(function(a){if(!a||!a.type){return;}try{var ok=false;
     switch(a.type){
       case 'add_ledger':{var cat=a.category||'其他';var kind=normalizeKind(a.kind);if(kind==='out'&&CATS.out.indexOf(cat)<0)cat='其他';if(kind==='in'&&CATS.in.indexOf(cat)<0)cat='其他';D.ledger.push({id:uid(),d:a.date||todayStr(),t:kind,c:cat,a:parseAmount(a.amount),n:a.note||'',ct:todayStr()});ok=true;break;}
-      case 'edit_ledger':{var x=findLedger(a.match);if(!x){fails.push('没找到要修改的账目「'+esc(a.match)+'」');break;}if(a.date!==undefined)x.d=a.date;if(a.kind!==undefined)x.t=normalizeKind(a.kind);if(a.category!==undefined){var cat=a.category;if(x.t==='out'&&CATS.out.indexOf(cat)<0)cat='其他';if(x.t==='in'&&CATS.in.indexOf(cat)<0)cat='其他';x.c=cat;}if(a.amount!==undefined)x.a=parseAmount(a.amount);if(a.note!==undefined)x.n=a.note;ok=true;break;}
-      case 'delete_ledger':{var x=findLedger(a.match);if(!x){fails.push('没找到要删除的账目「'+esc(a.match)+'」');break;}D.del.ledger.push(x.id);D.ledger=D.ledger.filter(function(r){return r.id!==x.id});ok=true;break;}
+      case 'edit_ledger':{var x=a.id?D.ledger.find(function(r){return r.id===a.id}):findLedger(a.match);if(!x){fails.push('没找到要修改的账目「'+esc(a.match||a.id)+'」');break;}if(a.date!==undefined)x.d=a.date;if(a.kind!==undefined)x.t=normalizeKind(a.kind);if(a.category!==undefined){var cat=a.category;if(x.t==='out'&&CATS.out.indexOf(cat)<0)cat='其他';if(x.t==='in'&&CATS.in.indexOf(cat)<0)cat='其他';x.c=cat;}if(a.amount!==undefined)x.a=parseAmount(a.amount);if(a.note!==undefined)x.n=a.note;ok=true;break;}
+      case 'delete_ledger':{var x=a.id?D.ledger.find(function(r){return r.id===a.id}):findLedger(a.match);if(!x){fails.push('没找到要删除的账目「'+esc(a.match||a.id)+'」');break;}D.del.ledger.push(x.id);D.ledger=D.ledger.filter(function(r){return r.id!==x.id});ok=true;break;}
       case 'add_todo':D.todos.push({id:uid(),t:a.title||'未命名待办',p:a.priority||'P2',d:a.due||'',st:'pending',ct:todayStr()});ok=true;break;
       case 'edit_todo':{var t=findTodo(a.match);if(!t){fails.push('没找到待办「'+esc(a.match)+'」');break;}if(a.title!==undefined)t.t=a.title;if(a.priority!==undefined)t.p=a.priority;if(a.due!==undefined)t.d=a.due;if(a.status!==undefined)t.st=a.status;ok=true;break;}
       case 'delete_todo':{var t=findTodo(a.match);if(!t){fails.push('没找到待办「'+esc(a.match)+'」');break;}D.del.todos.push(t.id);D.todos=D.todos.filter(function(r){return r.id!==t.id});ok=true;break;}
