@@ -231,6 +231,11 @@ mark{background:var(--mustard-l);color:var(--ink);padding:0 2px;border-radius:3p
 .dlg p{margin:0 0 18px;color:var(--ink2);font-size:14.5px;line-height:1.65}
 #dlgP{white-space:pre-line}
 .dlg .row{display:flex;gap:9px;justify-content:flex-end}
+.inst-card{background:var(--card);border:2px solid var(--ink);border-radius:16px;max-width:440px;width:100%;padding:22px 20px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+.inst-card h3{margin:0 0 12px;font-size:19px;font-family:Georgia,"Songti SC",serif;text-align:center}
+.inst-btn{width:100%;font-size:16px;padding:14px;margin-bottom:14px}
+.inst-tip{margin:0 0 13px;color:var(--ink2);font-size:14.5px;line-height:1.7}
+.inst-tip b{color:var(--clay)}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(14px);background:var(--ink);color:var(--paper);padding:11px 19px;border-radius:11px;font-size:14.5px;font-weight:600;z-index:300;opacity:0;pointer-events:none;transition:.24s;max-width:88vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.2)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;line-height:1.9}
@@ -375,6 +380,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <button data-t="ai"><svg class="ico b" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>AI</button>
 </div></div>
 <div class="mask" id="mask"><div class="dlg"><h3 id="dlgT">确认</h3><p id="dlgP"></p><div class="row"><button class="btn ghost" onclick="closeDlg()">取消</button><button class="btn pri" id="dlgOk">确定</button></div></div></div>
+<div class="mask" id="installMask"><div class="inst-card"><h3>安装到手机</h3><div id="instBody"></div><button class="btn ghost" onclick="closeInstall()">关闭</button></div></div>
 <div class="toast" id="toast"></div>
 <script>
 // ===== CONFIG =====
@@ -902,25 +908,43 @@ function renderReminders(){var list=D.reminders||[];var box=$('rem_list');if(!bo
 var EXE_URL='https://github.com/lwl555/ai-director-canvas/releases/download/app-latest/personal-hub-windows.exe';
 var deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;});
-window.addEventListener('appinstalled',function(){toast('已安装到设备，从桌面图标打开即可');});
+window.addEventListener('appinstalled',function(){toast('已安装到设备，从桌面图标打开即可');closeInstall();});
 function openAppDownload(){
   var ua=navigator.userAgent;
-  var isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(ua);
-  if(isMobile && deferredPrompt){
-    deferredPrompt.prompt();
-    var c=deferredPrompt.userChoice; deferredPrompt=null;
-    if(c&&c.then)c.then(function(){}).catch(function(){});
+  var isMobile=/Android|iPhone|iPad|iPod|Mobile|Windows Phone/i.test(ua);
+  var isIOS=/iPhone|iPad|iPod/i.test(ua);
+  var isAndroid=/Android/i.test(ua);
+  if(!isMobile){
+    if(/Windows/i.test(ua) && EXE_URL){ window.open(EXE_URL,'_blank'); toast('开始下载 Windows 版安装包…'); return; }
+    dlgConfirm('获取 APP','桌面端请点上方按钮下载 Windows 版安装包（双击即用）；手机端用浏览器「添加到主屏幕」，即可获得独立全屏的真 APP。','知道了');
     return;
   }
-  if(isMobile){
-    dlgConfirm('装到手机（真 APP）','这是真正的 APP，不是网页书签：\n\n安卓 Chrome：点右上角「⋮」→「安装应用」。\niPhone / iPad：用 Safari 打开 → 底部「分享」→「添加到主屏幕」。\n\n添加后从桌面图标打开，就是专属全屏工作台，离线可用、数据全部存在你手机里。','知道了');
-  }else if(/Windows/i.test(ua)){
-    if(EXE_URL){ window.open(EXE_URL,'_blank'); toast('开始下载 Windows 版安装包…'); return; }
-    dlgConfirm('Windows 桌面版','Windows 桌面版已为你打包完成（约 75MB），双击即可运行，无需安装，数据本地保存。','知道了');
-  }else{
-    dlgConfirm('获取 APP','桌面端请点上方按钮下载 Windows 版安装包；手机端用浏览器「添加到主屏幕」，即可获得独立全屏的真 APP。','知道了');
-  }
+  showMobileInstall(isIOS,isAndroid);
 }
+function showMobileInstall(isIOS,isAndroid){
+  var h='';
+  if(isAndroid && deferredPrompt){
+    h+='<button class="btn pri inst-btn" onclick="doInstall()">一键安装到主屏幕</button>';
+    h+='<p class="inst-tip">点上方按钮，浏览器会弹出「安装」确认，点<b>安装</b>即可。装完就是手机桌面的独立 APP（全屏、离线可用、数据都在你手机里）。</p>';
+  }else if(isAndroid){
+    h+='<p class="inst-tip"><b>安卓 Chrome：</b>点浏览器右上角「⋮」菜单 → 选<b>「安装应用 / 添加到主屏幕」</b>。稍等几秒桌面就会出现工作台图标，点击即开（全屏、离线可用）。</p>';
+    h+='<p class="inst-tip">若没看到该选项，请稍等页面完全加载或刷新一次页面（安装功能需联网首次激活）。</p>';
+  }else if(isIOS){
+    h+='<p class="inst-tip"><b>iPhone / iPad（Safari）：</b><br>① 点底部中间的<b>「分享」</b>按钮（方框带向上箭头）<br>② 向上滑找到并点<b>「添加到主屏幕」</b><br>③ 点右上角<b>「添加」</b><br>完成后桌面出现工作台图标，点击即开（全屏 APP）。</p>';
+  }else{
+    h+='<p class="inst-tip">用手机浏览器打开本页面，按系统提示「安装 / 添加到主屏幕」即可获得独立 APP。</p>';
+  }
+  $('instBody').innerHTML=h;
+  $('installMask').classList.add('on');
+}
+function doInstall(){
+  closeInstall();
+  if(!deferredPrompt){showMobileInstall(false,/Android/i.test(navigator.userAgent));return;}
+  deferredPrompt.prompt();
+  var p=deferredPrompt.userChoice;deferredPrompt=null;
+  if(p&&p.then)p.then(function(){}).catch(function(){});
+}
+function closeInstall(){$('installMask').classList.remove('on');}
 
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded',function(){
@@ -929,6 +953,10 @@ window.addEventListener('DOMContentLoaded',function(){
   var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;
   if(restoreSession()){if(!isTokenExpired()){enterApp();}else{refreshToken().then(function(ok){if(ok)enterApp();else showAuth();});}}
   else{showAuth();loadLocal();}
+  // 注册 Service Worker（仅 https 环境；让手机端可"安装到主屏幕"）
+  if(location.protocol==='https:' && 'serviceWorker' in navigator){
+    navigator.serviceWorker.register('service-worker.js').catch(function(e){console.log('sw reg fail',e.message);});
+  }
 });
 </script>
 </body>
