@@ -923,9 +923,10 @@ function openAppDownload(){
   var isQQ=/\\bQQ\\b/i.test(ua);
   var isWeibo=/Weibo/i.test(ua);
   var isInAppBrowser=isWechat||isQQ||isWeibo;
-  var isMobile=/Android|iPhone|iPad|iPod|Mobile|Windows Phone/i.test(ua);
   var isIOS=/iPhone|iPad|iPod/i.test(ua);
-  var isAndroid=/Android/i.test(ua);
+  // 兼容国产浏览器 UA 被精简/改写的情况：只要非 iOS 的移动设备，一律给安卓安装入口
+  var isMobile=/Mobile|Android|iPhone|iPad|iPod|Windows Phone|HarmonyOS/i.test(ua);
+  var isAndroidLike=isMobile && !isIOS;
   if(isInAppBrowser){
     showInAppBrowserTip(isWechat?'微信':isQQ?'QQ':'微博');
     return;
@@ -935,13 +936,11 @@ function openAppDownload(){
     dlgConfirm('获取 APP','桌面端请点上方按钮下载 Windows 版安装包（双击即用）；手机端用浏览器「添加到主屏幕」，即可获得独立全屏的真 APP。','知道了');
     return;
   }
-  if(isAndroid){
-    if(APK_URL){ triggerApkDownload(); showApkInstallGuide(); return; }
-    showMobileInstall(false,true); return;
-  }
-  showMobileInstall(isIOS,isAndroid);
+  if(isIOS){ showMobileInstall(true,false); return; }
+  // 安卓/鸿蒙/国产浏览器：直接给 APK 下载浮层（自动触发下载 + 显示手动下载按钮双保险）
+  showApkInstallGuide(true);
 }
-var APP_VER='20260808c';
+var APP_VER='20260808d';
 function triggerApkDownload(){
   if(!APK_URL)return;
   try{
@@ -950,16 +949,17 @@ function triggerApkDownload(){
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
   }catch(e){ /* 自动失败则靠弹窗里的直链按钮 */ }
 }
-function showApkInstallGuide(){
+function showApkInstallGuide(autoStart){
   var url=APK_URL||'';
   var h='';
-  h+='<p class="inst-tip" style="color:var(--clay);font-weight:700;font-size:15.5px">📦 安卓安装包已开始下载</p>';
-  h+='<p class="inst-tip">若没自动弹出下载，点下面按钮手动下载：</p>';
-  h+='<a class="btn pri inst-btn" href="'+esc(url)+'" download="personal-hub.apk" target="_blank" rel="noopener">⬇️ 点击下载安装包</a>';
+  h+='<p class="inst-tip" style="color:var(--clay);font-weight:700;font-size:16px">📦 下载安卓 APP 安装包</p>';
+  h+='<a class="btn pri inst-btn" href="'+esc(url)+'" download="personal-hub.apk" target="_blank" rel="noopener" onclick="triggerApkDownload()">⬇️ 点击下载安装包</a>';
   h+='<p class="inst-tip" style="margin-top:14px"><b>安装步骤：</b></p>';
-  h+='<p class="inst-tip">① 下载完成后，下拉通知栏点「<b>personal-hub.apk</b>」文件<br>② 若弹出<b>「禁止安装未知来源应用」</b>→ 点「<b>设置</b>」→ 打开「<b>允许来自此来源的应用</b>」→ 返回继续<br>③ 点「<b>安装</b>」，完成后桌面出现「个人工作台」图标</p>';
-  h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓默认禁止装非应用商店的 APP，这是正常安全提示，按②允许一次即可，不是网页问题。</p>';
+  h+='<p class="inst-tip">① 点上方按钮下载 APK 文件<br>② 下载完成后，下拉通知栏点「<b>personal-hub.apk</b>」<br>③ 若弹<b>「禁止安装未知来源应用」</b>→ 点「<b>设置</b>」→ 打开「<b>允许来自此来源</b>」→ 返回继续<br>④ 点「<b>安装</b>」，完成后桌面出现「个人工作台」图标</p>';
+  h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">提示：若浏览器未自动弹出下载，点上方大按钮即可。部分浏览器会提示风险，选「继续下载/保留」。</p>';
+  h+='<button class="btn sec inst-btn" style="margin-top:10px" onclick="showMobileInstall(false,true)">🏠 不装APK，只添加到主屏幕</button>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
+  if(autoStart){ setTimeout(triggerApkDownload,80); }
 }
 function showInAppBrowserTip(name){
   var url=location.href;
