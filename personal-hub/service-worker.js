@@ -1,15 +1,7 @@
-// 个人工作台 PWA Service Worker
-// 作用：让网站可被"安装到主屏幕"（Android 真一键安装），并支持离线打开。
-const CACHE = 'ph-v2';
-const APP_SHELL = ['./', './index.html'];
-
-self.addEventListener('install', function (e) {
-  self.skipWaiting();
-  e.waitUntil(
-    caches.open(CACHE).then(function (c) { return c.addAll(APP_SHELL).catch(function () { return c.add('./index.html'); }); })
-  );
-});
-
+// 个人工作台 PWA Service Worker — ph-v3
+// 关键策略：页面 HTML 永远优先走网络（保证用户看到最新版），副本仅用于离线兜底。
+const CACHE = 'ph-v3';
+self.addEventListener('install', function (e) { self.skipWaiting(); });
 self.addEventListener('activate', function (e) {
   e.waitUntil(
     caches.keys().then(function (keys) {
@@ -17,21 +9,26 @@ self.addEventListener('activate', function (e) {
     }).then(function () { return self.clients.claim(); })
   );
 });
-
+self.addEventListener('message', function (e) { if (e.data && e.data.type === 'SKIP_WAITING') { self.skipWaiting(); } });
 self.addEventListener('fetch', function (e) {
   var req = e.request;
   if (req.method !== 'GET') return;
-  // 页面导航：优先网络（保证更新），离线时回退缓存
-  if (req.mode === 'navigate') {
+  var url = new URL(req.url);
+  // 页面 HTML：stale-while-revalidate（网络优先取最新，后台更新缓存供离线）
+  if (req.mode === 'navigate' || /\/index\.html$/.test(url.pathname) || /\/personal-hub\/?$/.test(url.pathname)) {
     e.respondWith(
-      fetch(req).catch(function () {
+      fetch(req).then(function (res) {
+        if (res && res.status === 200 && res.type === 'basic') {
+          var copy = res.clone();
+          caches.open(CACHE).then(function (c) { c.put(req, copy); });
+        }
+        return res;
+      }).catch(function () {
         return caches.match(req).then(function (r) { return r || caches.match('./index.html'); });
       })
     );
     return;
   }
   // 其他静态资源：缓存优先，回退网络
-  e.respondWith(
-    caches.match(req).then(function (r) { return r || fetch(req); })
-  );
+  e.respondWith(caches.match(req).then(function (r) { return r || fetch(req); }));
 });

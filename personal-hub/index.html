@@ -936,10 +936,30 @@ function openAppDownload(){
     return;
   }
   if(isAndroid){
-    if(APK_URL){ window.open(APK_URL,'_blank'); toast('开始下载安卓安装包，下载完点文件即可安装'); return; }
-    return;
+    if(APK_URL){ triggerApkDownload(); showApkInstallGuide(); return; }
+    showMobileInstall(false,true); return;
   }
   showMobileInstall(isIOS,isAndroid);
+}
+var APP_VER='20260808c';
+function triggerApkDownload(){
+  if(!APK_URL)return;
+  try{
+    var a=document.createElement('a');
+    a.href=APK_URL; a.download='personal-hub.apk'; a.rel='noopener';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }catch(e){ /* 自动失败则靠弹窗里的直链按钮 */ }
+}
+function showApkInstallGuide(){
+  var url=APK_URL||'';
+  var h='';
+  h+='<p class="inst-tip" style="color:var(--clay);font-weight:700;font-size:15.5px">📦 安卓安装包已开始下载</p>';
+  h+='<p class="inst-tip">若没自动弹出下载，点下面按钮手动下载：</p>';
+  h+='<a class="btn pri inst-btn" href="'+esc(url)+'" download="personal-hub.apk" target="_blank" rel="noopener">⬇️ 点击下载安装包</a>';
+  h+='<p class="inst-tip" style="margin-top:14px"><b>安装步骤：</b></p>';
+  h+='<p class="inst-tip">① 下载完成后，下拉通知栏点「<b>personal-hub.apk</b>」文件<br>② 若弹出<b>「禁止安装未知来源应用」</b>→ 点「<b>设置</b>」→ 打开「<b>允许来自此来源的应用</b>」→ 返回继续<br>③ 点「<b>安装</b>」，完成后桌面出现「个人工作台」图标</p>';
+  h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓默认禁止装非应用商店的 APP，这是正常安全提示，按②允许一次即可，不是网页问题。</p>';
+  var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
 function showInAppBrowserTip(name){
   var url=location.href;
@@ -994,8 +1014,20 @@ window.addEventListener('DOMContentLoaded',function(){
   if(restoreSession()){if(!isTokenExpired()){enterApp();}else{refreshToken().then(function(ok){if(ok)enterApp();else showAuth();});}}
   else{showAuth();loadLocal();}
   // 注册 Service Worker（仅 https 环境；让手机端可"安装到主屏幕"）
+  // 关键：新版本自动激活 + 刷新一次，确保用户不会一直看到旧的缓存页面
   if(location.protocol==='https:' && 'serviceWorker' in navigator){
-    navigator.serviceWorker.register('service-worker.js').catch(function(e){console.log('sw reg fail',e.message);});
+    navigator.serviceWorker.register('service-worker.js').then(function(reg){
+      if(reg.waiting){ reg.waiting.postMessage({type:'SKIP_WAITING'}); }
+      reg.addEventListener('updatefound',function(){
+        var nw=reg.installing; if(!nw)return;
+        nw.addEventListener('statechange',function(){
+          if(nw.state==='installed' && navigator.serviceWorker.controller){ nw.postMessage({type:'SKIP_WAITING'}); }
+        });
+      });
+    }).catch(function(e){console.log('sw reg fail',e.message);});
+    navigator.serviceWorker.addEventListener('controllerchange',function(){
+      if(!window.__swReloaded){ window.__swReloaded=true; location.reload(); }
+    });
   }
 });
 </script>
