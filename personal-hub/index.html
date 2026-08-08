@@ -355,7 +355,14 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg><h3>商品库</h3><div class="sp"><span class="mut2" id="ecCnt"></span></div></div><div class="bd"><div class="form"><input class="f2" id="pd_n" placeholder="商品名"><input class="w110 half" id="pd_p" type="number" inputmode="decimal" step="0.01" placeholder="价格¥"><input class="w150 half" id="pd_c" placeholder="分类"><input class="fw" id="pd_f" placeholder="卖点"><button class="btn pri" onclick="addProduct()">加入</button></div><div id="ecProducts"></div></div></div>
 </div></section>
 <section class="panel" id="p-hot"><div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>今日热度榜</h3><div class="sp"><span class="mut2" id="hotUpd"></span></div></div><div class="bd">
-<div class="hot-src" id="hotSrc"></div>
+<div class="hot-src" id="hotSrc">
+<button type="button" data-h="weibo" class="on" onclick="loadHot('weibo')">微博热搜</button>
+<button type="button" data-h="zhihu" onclick="loadHot('zhihu')">知乎热榜</button>
+<button type="button" data-h="douyin" onclick="loadHot('douyin')">抖音热点</button>
+<button type="button" data-h="toutiao" onclick="loadHot('toutiao')">头条热榜</button>
+<button type="button" data-h="bilibili" onclick="loadHot('bilibili')">B站热榜</button>
+<button type="button" data-h="baidu" onclick="loadHot('baidu')">百度热搜</button>
+</div>
 <div class="form"><input class="fw" id="hotSearch" placeholder="搜索榜单内容…" oninput="searchHot()"></div>
 <div class="stats" id="hotStats" style="display:none"></div>
 <div id="hotList"><div class="empty">选择上方平台查看实时热榜</div></div>
@@ -787,7 +794,7 @@ var HOT_LIST=[['weibo','微博热搜'],['zhihu','知乎热榜'],['douyin','抖�
 var HOT_DIRECT={weibo:'https://60s.viki.moe/v2/weibo?cache=true',zhihu:'https://60s.viki.moe/v2/zhihu?cache=true',douyin:'https://60s.viki.moe/v2/douyin?cache=true',toutiao:'https://60s.viki.moe/v2/toutiao?cache=true'};
 function map60(d){var arr=Array.isArray(d&&d.data)?d.data:[];return arr.slice(0,50).map(function(x,i){return {rank:i+1,title:String(x.title||'').trim(),desc:String(x.detail||x.desc||'').slice(0,120),hot:Number(x.hot_value)||Number(x.hot)||0,url:x.link||x.url||''};}).filter(function(x){return x.title;});}
 var hotCur='weibo',hotCache=null,hotLoaded=false;
-function initHot(){var h='';HOT_LIST.forEach(function(s){h+='<button data-h="'+s[0]+'" class="'+(s[0]===hotCur?'on':'')+'" onclick="loadHot(\''+s[0]+'\')">'+s[1]+'</button>';});$('hotSrc').innerHTML=h;}
+function initHot(){$('hotSrc').querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.dataset.h===hotCur);});}
 function fmtHot(n){if(!n)return'';if(n>=1e8)return (n/1e8).toFixed(1)+'亿';if(n>=1e4)return (n/1e4).toFixed(1)+'万';return String(n);}
 function highlight(text,q){if(!text)return'';var idx=text.toLowerCase().indexOf(q.toLowerCase());if(idx<0)return esc(text);return esc(text.slice(0,idx))+'<mark>'+esc(text.slice(idx,idx+q.length))+'</mark>'+esc(text.slice(idx+q.length));}
 function hotRowHtml(it,q){var t=q?highlight(it.title,q):esc(it.title);var d=q?highlight(it.desc,q):esc(it.desc||'');var rk=it.rank<=3?' t'+it.rank:'';var v=it.hot?fmtHot(it.hot):'';
@@ -911,15 +918,43 @@ window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();def
 window.addEventListener('appinstalled',function(){toast('已安装到设备，从桌面图标打开即可');closeInstall();});
 function openAppDownload(){
   var ua=navigator.userAgent;
+  var isWechat=/MicroMessenger/i.test(ua);
+  var isQQ=/\\bQQ\\b/i.test(ua);
+  var isWeibo=/Weibo/i.test(ua);
+  var isInAppBrowser=isWechat||isQQ||isWeibo;
   var isMobile=/Android|iPhone|iPad|iPod|Mobile|Windows Phone/i.test(ua);
   var isIOS=/iPhone|iPad|iPod/i.test(ua);
   var isAndroid=/Android/i.test(ua);
+  if(isInAppBrowser){
+    showInAppBrowserTip(isWechat?'微信':isQQ?'QQ':'微博');
+    return;
+  }
   if(!isMobile){
     if(/Windows/i.test(ua) && EXE_URL){ window.open(EXE_URL,'_blank'); toast('开始下载 Windows 版安装包…'); return; }
     dlgConfirm('获取 APP','桌面端请点上方按钮下载 Windows 版安装包（双击即用）；手机端用浏览器「添加到主屏幕」，即可获得独立全屏的真 APP。','知道了');
     return;
   }
   showMobileInstall(isIOS,isAndroid);
+}
+function showInAppBrowserTip(name){
+  var url=location.href;
+  var h='<p class="inst-tip" style="color:var(--clay);font-weight:700;font-size:15.5px">⚠️ '+name+' 里装不了 APP</p>';
+  h+='<p class="inst-tip">'+name+' 内置浏览器不支持把网页装成 APP（PWA 安装功能被 '+name+' 屏蔽，这是 '+name+' 的限制，不是网页问题）。</p>';
+  h+='<p class="inst-tip"><b>正确做法：</b>点 '+name+' 右上角「···」→「<b>在浏览器中打开</b>」，用<b>手机自带浏览器 / Chrome / Safari</b>打开本页面，然后点「下载 APP」就能装成独立 APP。</p>';
+  h+='<p class="inst-tip" style="margin-top:14px"><b>一键复制链接：</b></p>';
+  h+='<div class="form" style="gap:8px"><input class="fw" id="copyUrl" value="'+esc(url)+'" readonly style="font-size:13px;padding:9px 11px"><button class="btn pri" onclick="copyInstallUrl()">📋 复制链接</button></div>';
+  h+='<p class="inst-tip" style="margin-top:10px;font-size:12px;color:var(--ink3)">复制后，'+name+' 里点右上角「···」→「浏览器打开」即可。也可以把链接发给"文件传输助手"自己点开。</p>';
+  $('instBody').innerHTML=h;
+  $('installMask').classList.add('on');
+}
+function copyInstallUrl(){
+  var inp=document.getElementById('copyUrl');
+  if(!inp)return;
+  inp.select();inp.setSelectionRange(0,99999);
+  var ok=false;
+  try{ ok=document.execCommand('copy'); }catch(e){}
+  if(navigator.clipboard && !ok){navigator.clipboard.writeText(inp.value).then(function(){toast('链接已复制，去浏览器粘贴打开');}).catch(function(){toast('复制失败，请长按输入框手动复制');});return;}
+  toast(ok?'链接已复制，去浏览器粘贴打开':'复制失败，请长按输入框手动复制');
 }
 function showMobileInstall(isIOS,isAndroid){
   var h='';

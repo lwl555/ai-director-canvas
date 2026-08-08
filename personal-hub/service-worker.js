@@ -1,6 +1,6 @@
 // 个人工作台 PWA Service Worker
 // 作用：让网站可被"安装到主屏幕"（Android 真一键安装），并支持离线打开。
-const CACHE = 'ph-v1';
+const CACHE = 'ph-v2';
 const APP_SHELL = ['./', './index.html'];
 
 self.addEventListener('install', function (e) {
