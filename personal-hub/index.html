@@ -873,29 +873,27 @@ function renderTop(){
 }
 function setWeatherCity(){var c=$('wcity').value.trim();D.wcity=c;saveLocal();$('wcity').value='';weatherCache=null;fetchWeather(c);toast(c?('已切换到 '+c):'已恢复自动定位');}
 function locateWeather(){if(!navigator.geolocation){toast('当前环境不支持定位');return;}$('weatherCity').textContent='定位中…';navigator.geolocation.getCurrentPosition(function(pos){weatherCache=null;var c=pos.coords.latitude+','+pos.coords.longitude;D.wcity=c;saveLocal();fetchWeather(c,true);},function(){toast('定位失败，请手动选择城市');},{enableHighAccuracy:true,timeout:10000,maximumAge:0});}
-// 根据经纬度反查中文城市名（免费 OpenStreetMap 反地理编码，支持中文，无需 key）
-async function reverseCity(lat,lon){try{var r=await fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lon+'&accept-language=zh-CN&zoom=10',{headers:{'Accept':'application/json'}});if(!r.ok)return '';var d=await r.json();var a=d.address||{};return a.city||a.town||a.county||a.state||(d.display_name?d.display_name.split(',')[0]:'')||'';}catch(e){return '';}}
+// WMO 天气代码 → 中文描述 + 图标（Open-Meteo 使用 WMO 标准代码）
+function wmoZh(code){var m={0:['晴','☀'],1:['基本晴朗','☀'],2:['局部多云','⛅'],3:['阴','☁'],45:['雾','🌫'],48:['雾凇','🌫'],51:['毛毛雨','🌧'],53:['小雨','🌧'],55:['中雨','🌧'],56:['冻毛毛雨','🌧'],57:['冻雨','🌧'],61:['小雨','🌧'],63:['中雨','🌧'],65:['大雨','🌧'],66:['冻雨','🌧'],67:['强冻雨','🌧'],71:['小雪','❄'],73:['中雪','❄'],75:['大雪','❄'],77:['雪粒','❄'],80:['阵雨','🌧'],81:['强阵雨','🌧'],82:['暴雨','🌧'],85:['阵雪','❄'],86:['强阵雪','❄'],95:['雷阵雨','⛈'],96:['雷阵雨伴冰雹','⛈'],99:['强雷暴伴冰雹','⛈']};return m[code]||['未知','🌡'];}
+// 城市名 → 经纬度（Open-Meteo 地理编码，自带中文名，无需 key）
+async function geoCity(name){try{var r=await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(name)+'&language=zh&count=1');if(!r.ok)return null;var d=await r.json();if(!d.results||!d.results.length)return null;var x=d.results[0];return {lat:x.latitude,lon:x.longitude,name:x.name};}catch(e){return null;}}
+// 经纬度 → 最近中文城市名（Open-Meteo 反向：先用坐标取天气，再用坐标反查地名）
+async function reverseCity(lat,lon){try{var r=await fetch('https://geocoding-api.open-meteo.com/v1/search?latitude='+lat+'&longitude='+lon+'&language=zh&count=1');if(!r.ok)return '';var d=await r.json();return (d.results&&d.results[0])?d.results[0].name:'';}catch(e){return '';}}
 async function fetchWeather(loc, isCoord){try{
-  var url='https://wttr.in/'+(loc?encodeURIComponent(loc):'')+'?format=j1&lang=zh';
+  var lat,lon,city='';
+  if(isCoord){var p=loc.split(',');lat=parseFloat(p[0]);lon=parseFloat(p[1]);}
+  else {var g=await geoCity(loc);if(!g)throw new Error('city not found');lat=g.lat;lon=g.lon;city=g.name;}
+  var url='https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FShanghai&forecast_days=3';
   var r=await fetch(url);if(!r.ok)throw new Error('weather unavailable');var d=await r.json();weatherCache=d;
-  var cur=d.current_condition[0];
-  // 位置名：手动城市直接用输入；经纬度反查中文城市名
-  var city='';
-  if(isCoord){city=await reverseCity(loc.split(',')[0],loc.split(',')[1]);}
-  else if(loc){city=loc;}
-  if(!city){var area=(d.nearest_area&&d.nearest_area[0]);if(area){city=(area.areaName&&area.areaName[0]&&area.areaName[0].value)||(area.region&&area.region[0]&&area.region[0].value)||'本地';}}
-  $('weatherCity').textContent=city||'本地';
-  // 天气描述优先用中文，没有则把英文对照翻译成中文
-  var desc=cur.lang_zh&&cur.lang_zh[0]?cur.lang_zh[0].value:zhDesc(cur.weatherDesc[0].value);
-  $('weatherBox').innerHTML='<div class="w-now"><div class="w-temp">'+cur.temp_C+'°C</div><div class="w-info"><div>'+desc+'</div><div class="mut2">湿度 '+cur.humidity+'% · 体感 '+cur.FeelsLikeC+'°C</div></div></div><div class="w-advice">'+weatherAdvice(cur)+'</div>';
-  var fc=d.weather.slice(0,3);var fh='';fc.forEach(function(w){var fd=w.hourly[4]||w.hourly[0];var fdesc=zhDesc(fd.weatherDesc[0].value);fh+='<div class="f-day"><div class="f-date">'+(w.date===todayStr()?'今天':w.date.slice(5))+'</div><div class="f-icon">'+weatherIcon(fdesc)+'</div><div class="f-temp">'+w.mintempC+'° / '+w.maxtempC+'°</div><div class="f-desc">'+fdesc+'</div></div>';});$('forecastBox').innerHTML=fh;
+  if(isCoord){city=await reverseCity(lat,lon);}
+  $('weatherCity').textContent=city||'当前位置';
+  var cur=d.current; var cz=wmoZh(cur.weather_code);
+  $('weatherBox').innerHTML='<div class="w-now"><div class="w-temp">'+Math.round(cur.temperature_2m)+'°C</div><div class="w-info"><div>'+cz[1]+' '+cz[0]+'</div><div class="mut2">湿度 '+cur.relative_humidity_2m+'% · 体感 '+Math.round(cur.apparent_temperature)+'°C</div></div></div><div class="w-advice">'+weatherAdvice(cur.temperature_2m)+'</div>';
+  var fc=d.daily; var fh='';
+  for(var i=0;i<Math.min(3,fc.time.length);i++){var fz=wmoZh(fc.weather_code[i]);var dt=fc.time[i];fh+='<div class="f-day"><div class="f-date">'+(dt===todayStr()?'今天':dt.slice(5))+'</div><div class="f-icon">'+fz[1]+'</div><div class="f-temp">'+Math.round(fc.temperature_2m_min[i])+'° / '+Math.round(fc.temperature_2m_max[i])+'°</div><div class="f-desc">'+fz[0]+'</div></div>';}
+  $('forecastBox').innerHTML=fh;
 }catch(e){$('weatherBox').innerHTML='<div class="w-loading">天气暂时获取不到，稍后再试</div>';$('forecastBox').innerHTML='';}}
-// 英文天气描述 → 中文（wttr.in 某些情况下 lang_zh 缺失时兜底）
-function zhDesc(en){var m={'Sunny':'晴','Clear':'晴','Partly cloudy':'多云','Cloudy':'阴','Overcast':'阴','Mist':'薄雾','Fog':'雾','Patchy rain possible':'局部有雨','Patchy rain nearby':'局部有雨','Light rain':'小雨','Light drizzle':'毛毛雨','Moderate rain':'中雨','Heavy rain':'大雨','Light rain shower':'阵雨','Moderate or heavy rain shower':'强阵雨','Thundery outbreaks possible':'可能有雷阵雨','Patchy light rain':'零星小雨','Moderate or heavy rain':'中到大雨','Light rain shower':'阵雨','Patchy light drizzle':'零星毛毛雨','Blizzard':'暴风雪','Light snow':'小雪','Moderate snow':'中雪','Heavy snow':'大雪','Light snow showers':'阵雪','Patchy snow possible':'局部有雪','Freezing fog':'冻雾','Ice pellets':'冰粒','Sleet':'雨夹雪'};return m[en]||en;}
-function weatherAdvice(cur){var t=parseInt(cur.temp_C);if(t>=35)return '高温预警，多喝水、少暴晒。';if(t>=28)return '天气较热，适合清爽出行。';if(t>=18)return '温度舒适，正是高效工作的好天气。';if(t>=10)return '有点凉，记得带件外套。';if(t>=0)return '天气寒冷，注意保暖。';return '气温很低，出门务必穿暖。';}
-function weatherIcon(desc){if(/雨/.test(desc))return '🌧';if(/雪|冰/.test(desc))return '❄';if(/雾|霾/.test(desc))return '🌫';if(/阴|多云|云/.test(desc))return '☁';if(/晴/.test(desc))return '☀';return '⛅';}
-function weatherAdvice(cur){var t=parseInt(cur.temp_C);if(t>=35)return '高温预警，多喝水、少暴晒。';if(t>=28)return '天气较热，适合清爽出行。';if(t>=18)return '温度舒适，正是高效工作的好天气。';if(t>=10)return '有点凉，记得带件外套。';if(t>=0)return '天气寒冷，注意保暖。';return '气温很低，出门务必穿暖。';}
-function weatherIcon(desc){if(/雨/.test(desc))return '🌧';if(/云|阴/.test(desc))return '☁';if(/晴/.test(desc))return '☀';if(/雪/.test(desc))return '❄';return '⛅';}
+function weatherAdvice(t){t=parseInt(t);if(t>=35)return '高温预警，多喝水、少暴晒。';if(t>=28)return '天气较热，适合清爽出行。';if(t>=18)return '温度舒适，正是高效工作的好天气。';if(t>=10)return '有点凉，记得带件外套。';if(t>=0)return '天气寒冷，注意保暖。';return '气温很低，出门务必穿暖。';}
 
 // ===== 提醒 / 通知（Capacitor 原生优先，桌面降级）=====
 var APP_DOWNLOAD_URL=''; // 构建好 APK 后填入托管地址；为空时引导用浏览器“添加到主屏幕”
@@ -978,7 +976,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260809a';
+var APP_VER='20260809b';
 function triggerApkDownload(){
   if(!APK_URL)return;
   try{
