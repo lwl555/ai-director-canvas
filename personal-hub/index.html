@@ -7,6 +7,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="工作台">
 <title>个人工作台</title>
+<meta name="theme-color" content="#C15A2B">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoi5Liq5Lq65bel5L2c5Y+wIiwic2hvcnRfbmFtZSI6IuW3peS9nOWPsCIsInN0YXJ0X3VybCI6Ii4iLCJzY29wZSI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsIm9yaWVudGF0aW9uIjoicG9ydHJhaXQiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiI0YzRUVFMyIsInRoZW1lX2NvbG9yIjoiI0MxNUEyQiIsImljb25zIjpbeyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSGRwWkhSb1BTSXhPVElpSUdobGFXZG9kRDBpTVRreUlpQjJhV1YzUW05NFBTSXdJREFnTVRreUlERTVNaUkrUEhKbFkzUWdkMmxrZEdnOUlqRTVNaUlnYUdWcFoyaDBQU0l4T1RJaUlISjRQU0kwTUNJZ1ptbHNiRDBpSTBNeE5VRXlRaUl2UGp4MFpYaDBJSGc5SWprMklpQjVQU0l4TXpRaUlHWnZiblF0YzJsNlpUMGlNVEUySWlCMFpYaDBMV0Z1WTJodmNqMGliV2xrWkd4bElpQm1hV3hzUFNJalJrSkdPRVl4SWlCbWIyNTBMV1poYldsc2VUMGlSMlZ2Y21kcFlTeHpaWEpwWmlJKzViZWxQQzkwWlhoMFBqd3ZjM1puUGc9PSIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn0seyJzcmMiOiJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSGRwWkhSb1BTSXhPVElpSUdobGFXZG9kRDBpTVRreUlpQjJhV1YzUW05NFBTSXdJREFnTVRreUlERTVNaUkrUEhKbFkzUWdkMmxrZEdnOUlqRTVNaUlnYUdWcFoyaDBQU0l4T1RJaUlISjRQU0kwTUNJZ1ptbHNiRDBpSTBNeE5VRXlRaUl2UGp4MFpYaDBJSGc5SWprMklpQjVQU0l4TXpRaUlHWnZiblF0YzJsNlpUMGlNVEUySWlCMFpYaDBMV0Z1WTJodmNqMGliV2xrWkd4bElpQm1hV3hzUFNJalJrSkdPRVl4SWlCbWIyNTBMV1poYldsc2VUMGlSMlZ2Y21kcFlTeHpaWEpwWmlJKzViZWxQQzkwWlhoMFBqd3ZjM1puUGc9PSIsInNpemVzIjoiNTEyeDUxMiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTkyIDE5MiI+PHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSI0MCIgZmlsbD0iI0MxNUEyQiIvPjx0ZXh0IHg9Ijk2IiB5PSIxMzQiIGZvbnQtc2l6ZT0iMTE2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjRkJGOEYxIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiI+5belPC90ZXh0Pjwvc3ZnPg==">
 <style>
 :root{--paper:#F3EEE3;--card:#FBF8F1;--sand:#EFE7D7;--sand2:#E7DCC7;--ink:#241F1B;--ink2:#6E6357;--ink3:#9A8E7F;--line:#DFD5C2;--line2:#CDBFA6;--clay:#C15A2B;--clay-d:#9C4520;--clay-l:#F5E3D6;--olive:#5F7043;--olive-l:#E7EBDC;--mustard:#C0891F;--mustard-l:#F7EBD1;--rust:#B2382C;--rust-l:#F8E0DC;--r:14px;--sh:0 1px 2px rgba(60,45,25,.06),0 6px 18px rgba(60,45,25,.05)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -226,6 +229,7 @@ mark{background:var(--mustard-l);color:var(--ink);padding:0 2px;border-radius:3p
 .dlg{background:var(--card);border:2px solid var(--ink);border-radius:16px;max-width:420px;width:100%;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
 .dlg h3{margin:0 0 8px;font-size:18px;font-family:Georgia,"Songti SC",serif}
 .dlg p{margin:0 0 18px;color:var(--ink2);font-size:14.5px;line-height:1.65}
+#dlgP{white-space:pre-line}
 .dlg .row{display:flex;gap:9px;justify-content:flex-end}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(14px);background:var(--ink);color:var(--paper);padding:11px 19px;border-radius:11px;font-size:14.5px;font-weight:600;z-index:300;opacity:0;pointer-events:none;transition:.24s;max-width:88vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.2)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -305,13 +309,14 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="card greet"><div class="bd"><div class="greet-main"><div class="greet-tx" id="greetTx">你好 👋</div><div class="greet-sub" id="greetSub">今天也是充满可能的一天</div></div><div class="weather" id="weatherBox"><div class="w-loading">正在获取天气…</div></div></div></div>
 <div class="grid g2">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><h3>今日概览</h3></div><div class="bd"><div class="stats" id="topStats"></div><div id="topToday"></div></div></div>
-<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>未来天气</h3><div class="sp"><span class="mut2" id="weatherCity">定位中…</span></div></div><div class="bd"><div class="forecast" id="forecastBox"></div></div></div>
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>未来天气</h3><div class="sp"><span class="mut2" id="weatherCity">定位中…</span></div></div><div class="bd"><div class="form" style="margin-bottom:10px"><input id="wcity" class="f1" placeholder="城市，如 上海 / Shanghai" style="min-height:38px"><button class="btn pri sm" onclick="setWeatherCity()">设置</button><button class="btn sm ghost" onclick="locateWeather()" title="使用浏览器GPS定位">📍 自动定位</button></div><div class="forecast" id="forecastBox"></div></div></div>
 </div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>提醒中心</h3><div class="sp"><span class="mut2" id="notifState"></span></div></div><div class="bd">
 <div class="form"><input id="rem_min" type="number" inputmode="numeric" placeholder="分钟后" style="width:92px;min-height:40px"><input id="rem_txt" class="f1" placeholder="提醒内容（如：该起来走走了）"><button class="btn pri" onclick="scheduleCountdown()">倒计时提醒</button></div>
 <div class="form" style="margin-top:10px"><span class="mut" style="white-space:nowrap">每日日记</span><input id="rem_diary" type="time" style="width:120px;min-height:40px"><button class="btn" onclick="scheduleDiaryReminder()">设定</button><button class="btn ghost" onclick="cancelDiaryReminder()">取消</button></div>
 <div class="mut2" style="margin-top:10px;line-height:1.8" id="rem_list"></div>
 </div></div>
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v5h5M8 13h8M8 17h5"/></svg><h3>今日日记</h3><div class="sp"><span class="mut2" id="diaryCount"></span></div></div><div class="bd"><div class="form"><input id="td_mood" class="w130 half" placeholder="心情（如 开心）"><textarea id="td_diary" class="fw" rows="2" placeholder="今天想记录点什么…"></textarea><button class="btn pri" onclick="saveTodayDiary()">保存日记</button></div><div id="diaryRecent"></div></div></div>
 </section>
 <section class="panel on" id="p-media"><div class="grid">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16.5" rx="2"/><path d="M3 9h18M9 9v11.5M15 9v11.5"/></svg><h3>选题看板</h3><div class="sp"><span class="mut2" id="postCnt"></span></div></div><div class="bd"><div class="form"><input class="f2" id="po_t" placeholder="选题标题"><select class="w130 half" id="po_p"><option>小红书</option><option>抖音</option><option>视频号</option><option>B站</option><option>公众号</option><option>知乎</option></select><input class="w150 half" id="po_d" type="date" title="计划发布日"><button class="btn pri" onclick="addPost()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>加入看板</button></div><div class="kb" id="kanban"></div></div></div>
@@ -380,7 +385,7 @@ var STUDIO_URL='https://wcnssyiqitugqfmcbdhe.functions.supabase.co/ai-studio';
 var SK='ph_session_v1',DK='ph_data_v1';
 var session=null,isOffline=false,curTab='media',syncTimer=null;
 var D=defaultD();
-function defaultD(){return {posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],ledger:[],habits:[],hLogs:{},todos:[],products:[],diary:[],budget:0,chats:[],reminders:[],del:{posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],ledger:[],todos:[],habits:[],habitLogs:[],products:[],diary:[]}};}
+function defaultD(){return {posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],ledger:[],habits:[],hLogs:{},todos:[],products:[],diary:[],budget:0,chats:[],reminders:[],wcity:'',del:{posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],ledger:[],todos:[],habits:[],habitLogs:[],products:[],diary:[]}};}
 function defaultDel(){return {posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],ledger:[],todos:[],habits:[],habitLogs:[],products:[],diary:[]};}
 var CATS={out:['餐饮','交通','购物','住房','娱乐','医疗','教育','其他'],in:['工资','副业','理财','红包','其他']};
 
@@ -561,6 +566,8 @@ function addTodo(){var t=$('td_t').value.trim();if(!t){toast('请输入待办内
 function addDiary(){var c=$('dr_c').value.trim();if(!c){toast('请写点什么');return;}D.diary.push({id:uid(),d:$('dr_d').value||todayStr(),m:$('dr_m').value.trim()||'无',c:c,ct:todayStr()});$('dr_c').value='';$('dr_m').value='';saveLocal();scheduleCloudSync();renderDiary();renderToday();toast('日记已保存');}
 function delDiary(id){D.del.diary.push(id);D.diary=D.diary.filter(function(x){return x.id!==id});saveLocal();scheduleCloudSync();renderDiary();renderToday();}
 function renderDiary(){if($('dr_d'))$('dr_d').value=todayStr();var html='';D.diary.slice().sort(function(a,b){return b.d.localeCompare(a.d)}).forEach(function(x){html+='<div class="item"><div class="main"><div class="t">'+fmtDate(x.d)+' <span class="tag clay">'+esc(x.m)+'</span></div><div class="s" style="white-space:pre-wrap;line-height:1.5">'+esc(x.c)+'</div></div><div class="acts"><button class="iconbtn del" onclick="delDiary(\''+x.id+'\')"><svg class="ico s" viewBox="0 0 24 24"><path d="M4 6.5h16M9.5 6.5V4.8a1.3 1.3 0 0 1 1.3-1.3h2.4a1.3 1.3 0 0 1 1.3 1.3v1.7M6.5 6.5l.9 13a1.3 1.3 0 0 0 1.3 1.2h6.6a1.3 1.3 0 0 0 1.3-1.2l.9-13"/></svg></button></div></div>';});$('drList').innerHTML=html||'<div class="empty">还没有日记，写一篇吧</div>';}
+function saveTodayDiary(){var c=$('td_diary').value.trim();if(!c){toast('请写点什么');return;}D.diary.push({id:uid(),d:todayStr(),m:$('td_mood').value.trim()||'无',c:c,ct:todayStr()});$('td_diary').value='';$('td_mood').value='';saveLocal();scheduleCloudSync();renderDiary();renderToday();toast('日记已保存');}
+function renderTodayDiary(){var box=$('diaryRecent');if(!box)return;var list=D.diary.slice().sort(function(a,b){return b.d.localeCompare(a.d);}).slice(0,5);var cnt=$('diaryCount');if(cnt)cnt.textContent=D.diary.length+' 篇';if(!list.length){box.innerHTML='<div class="empty">还没有日记，写下今天的第一篇吧</div>';return;}box.innerHTML=list.map(function(x){return '<div class="item"><div class="main"><div class="t">'+fmtDate(x.d)+' <span class="tag clay">'+esc(x.m)+'</span></div><div class="s" style="white-space:pre-wrap;line-height:1.5">'+esc(x.c)+'</div></div></div>';}).join('');}
 function toggleTodo(id){var t=D.todos.find(function(x){return x.id===id});if(t)t.st=t.st==='done'?'pending':'done';saveLocal();scheduleCloudSync();renderTodos();renderToday();}
 function delTodo(id){D.del.todos.push(id);D.todos=D.todos.filter(function(x){return x.id!==id});saveLocal();scheduleCloudSync();renderTodos();renderToday();}
 function renderTodos(){var done=D.todos.filter(function(x){return x.st==='done'}).length;var total=D.todos.length;var pct=total?Math.round(done/total*100):0;$('tdStats').innerHTML='<div class="st"><div class="k">待办总数</div><div class="v">'+total+'</div></div><div class="st"><div class="k">已完成</div><div class="v green">'+done+'</div></div><div class="st"><div class="k">完成率</div><div class="v clay">'+pct+'%</div></div>';
@@ -769,7 +776,10 @@ function renderProducts(){if(!D.products.length){$('ecProducts').innerHTML='<div
   $('ecProducts').innerHTML=h;$('ecCnt').textContent=D.products.length+'个';}
 
 // ===== 今日热度榜 =====
-var HOT_LIST=[['weibo','微博热搜'],['zhihu','知乎热榜'],['douyin','抖音热点'],['bilibili','B站热榜'],['baidu','百度热搜'],['toutiao','头条热榜'],['36kr','36氪快讯'],['juejin','掘金热榜']];
+var HOT_LIST=[['weibo','微博热搜'],['zhihu','知乎热榜'],['douyin','抖音热点'],['toutiao','头条热榜'],['bilibili','B站热榜'],['baidu','百度热搜']];
+// 60s 直连（浏览器端取，免服务端/令牌）：微博/知乎/抖音/头条 已验证支持跨域
+var HOT_DIRECT={weibo:'https://60s.viki.moe/v2/weibo?cache=true',zhihu:'https://60s.viki.moe/v2/zhihu?cache=true',douyin:'https://60s.viki.moe/v2/douyin?cache=true',toutiao:'https://60s.viki.moe/v2/toutiao?cache=true'};
+function map60(d){var arr=Array.isArray(d&&d.data)?d.data:[];return arr.slice(0,50).map(function(x,i){return {rank:i+1,title:String(x.title||'').trim(),desc:String(x.detail||x.desc||'').slice(0,120),hot:Number(x.hot_value)||Number(x.hot)||0,url:x.link||x.url||''};}).filter(function(x){return x.title;});}
 var hotCur='weibo',hotCache=null,hotLoaded=false;
 function initHot(){var h='';HOT_LIST.forEach(function(s){h+='<button data-h="'+s[0]+'" class="'+(s[0]===hotCur?'on':'')+'" onclick="loadHot(\''+s[0]+'\')">'+s[1]+'</button>';});$('hotSrc').innerHTML=h;}
 function fmtHot(n){if(!n)return'';if(n>=1e8)return (n/1e8).toFixed(1)+'亿';if(n>=1e4)return (n/1e4).toFixed(1)+'万';return String(n);}
@@ -778,13 +788,27 @@ function hotRowHtml(it,q){var t=q?highlight(it.title,q):esc(it.title);var d=q?hi
   return '<div class="hot-row"><div class="hot-rk'+rk+'">'+it.rank+'</div><div class="hot-tx">'+(it.url?'<a href="'+esc(it.url)+'" target="_blank" rel="noopener">'+t+'</a>':'<span>'+t+'</span>')+(d?'<div class="d">'+d+'</div>':'')+'</div>'+(v?'<div class="hot-v">'+v+'</div>':'')+'</div>';}
 async function loadHot(source){if(isOffline||!session){toast('请登录后查看热度榜');return;}
   hotCur=source||hotCur;$('hotSrc').querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.dataset.h===hotCur);});
-  $('hotList').innerHTML='<div class="ec-load"><span class="spin"></span>正在获取'+HOT_LIST.find(function(s){return s[0]===hotCur})[1]+'…</div>';
-  try{var headers={'Content-Type':'application/json'};if(session&&session.access_token)headers['Authorization']='Bearer '+session.access_token;
-    var r=await fetch(STUDIO_URL,{method:'POST',headers:headers,body:JSON.stringify({mode:'hot',source:hotCur})});
-    var d=await r.json();if(!r.ok)throw new Error(d.error||'获取失败');
-    hotCache=d;hotLoaded=true;$('hotUpd').textContent=d.label+(d.updateTime?' · 更新 '+d.updateTime:'')+(d.provider?' · '+d.provider:'');
-    var s=d.stats||{};$('hotStats').style.display='grid';
-    $('hotStats').innerHTML='<div class="st"><div class="k">榜单条目</div><div class="v">'+ (s.count||0) +'</div></div><div class="st"><div class="k">平均热度</div><div class="v clay">'+fmtHot(s.avg||0)+'</div></div><div class="st"><div class="k">中位热度</div><div class="v">'+fmtHot(s.median||0)+'</div></div><div class="st"><div class="k">最高热度</div><div class="v red">'+fmtHot(s.max||0)+'</div></div><div class="st"><div class="k">前10均热</div><div class="v">'+fmtHot(s.top10avg||0)+'</div></div>';
+  var f=HOT_LIST.find(function(s){return s[0]===hotCur});var label=f?f[1]:'';
+  $('hotList').innerHTML='<div class="ec-load"><span class="spin"></span>正在获取'+label+'…</div>';
+  try{var items,provider;
+    if(HOT_DIRECT[hotCur]){
+      var r=await fetch(HOT_DIRECT[hotCur]);if(!r.ok)throw new Error('网络错误 '+r.status);
+      var d=await r.json();items=map60(d);if(!items.length)throw new Error('暂无数据');
+      provider='60s 直连';
+    }else{
+      var headers={'Content-Type':'application/json'};if(session&&session.access_token)headers['Authorization']='Bearer '+session.access_token;
+      var r2=await fetch(STUDIO_URL,{method:'POST',headers:headers,body:JSON.stringify({mode:'hot',source:hotCur})});
+      var d2=await r2.json();if(!r2.ok)throw new Error(d2.error||'获取失败');
+      items=d2.items||[];provider=(d2.label||label)+(d2.provider?' · '+d2.provider:'');
+    }
+    hotCache={items:items,label:label,provider:provider,updateTime:''};hotLoaded=true;
+    $('hotUpd').textContent=label+' · '+provider;
+    var hots=items.map(function(x){return x.hot||0}).filter(function(h){return h>0});
+    var total=hots.reduce(function(s,h){return s+h;},0);
+    var sorted=hots.slice().sort(function(a,b){return b-a;});
+    var stats={count:items.length,avg:hots.length?Math.round(total/hots.length):0,median:sorted.length?sorted[Math.floor(sorted.length/2)]:0,max:sorted[0]||0,top10avg:sorted.length?Math.round(sorted.slice(0,10).reduce(function(s,h){return s+h;},0)/Math.min(10,sorted.length)):0};
+    $('hotStats').style.display='grid';
+    $('hotStats').innerHTML='<div class="st"><div class="k">榜单条目</div><div class="v">'+stats.count+'</div></div><div class="st"><div class="k">平均热度</div><div class="v clay">'+fmtHot(stats.avg)+'</div></div><div class="st"><div class="k">中位热度</div><div class="v">'+fmtHot(stats.median)+'</div></div><div class="st"><div class="k">最高热度</div><div class="v red">'+fmtHot(stats.max)+'</div></div><div class="st"><div class="k">前10均热</div><div class="v">'+fmtHot(stats.top10avg)+'</div></div>';
     renderHotList('');
   }catch(e){$('hotList').innerHTML='<div class="ec-skel" style="border-color:#E4C3BD;background:var(--rust-l);color:var(--rust)">获取失败：'+esc(e.message)+'</div>';$('hotStats').style.display='none';}
 }
@@ -818,13 +842,17 @@ function renderTop(){
   $('topStats').innerHTML='<div class="st"><div class="k">今日支出</div><div class="v red">¥'+tdOut.toFixed(2)+'</div></div><div class="st"><div class="k">今日收入</div><div class="v green">¥'+tdIn.toFixed(2)+'</div></div><div class="st"><div class="k">待办</div><div class="v clay">'+tdTodo+'</div></div><div class="st"><div class="k">已完成</div><div class="v green">'+tdDone+'</div></div><div class="st"><div class="k">日记</div><div class="v">'+tdDiary+'</div></div>';
   var items=[];D.todos.forEach(function(x){if(x.st==='pending')items.push({tg:'待办',tx:x.t+(x.d?' · '+fmtDate(x.d):''),od:x.d&&x.d<t});});D.posts.forEach(function(x){if(x.st!=='done'&&x.d&&x.d<=t)items.push({tg:'选题',tx:x.t,od:x.d<t});});D.shots.forEach(function(x){if(x.st!=='已交付'&&x.dd&&x.dd<=t)items.push({tg:'分镜',tx:(x.no||'')+x.de,od:x.dd<t});});
   var html='';if(!items.length)html='<div class="empty">今天没有待处理的事项，去享受生活吧 🎉</div>';else items.forEach(function(it){html+='<div class="trow'+(it.od?' od':'')+'"><span class="tg">'+it.tg+'</span><div class="tx">'+esc(it.tx)+(it.od?' <span class="m">逾期</span>':'')+'</div></div>';});$('topToday').innerHTML=html;
-  if(!weatherCache)fetchWeather();
+  if(!weatherCache)fetchWeather(D.wcity||'');
+  renderTodayDiary();
 }
-async function fetchWeather(){try{
-  var r=await fetch('https://wttr.in/?format=j1');if(!r.ok)throw new Error('weather unavailable');var d=await r.json();weatherCache=d;
-  var cur=d.current_condition[0];var area=d.nearest_area[0];var city=area.areaName[0].value;
-  $('weatherCity').textContent=city;
-  var desc=cur.lang_zh?cur.lang_zh[0].value:cur.weatherDesc[0].value;
+function setWeatherCity(){var c=$('wcity').value.trim();D.wcity=c;saveLocal();$('wcity').value='';weatherCache=null;fetchWeather(c);toast(c?('已切换到 '+c):'已恢复自动定位');}
+function locateWeather(){if(!navigator.geolocation){toast('当前环境不支持定位');return;}$('weatherCity').textContent='定位中…';navigator.geolocation.getCurrentPosition(function(pos){weatherCache=null;fetchWeather(pos.coords.latitude.toFixed(2)+','+pos.coords.longitude.toFixed(2));},function(){toast('定位失败，请手动输入城市');},{enableHighAccuracy:true,timeout:10000,maximumAge:0});}
+async function fetchWeather(loc){try{
+  var url='https://wttr.in/'+(loc?encodeURIComponent(loc):'')+'?format=j1&lang=zh';
+  var r=await fetch(url);if(!r.ok)throw new Error('weather unavailable');var d=await r.json();weatherCache=d;
+  var cur=d.current_condition[0];var area=(d.nearest_area&&d.nearest_area[0]);var city=loc||(area&&area.areaName&&area.areaName[0]?area.areaName[0].value:'');
+  $('weatherCity').textContent=city||'本地';
+  var desc=cur.lang_zh&&cur.lang_zh[0]?cur.lang_zh[0].value:cur.weatherDesc[0].value;
   $('weatherBox').innerHTML='<div class="w-now"><div class="w-temp">'+cur.temp_C+'°C</div><div class="w-info"><div>'+desc+'</div><div class="mut2">湿度 '+cur.humidity+'% · 体感 '+cur.FeelsLikeC+'°C</div></div></div><div class="w-advice">'+weatherAdvice(cur)+'</div>';
   var fc=d.weather.slice(0,3);var fh='';fc.forEach(function(w){fh+='<div class="f-day"><div class="f-date">'+(w.date===todayStr()?'今天':w.date.slice(5))+'</div><div class="f-icon">'+weatherIcon(w.hourly[4].weatherDesc[0].value)+'</div><div class="f-temp">'+w.mintempC+'° / '+w.maxtempC+'°</div><div class="f-desc">'+w.hourly[4].weatherDesc[0].value+'</div></div>';});$('forecastBox').innerHTML=fh;
 }catch(e){$('weatherBox').innerHTML='<div class="w-loading">天气暂时获取不到，稍后再试</div>';$('forecastBox').innerHTML='';}}
@@ -871,9 +899,27 @@ async function scheduleDiaryReminder(){
 function cancelDiaryReminder(){var N=capNotif();if(N){N.cancel({notifications:[900001]}).catch(function(){});}D.reminders=(D.reminders||[]).filter(function(r){return r.type!=='diary';});saveLocal();renderReminders();toast('已取消日记提醒');}
 function restoreNativeReminders(){var N=capNotif();if(!N)return;var list=D.reminders||[];list.forEach(function(r){if(r.type==='countdown'&&r.at>Date.now()){N.schedule({notifications:[{id:Math.floor(Math.random()*1e9),title:'⏰ 提醒',body:r.txt,schedule:{at:new Date(r.at)}}]}).catch(function(){});}});}
 function renderReminders(){var list=D.reminders||[];var box=$('rem_list');if(!box)return;if(!list.length){box.textContent='暂无提醒';return;}var h='';list.forEach(function(r){if(r.type==='countdown'){h+='<div>⏰ '+new Date(r.at).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})+' · '+esc(r.txt)+'</div>';}else if(r.type==='diary'){h+='<div>📔 每日 '+r.time+' 写日记</div>';}});box.innerHTML=h;}
+var EXE_URL='https://github.com/lwl555/ai-director-canvas/releases/download/app-latest/personal-hub-windows.exe';
+var deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;});
+window.addEventListener('appinstalled',function(){toast('已安装到设备，从桌面图标打开即可');});
 function openAppDownload(){
-  if(APP_DOWNLOAD_URL){window.open(APP_DOWNLOAD_URL,'_blank');return;}
-  dlgConfirm('获取手机 APP','现在有两种方式在手机上使用：\n\n① 立即用（无需安装）：手机浏览器打开本页面 → 点右上角「分享」→「添加到主屏幕」，即可像 APP 一样从桌面打开。\n\n② 完整原生 APP（带系统通知栏提醒）：APK 正在构建中，完成后这里会直接提供下载。也可在电脑上用 Android Studio 打开本项目一键打包。','好的');
+  var ua=navigator.userAgent;
+  var isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+  if(isMobile && deferredPrompt){
+    deferredPrompt.prompt();
+    var c=deferredPrompt.userChoice; deferredPrompt=null;
+    if(c&&c.then)c.then(function(){}).catch(function(){});
+    return;
+  }
+  if(isMobile){
+    dlgConfirm('装到手机（真 APP）','这是真正的 APP，不是网页书签：\n\n安卓 Chrome：点右上角「⋮」→「安装应用」。\niPhone / iPad：用 Safari 打开 → 底部「分享」→「添加到主屏幕」。\n\n添加后从桌面图标打开，就是专属全屏工作台，离线可用、数据全部存在你手机里。','知道了');
+  }else if(/Windows/i.test(ua)){
+    if(EXE_URL){ window.open(EXE_URL,'_blank'); toast('开始下载 Windows 版安装包…'); return; }
+    dlgConfirm('Windows 桌面版','Windows 桌面版已为你打包完成（约 75MB），双击即可运行，无需安装，数据本地保存。','知道了');
+  }else{
+    dlgConfirm('获取 APP','桌面端请点上方按钮下载 Windows 版安装包；手机端用浏览器「添加到主屏幕」，即可获得独立全屏的真 APP。','知道了');
+  }
 }
 
 // ===== INIT =====
