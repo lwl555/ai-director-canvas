@@ -913,6 +913,7 @@ function cancelDiaryReminder(){var N=capNotif();if(N){N.cancel({notifications:[9
 function restoreNativeReminders(){var N=capNotif();if(!N)return;var list=D.reminders||[];list.forEach(function(r){if(r.type==='countdown'&&r.at>Date.now()){N.schedule({notifications:[{id:Math.floor(Math.random()*1e9),title:'⏰ 提醒',body:r.txt,schedule:{at:new Date(r.at)}}]}).catch(function(){});}});}
 function renderReminders(){var list=D.reminders||[];var box=$('rem_list');if(!box)return;if(!list.length){box.textContent='暂无提醒';return;}var h='';list.forEach(function(r){if(r.type==='countdown'){h+='<div>⏰ '+new Date(r.at).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})+' · '+esc(r.txt)+'</div>';}else if(r.type==='diary'){h+='<div>📔 每日 '+r.time+' 写日记</div>';}});box.innerHTML=h;}
 var EXE_URL='https://github.com/lwl555/ai-director-canvas/releases/download/app-latest/personal-hub-windows.exe';
+var APK_URL='https://github.com/lwl555/ai-director-canvas/releases/download/app-latest/personal-hub.apk';
 var deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;});
 window.addEventListener('appinstalled',function(){toast('已安装到设备，从桌面图标打开即可');closeInstall();});
@@ -932,6 +933,10 @@ function openAppDownload(){
   if(!isMobile){
     if(/Windows/i.test(ua) && EXE_URL){ window.open(EXE_URL,'_blank'); toast('开始下载 Windows 版安装包…'); return; }
     dlgConfirm('获取 APP','桌面端请点上方按钮下载 Windows 版安装包（双击即用）；手机端用浏览器「添加到主屏幕」，即可获得独立全屏的真 APP。','知道了');
+    return;
+  }
+  if(isAndroid){
+    if(APK_URL){ window.open(APK_URL,'_blank'); toast('开始下载安卓安装包，下载完点文件即可安装'); return; }
     return;
   }
   showMobileInstall(isIOS,isAndroid);
