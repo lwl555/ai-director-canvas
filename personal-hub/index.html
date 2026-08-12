@@ -408,37 +408,32 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 .vdir-out-media{max-width:100%;border-radius:10px;margin-top:6px;background:#000}
 .ai-actions{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
 .ai-tag{font-size:11px;font-weight:700;color:var(--ac);letter-spacing:.4px;margin-bottom:4px}
+.vdir-mode{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center}
+.vdir-mode button{padding:6px 10px;border:1px solid var(--line);background:var(--card);border-radius:16px;font-size:12.5px;cursor:pointer;color:var(--ink)}
+.vdir-mode button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.vdir-mode button.mem{margin-left:auto;border-style:dashed}
+.vdir-sp{flex:1}
+.vdir-mem{margin-top:8px;border:1px solid var(--line);border-radius:10px;padding:8px;max-height:240px;overflow:auto;background:var(--sand2)}
+.vdir-mem .gl{font-size:12px;padding:6px 0;border-bottom:1px dashed var(--line);line-height:1.5}
+.vdir-mem .gl:last-child{border-bottom:none}
+.vdir-mem .ok{color:#0a8a4a;font-weight:700}.vdir-mem .bad{color:#c0392b;font-weight:700}
+.hot-item .rk{display:inline-block;min-width:26px;text-align:center;font-weight:700;color:#fff;background:var(--ac);border-radius:8px;padding:1px 5px;font-size:12px;margin-right:6px}
+.hot-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--ink3);margin:3px 0 4px}
+.hot-meta .tag{background:var(--sand2);border-radius:8px;padding:0 6px}
 </style>
 <div id="vdirKeyBar" class="mut2" style="display:none;margin:0 0 10px;font-size:12px;color:#c0392b">注意：尚未配置 Agnes API Key。可在设置中填入 sk-...（agnes-ai.cn 后台获取），或部署后端代理 agnes-media 后自动免 Key。</div>
-<div class="vdir-tabs">
- <button class="on" data-m="chat" onclick="vdirTab('chat')">对话</button>
- <button data-m="img" onclick="vdirTab('img')">文生图</button>
- <button data-m="video" onclick="vdirTab('video')">文生视频</button>
- <button data-m="i2v" onclick="vdirTab('i2v')">图生视频</button>
+<div class="vdir-mode" id="vdirModeBar">
+ <button class="on" data-m="chat" onclick="vdirSetMode('chat')">💬 对话</button>
+ <button data-m="img" onclick="vdirSetMode('img')">🎨 文生图</button>
+ <button data-m="video" onclick="vdirSetMode('video')">🎬 文生视频</button>
+ <button data-m="i2v" onclick="vdirSetMode('i2v')">🖼️ 图生视频</button>
+ <span class="vdir-sp"></span>
+ <button class="mem" type="button" onclick="vdirToggleMem()" title="生成记忆（自动纠错记录）">📓 记忆</button>
 </div>
-<div id="vdirViewChat">
-  <div class="mut2" style="margin-bottom:6px">小林：说需求，它联网搜索、拆解任务、整理视频/图文生成方案；需求模糊时会主动追问。或点「完整方案」用上方内容生成分镜</div>
-  <div class="ai-chat" id="vdir_chat" style="height:320px"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>我是小林，你的通用 AI 助手（基于 Agnes 免费模型），可以联网搜索、帮你规划视频、写提示词，有疑问会主动问你</div></div></div>
-  <div class="ai-input" style="margin-top:8px"><textarea id="vdir_input" placeholder="例如：做一个30秒的国风茶饮宣传视频…" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();vdirSend()}"></textarea><button class="btn" onclick="vdirPlan()" title="用上方内容生成完整分镜方案">完整方案</button><button class="btn pri ai-send" onclick="vdirSend()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
-</div>
-<div id="vdirViewGen" style="display:none">
-  <div class="mut2" style="margin-bottom:6px">选模式直接生成（Agnes 真实出图/出视频，可视化）</div>
-  <div class="form"><select class="w150 half" id="vdir_task" onchange="renderVideoModels()">
-    <option value="img">文生图</option>
-    <option value="video">文生视频</option>
-    <option value="i2v">图生视频</option>
-  </select>
-  <span class="tag" id="vdirModelTag" style="margin-left:6px"></span></div>
-  <textarea id="vdir_prompt" class="fw" rows="4" placeholder="描述画面 / 动作 / 风格、比例、时长…" style="margin-top:8px"></textarea>
-  <div id="vdir_imgbox" style="display:none;margin-top:8px"><label class="mut2">上传参考图（图生视频）</label><input type="file" id="vdir_img" accept="image/*" onchange="vdirImgPreview()"><img id="vdir_imgprev" style="max-width:100%;border-radius:8px;margin-top:6px;display:none"></div>
-  <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-    <button class="btn pri" onclick="vdirGenerate()">生成</button>
-    <button class="btn" onclick="vdirCopy()">复制提示词</button>
-    <button class="btn" onclick="vdirSavePrompt()">存为提示词</button>
-  </div>
-  <div id="vdirOut" style="margin-top:10px"></div>
-  <div class="mut2" style="margin-top:8px;font-size:12px" id="vdirModelNote"></div>
-</div>
+<div id="vdirRefBox" style="display:none;margin:6px 0 2px"><label class="mut2">参考图（人物/场景统一用，图生视频必填）</label><input type="file" id="vdir_ref" accept="image/*" onchange="vdirRefPreview()"><img id="vdir_refprev" style="max-width:100%;border-radius:8px;margin-top:6px;display:none"></div>
+  <div class="mut2" style="margin-bottom:6px">小林：说需求，它联网搜索、拆解任务、整理视频/图文生成方案；需求模糊时会主动追问。切到「文生图/视频/图生视频」可直接生成，无需复制提示词。</div>
+  <div class="ai-chat" id="vdir_chat" style="height:340px"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>我是小林，你的通用 AI 助手（基于 Agnes 免费模型），可以联网搜索、帮你规划视频、写提示词、直接生成图片/视频，有疑问会主动问你</div></div></div>
+  <div class="ai-input" style="margin-top:8px"><textarea id="vdir_input" placeholder="例如：做一个30秒的国风茶饮宣传视频…" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();vdirSubmit()}"></textarea><button class="btn ghost xs" id="vdirPlanBtn" onclick="vdirPlan()" title="用上方内容生成完整分镜方案">完整方案</button><button class="btn pri ai-send" id="vdirActBtn" onclick="vdirSubmit()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
 <div class="mut2" style="margin:12px 0 2px">生成画廊（本地保存）</div>
 <div class="vdir-gallery" id="vdirGallery"></div>
 </div></div>
@@ -536,9 +531,13 @@ async function agnesEnsureReady(){
   if(agnesKey())return true;
   vdirWarnKey();return false;
 }
-function renderVideoModels(){if(!D)D=defaultD();var k=($('vdir_task')?$('vdir_task').value:'img');var lbl={img:'文生图 · '+AGNES_MODEL.img,video:'文生视频 · '+AGNES_MODEL.video,i2v:'图生视频 · '+AGNES_MODEL.video}[k]||'';
- if($('vdirModelTag'))$('vdirModelTag').textContent=lbl;
- if($('vdirModelNote'))$('vdirModelNote').textContent='当前模型：'+lbl+(agnesProxyOk?' · 后端代理模式':' · 直连模式')+' · 换模型改 AGNES_MODEL';}
+var vdirMode='chat';
+function vdirSetMode(m){vdirMode=m;var btns=document.querySelectorAll('#vdirModeBar button[data-m]');for(var i=0;i<btns.length;i++){btns[i].classList.toggle('on',btns[i].getAttribute('data-m')===m);}
+ var inp=$('vdir_input');var act=$('vdirActBtn');var plan=$('vdirPlanBtn');var ref=$('vdirRefBox');
+ if(m==='chat'){if(inp)inp.placeholder='例如：做一个30秒的国风茶饮宣传视频…';if(plan)plan.style.display='';if(ref)ref.style.display='none';}
+ else{var pn={img:'描述要生成的画面 / 风格 / 比例…',video:'描述视频画面、动作、时长、风格…',i2v:'描述基于参考图的动作 / 转场…'}[m]||'描述生成内容…';if(inp)inp.placeholder=pn;if(plan)plan.style.display='none';if(ref)ref.style.display=(m==='i2v')?'block':'none';}
+ toast(({chat:'对话模式',img:'文生图模式：输入即直接出图',video:'文生视频模式：输入即直接出视频',i2v:'图生视频模式：先上传参考图'}[m]||'')+' · 无需复制提示词');}
+function vdirSubmit(){if(vdirMode==='chat'){vdirSend();}else{vdirGenerateInline();}}
 function vdirEsc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function vdirAddMsg(role,text,html){var box=$('vdir_chat');if(!box)return;var em=box.querySelector('.ai-empty');if(em)em.remove();
  var d=document.createElement('div');d.className='ai-msg '+(role==='bot'?'bot':'user');
@@ -590,20 +589,33 @@ function vdirApplyShots(){if(!window.__vdirPlan){toast('先生成方案');return
  saveLocal();scheduleCloudSync();renderShots();renderShotTimeline();renderToday();toast('已拆入 '+n+' 个分镜');}
 function vdirApplyPrompt(){if(!window.__vdirPlan){toast('先生成方案');return;}var k=$('vdir_task').value;
  D.prompts.push({id:uid(),n:'视频方案 '+todayStr(),m:AGNES_MODEL.img,s:4,x:window.__vdirPlan,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
-function vdirUseAsPrompt(){if(!window.__vdirLast){toast('先和导演聊一下');return;}$('vdir_prompt').value=window.__vdirLast;$('vdir_task').value='video';vdirTab('video');}
+function vdirUseAsPrompt(){if(!window.__vdirLast){toast('先和导演聊一下');return;}vdirSetMode('video');$('vdir_input').value=window.__vdirLast;vdirGenerateInline();}
 function vdirApplyPromptText(){if(!window.__vdirLast){toast('先聊一下');return;}D.prompts.push({id:uid(),n:'视频方案 '+todayStr(),m:AGNES_MODEL.chat,s:4,x:window.__vdirLast,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
-function vdirUsePlanGen(){if(!window.__vdirPlan){toast('先生成方案');return;}$('vdir_prompt').value=window.__vdirPlan;$('vdir_task').value='video';vdirTab('video');vdirGenerate();}
-function vdirTab(m){var btns=document.querySelectorAll('.vdir-tabs button');for(var i=0;i<btns.length;i++){btns[i].classList.toggle('on',btns[i].getAttribute('data-m')===m);}
- var chat=$('vdirViewChat'),gen=$('vdirViewGen');if(chat)chat.style.display=(m==='chat')?'block':'none';if(gen)gen.style.display=(m==='chat')?'none':'block';
- var sel=$('vdir_task');if(sel&&m!=='chat')sel.value=m;
- var ib=$('vdir_imgbox');if(ib)ib.style.display=(m==='i2v')?'block':'none';
- if(m!=='chat')renderVideoModels();}
-function vdirImgPreview(){var f=$('vdir_img')&&$('vdir_img').files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var im=$('vdir_imgprev');if(im){im.src=rd.result;im.style.display='block';}window.__vdirImg=rd.result;};rd.readAsDataURL(f);}
-async function vdirGenerate(){var k=$('vdir_task').value;var p=$('vdir_prompt').value.trim();if(!p){toast('先写提示词');return;}
+function vdirUsePlanGen(){if(!window.__vdirPlan){toast('先生成方案');return;}vdirSetMode('video');$('vdir_input').value=window.__vdirPlan;vdirGenerateInline();}
+function vdirRefPreview(){var f=$('vdir_ref')&&$('vdir_ref').files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var im=$('vdir_refprev');if(im){im.src=rd.result;im.style.display='block';}window.__vdirRef=rd.result;};rd.readAsDataURL(f);}
+async function vdirGenerateInline(){
+ var inp=$('vdir_input');if(!inp)return;var p=inp.value.trim();if(!p){toast('先写生成内容');return;}
  if(!(await agnesEnsureReady()))return;
- var out=$('vdirOut');if(out)out.innerHTML='<div class="mut2">生成中…</div>';
- if(k==='img')return vdirGenImage(p,out);
- vdirGenVideo(p,out,(k==='i2v')?(window.__vdirImg||null):null);}
+ vdirAddMsg('user',p);inp.value='';
+ var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';
+ var ref=(vdirMode==='i2v')?(window.__vdirRef||null):null;
+ if(vdirMode==='i2v'&&!ref){body.innerHTML='<div class="mut2" style="color:#c0392b">图生视频请先上传参考图</div>';return;}
+ vdirLogGen(vdirMode,p,'生成中');
+ if(vdirMode==='img')return vdirGenImage(p,body);
+ return vdirGenVideo(p,body,ref,0);
+}
+function vdirToggleMem(){var m=$('vdirMem');if(!m)return;m.style.display=(m.style.display==='none'||!m.style.display)?'block':'none';if(m.style.display==='block')vdirRenderMem();}
+function vdirRenderMem(){var box=$('vdirMem');if(!box)return;var arr=(D.genLog||[]).slice().reverse();if(!arr.length){box.innerHTML='<div class="mut2">还没有生成记录。每次生成/出错都会自动记到这里，并自动纠错。</div>';return;}
+ box.innerHTML='<div class="mut2" style="margin-bottom:6px">📓 生成记忆（自动纠错日志，最新在上）</div>'+arr.map(function(g){var cls=g.status==='成功'?'ok':(g.status==='生成中'?'':'bad');var modeName={chat:'对话',img:'文生图',video:'文生视频',i2v:'图生视频'}[g.mode]||g.mode;return '<div class="gl"><span class="'+cls+'">['+esc(g.status)+']</span> <b>'+modeName+'</b> · '+esc(g.t)+'<br><span class="mut2">'+esc((g.prompt||'').slice(0,90))+'</span></div>';}).join('');}
+function vdirLogGen(mode,prompt,status){
+ if(!D.genLog)D.genLog=[];
+ var last=D.genLog[D.genLog.length-1];
+ if(last&&last.mode===mode&&last.prompt===prompt&&last.status==='生成中'){last.status=status;last.t=nowStr();}
+ else D.genLog.push({t:nowStr(),mode:mode,prompt:prompt,status:status});
+ saveLocal();if($('vdirMem')&&$('vdirMem').style.display!=='none')vdirRenderMem();}
+function nowStr(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+function vdirImgPreview(){var f=$('vdir_img')&&$('vdir_img').files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var im=$('vdir_imgprev');if(im){im.src=rd.result;im.style.display='block';}window.__vdirImg=rd.result;};rd.readAsDataURL(f);}
+async function vdirGenerate(){vdirGenerateInline();}
 function vdirGenImage(prompt,out){
   var url,hdr,body;
   if(agnesProxyOk){
@@ -615,10 +627,12 @@ function vdirGenImage(prompt,out){
   }
   fetch(url,{method:'POST',headers:hdr,body:body})
  .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error((j.error&&(j.error.message||j.error.msg))||('HTTP '+r.status));return j;});})
- .then(function(j){var imgUrl=(j.data&&j.data[0]&&j.data[0].url)||'';if(!imgUrl)throw new Error('未返回图片');if(out)out.innerHTML='<img class="vdir-out-media" src="'+imgUrl+'" alt="生成结果">';vdirSaveMedia({t:'image',src:imgUrl,prompt:prompt,m:AGNES_MODEL.img,ct:todayStr()});vdirGallery();toast('已生成并存入画廊');})
- .catch(function(e){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">生成失败：'+(e.message||e)+'</div>';});}
-function vdirGenVideo(prompt,out,imageData){
-  var vbody={model:AGNES_MODEL.video,prompt:prompt,width:1152,height:768,num_frames:121,frame_rate:24};if(imageData)vbody.image=imageData;
+ .then(function(j){var imgUrl=(j.data&&j.data[0]&&j.data[0].url)||'';if(!imgUrl)throw new Error('未返回图片');if(out)out.innerHTML='<img class="vdir-out-media" src="'+imgUrl+'" alt="生成结果">';vdirSaveMedia({t:'image',src:imgUrl,prompt:prompt,m:AGNES_MODEL.img,ct:todayStr()});vdirGallery();toast('已生成并存入画廊');vdirLogGen('img',prompt,'成功');window.__vdirLast=prompt;if(out&&out.parentNode){var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="vdirApplyPromptText()">存为提示词</button>';out.parentNode.appendChild(act);}})
+ .catch(function(e){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">生成失败：'+(e.message||e)+'</div>';vdirLogGen('img',prompt,'失败:'+(e.message||e));});}
+function vdirGenVideo(prompt,out,imageData,attempt){
+  if(attempt===undefined)attempt=0;
+  var frames=attempt>0?97:121;
+  var vbody={model:AGNES_MODEL.video,prompt:prompt,width:1152,height:768,num_frames:frames,frame_rate:24};if(imageData)vbody.image=imageData;
   var url,hdr,body;
   if(agnesProxyOk){
     url=AGNES_PROXY;hdr={'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'};
@@ -631,8 +645,11 @@ function vdirGenVideo(prompt,out,imageData){
   .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error((j.error&&(j.error.message||j.error.msg))||('HTTP '+r.status));return j;});})
   .then(function(j){var vid=j.video_id||j.task_id||j.id;if(!vid)throw new Error('未返回任务ID');
     vdirSaveMedia({t:'video',src:'',prompt:prompt,m:AGNES_MODEL.video,ct:todayStr(),vid:vid,status:'处理中',elapsed:0,retries:0});vdirGallery();
-    if(out)out.innerHTML=vdirProgressHTML(0,0);vdirPoll(vid,out);})
-  .catch(function(e){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">创建失败：'+(e.message||e)+'</div>';});}
+    if(out)out.innerHTML=vdirProgressHTML(0,0);vdirPoll(vid,out,prompt);})
+  .catch(function(e){
+    if(attempt<1){vdirLogGen('video',prompt,'创建失败→自动降低时长重试');vdirGenVideo(prompt,out,imageData,1);}
+    else{if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">创建失败：'+(e.message||e)+'</div>';vdirLogGen('video',prompt,'失败:'+(e.message||e));}
+  });}
 function vdirProgressHTML(elapsed,retries){
   var pct=Math.min(Math.round(elapsed/180*100),95);
   var bar='';for(var i=0;i<20;i++){bar+=(i<Math.floor(pct/5)?'█':'░');}
@@ -641,7 +658,7 @@ function vdirProgressHTML(elapsed,retries){
     +'<div style="font-family:monospace;font-size:11px;color:#6c5ce7;letter-spacing:1px">'+bar+'</div>'
     +'<div style="font-size:12px;color:#aaa;margin-top:6px">预计 1-3 分钟'+(retries>0?' · 重试 '+retries+'/3':'')+'</div>'
     +'</div>';}
-function vdirPoll(vid,out){var tries=0,retries=0,startTime=Date.now();
+function vdirPoll(vid,out,prompt){var tries=0,retries=0,startTime=Date.now();
   function poll(){
     tries++;
     var elapsed=Math.round((Date.now()-startTime)/1000);
@@ -656,9 +673,10 @@ function vdirPoll(vid,out){var tries=0,retries=0,startTime=Date.now();
         var arr=D.vmedia||[];for(var i=0;i<arr.length;i++){if(arr[i].vid===vid){arr[i].src=vurl;arr[i].status='完成';}}
         saveLocal();scheduleCloudSync();vdirGallery();
         if(out)out.innerHTML='<video class="vdir-out-media" src="'+vurl+'" controls autoplay loop></video>';
-        toast('视频生成完成');
+        vdirLogGen('video',prompt||'','成功');toast('视频生成完成');
       }else if(tries>=72){
         if(out)out.innerHTML='<div class="mut2">超时（6分钟），请稍后在画廊查看</div>';
+        vdirLogGen('video',prompt||'','超时');
       }else{
         if(out)out.innerHTML=vdirProgressHTML(elapsed,retries);
         var arr2=D.vmedia||[];for(var i=0;i<arr2.length;i++){if(arr2[i].vid===vid){arr2[i].elapsed=elapsed;arr2[i].retries=retries;}}
@@ -669,6 +687,7 @@ function vdirPoll(vid,out){var tries=0,retries=0,startTime=Date.now();
       retries++;
       if(retries>=3){
         if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">轮询失败（重试3次）：'+(e.message||e)+'<br>可稍后在画廊查看</div>';
+        vdirLogGen('video',prompt||'','轮询失败');
       }else{
         if(out)out.innerHTML=vdirProgressHTML(elapsed,retries);
         var arr3=D.vmedia||[];for(var i=0;i<arr3.length;i++){if(arr3[i].vid===vid){arr3[i].elapsed=elapsed;arr3[i].retries=retries;}}
@@ -694,13 +713,13 @@ function vdirGallery(){if(!D)D=defaultD();var box=$('vdirGallery');if(!box)retur
    return '<div class="vdir-g">'+media+'<div class="cap">'+vdirEsc(it.prompt||'')+'</div></div>';
  }).join('');}
 function vdirCopy(){var t=$('vdir_prompt').value.trim();if(!t){toast('先写提示词');return;}navigator.clipboard.writeText(t).then(function(){toast('已复制')},function(){toast('复制失败');});}
-function vdirSavePrompt(){var t=$('vdir_prompt').value.trim();if(!t){toast('先写提示词');return;}var k=$('vdir_task').value;var m={img:AGNES_MODEL.img,video:AGNES_MODEL.video,i2v:AGNES_MODEL.video}[k]||k;D.prompts.push({id:uid(),n:'提示词 '+todayStr(),m:m,s:4,x:t,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
+function vdirSavePrompt(){var t=$('vdir_input').value.trim();if(!t){toast('先写提示词');return;}var m={img:AGNES_MODEL.img,video:AGNES_MODEL.video,i2v:AGNES_MODEL.video}[vdirMode]||vdirMode;D.prompts.push({id:uid(),n:'提示词 '+todayStr(),m:m,s:4,x:t,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
 /* video panel init moved to DOMContentLoaded + renderAll (D not yet ready here) */
 
 var SK='ph_session_v1',DK='ph_data_v1';
 var session=null,isOffline=false,curTab='top',syncTimer=null;
 var D=defaultD();
-function defaultD(){return {posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],vmedia:[],ledger:[],habits:[],hLogs:{},todos:[],products:[],diary:[],budget:0,chats:[],sessions:[],curSid:null,reminders:[],wcity:'',del:{posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],vmedia:[],ledger:[],todos:[],habits:[],habitLogs:[],products:[],diary:[]}};}
+function defaultD(){return {posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],vmedia:[],genLog:[],ledger:[],habits:[],hLogs:{},todos:[],products:[],diary:[],budget:0,chats:[],sessions:[],curSid:null,reminders:[],wcity:'',del:{posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],vmedia:[],ledger:[],todos:[],habits:[],habitLogs:[],products:[],diary:[]}};}
 function defaultDel(){return {posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],vmedia:[],ledger:[],todos:[],habits:[],habitLogs:[],products:[],diary:[]};}
 var CATS={out:['餐饮','交通','购物','住房','娱乐','医疗','教育','其他'],in:['工资','副业','理财','红包','其他']};
 
@@ -1119,22 +1138,33 @@ function renderEcomBoard(){var box=$('ecBoard');if(!box)return;var ps=D.products
   var arr=Object.keys(cats).map(function(k,i){return{label:k,value:cats[k],color:colors[i%colors.length]};});
   box.innerHTML=svgBars(arr);if($('ecBoardSub'))$('ecBoardSub').textContent='按分类统计';}
 var HOT_SEED={
- '抖音':[{n:'多巴胺穿搭',h:96},{n:'智能水杯',h:84},{n:'桌面微景观',h:73},{n:'国风联名盲盒',h:68}],
- '小红书':[{n:'桌面收纳神器',h:91},{n:'复古胶片相机',h:79},{n:'早C晚A护肤',h:72},{n:'小众香薰',h:66}],
- '淘宝':[{n:'空气炸锅食谱',h:88},{n:'香薰机',h:71},{n:'针织开衫',h:64},{n:'宠物自动喂食器',h:60}],
- '京东':[{n:'扫地机器人',h:85},{n:'机械键盘',h:77},{n:'护眼台灯',h:69},{n:'羽绒被',h:62}],
- '拼多多':[{n:'露营折叠椅',h:80},{n:'9.9收纳盒',h:74},{n:'农家土特产',h:67},{n:'厨房神器',h:61}],
- '视频号':[{n:'知识付费课',h:78},{n:'本地生活团购',h:70},{n:'银发养生',h:64}]
+ '抖音':[{n:'多巴胺穿搭',h:96,price:'39-129元',sales:'月销10万+',tag:'女装/夏日'},{n:'智能水杯',h:88,price:'59-99元',sales:'月销3万+',tag:'数码/礼品'},{n:'桌面微景观',h:81,price:'29-69元',sales:'月销5万+',tag:'家居/解压'},{n:'国风联名盲盒',h:77,price:'49-89元',sales:'月销8万+',tag:'潮玩/IP'},{n:'露营轻装备',h:73,price:'99-399元',sales:'月销2万+',tag:'户外'},{n:'宠物自动喂食器',h:70,price:'129-299元',sales:'月销1.5万+',tag:'宠物'},{n:'复古胶片相机',h:66,price:'199-599元',sales:'月销8000+',tag:'摄影'}],
+ '小红书':[{n:'桌面收纳神器',h:93,price:'19-59元',sales:'月销6万+',tag:'家居/收纳'},{n:'早C晚A护肤',h:85,price:'99-299元',sales:'月销4万+',tag:'美妆'},{n:'小众香薰',h:79,price:'49-159元',sales:'月销2万+',tag:'香氛'},{n:'通勤托特包',h:74,price:'79-259元',sales:'月销3万+',tag:'箱包'},{n:'氛围感台灯',h:70,price:'89-199元',sales:'月销1万+',tag:'家居'},{n:'手冲咖啡器具',h:67,price:'59-299元',sales:'月销9000+',tag:'咖啡'},{n:'瑜伽服套装',h:63,price:'99-199元',sales:'月销2.5万+',tag:'运动'}],
+ '淘宝':[{n:'空气炸锅食谱',h:90,price:'9.9-39元',sales:'月销20万+',tag:'图书/厨艺'},{n:'针织开衫',h:82,price:'69-169元',sales:'月销9万+',tag:'女装'},{n:'香薰机',h:76,price:'39-129元',sales:'月销5万+',tag:'家居'},{n:'宠物自动喂食器',h:71,price:'129-299元',sales:'月销3万+',tag:'宠物'},{n:'厨房神器',h:67,price:'19-99元',sales:'月销12万+',tag:'厨具'},{n:'真丝睡衣',h:64,price:'99-299元',sales:'月销2万+',tag:'家居服'},{n:'儿童益智玩具',h:61,price:'29-129元',sales:'月销6万+',tag:'母婴'}],
+ '京东':[{n:'扫地机器人',h:87,price:'999-2999元',sales:'月销4万+',tag:'家电'},{n:'机械键盘',h:80,price:'199-699元',sales:'月销5万+',tag:'数码'},{n:'护眼台灯',h:73,price:'99-399元',sales:'月销3万+',tag:'照明'},{n:'羽绒被',h:69,price:'299-999元',sales:'月销1万+',tag:'家纺'},{n:'净水器',h:66,price:'599-1999元',sales:'月销2万+',tag:'家电'},{n:'电动牙刷',h:63,price:'99-399元',sales:'月销6万+',tag:'个护'},{n:'显示器',h:60,price:'699-2999元',sales:'月销1.5万+',tag:'数码'}],
+ '拼多多':[{n:'9.9收纳盒',h:83,price:'9.9元',sales:'月销50万+',tag:'家居'},{n:'农家土特产',h:76,price:'19.9-59元',sales:'月销20万+',tag:'食品'},{n:'露营折叠椅',h:73,price:'29-99元',sales:'月销8万+',tag:'户外'},{n:'厨房神器',h:69,price:'9.9-49元',sales:'月销30万+',tag:'厨具'},{n:'数据线',h:65,price:'5.9-19元',sales:'月销100万+',tag:'数码'},{n:'宝宝辅食机',h:62,price:'39-99元',sales:'月销5万+',tag:'母婴'},{n:'老花镜',h:59,price:'9.9-39元',sales:'月销15万+',tag:'银发'}],
+ '视频号':[{n:'知识付费课',h:80,price:'9.9-999元',sales:'可见热度',tag:'教育'},{n:'本地生活团购',h:73,price:'9.9-199元',sales:'可见热度',tag:'到店'},{n:'银发养生',h:69,price:'19-199元',sales:'可见热度',tag:'健康'},{n:'非遗手作',h:65,price:'39-399元',sales:'可见热度',tag:'文创'},{n:'社区团购',h:62,price:'9.9-99元',sales:'可见热度',tag:'生鲜'},{n:'亲子研学',h:59,price:'99-999元',sales:'可见热度',tag:'教育'}]
 };
-function renderHotProducts(){var box=$('hotProducts');if(!box)return;var html='';
- Object.keys(HOT_SEED).forEach(function(p){html+='<div class="hot-plat"><div class="hot-plat-h"><span class="pf">'+esc(p)+'</span><span class="mut2">'+(HOT_SEED[p].length)+' 个热点</span></div>';
-  html+=HOT_SEED[p].map(function(x,i){var gi=p+'|'+i;return '<div class="hot-item"><div class="top"><span class="nm">'+esc(x.n)+'</span><span class="pf sm">热度 '+x.h+'</span><button class="btn xs ghost" type="button" onclick="aiAnalyzeHot(\''+gi+'\')">AI分析</button></div><div class="hot-bar"><i style="width:'+x.h+'%"></i></div></div>';}).join('');
+function mdLite(t){t=esc(t||'');
+ t=t.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+ t=t.replace(/^[\s]*([0-9]+)[.、)]\s+(.+)$/gm,'<div style="font-weight:700;margin:6px 0 2px">$1. $2</div>');
+ t=t.replace(/^[\s]*[-*]\s+(.+)$/gm,'<div style="margin:2px 0 2px 12px">· $1</div>');
+ t=t.replace(/\n{2,}/g,'<div style="height:6px"></div>').replace(/\n/g,'<br>');
+ return t;}
+function renderHotProducts(){var box=$('hotProducts');if(!box)return;var html='<div class="mut2" style="margin-bottom:8px">⚠ 以下为<strong>参考样例热点</strong>（非实时抓取，用于选题灵感）。接入各平台开放数据后即可显示真实排名。</div>';
+ Object.keys(HOT_SEED).forEach(function(p){
+  var arr=HOT_SEED[p].slice().sort(function(a,b){return b.h-a.h;});
+  html+='<div class="hot-plat"><div class="hot-plat-h"><span class="pf">'+esc(p)+'</span><span class="mut2">'+arr.length+' 个热点 · 按热度排名</span></div>';
+  html+=arr.map(function(x,i){var gi=p+'|'+HOT_SEED[p].indexOf(x);
+   return '<div class="hot-item"><div class="top"><span class="rk">#'+(i+1)+'</span><span class="nm">'+esc(x.n)+'</span><span class="pf sm">热度 '+x.h+'</span><button class="btn xs ghost" type="button" onclick="aiAnalyzeHot(\''+gi+'\')">AI分析</button></div>'
+    +'<div class="hot-meta"><span>'+esc(x.price)+'</span><span>'+esc(x.sales)+'</span><span class="tag">'+esc(x.tag)+'</span></div>'
+    +'<div class="hot-bar"><i style="width:'+x.h+'%"></i></div></div>';}).join('');
   html+='</div>';});
  html+='<div id="ecAnalyze" style="margin-top:8px"></div>';box.innerHTML=html;}
 async function aiAnalyzeHot(key){var parts=String(key).split('|');var arr=HOT_SEED[parts[0]];var x=arr&&arr[Number(parts[1])];var box=$('ecAnalyze');if(!box)return;if(!x){box.innerHTML='<div class="ec-skel" style="border-color:#E4C3BD;background:var(--rust-l);color:var(--rust)">未找到该商品</div>';return;}box.innerHTML='<div class="ec-load"><span class="spin"></span>AI 正在分析「'+esc(x.n)+'」…</div>';
   try{var headers={'Content-Type':'application/json'};if(session&&session.access_token)headers['Authorization']='Bearer '+session.access_token;
-    var r=await fetch(AI_URL,{method:'POST',headers:headers,body:JSON.stringify({message:'请作为电商运营专家，分析这个热门商品：「'+x.n+'」（平台：'+parts[0]+'，热度：'+x.h+'）。给出：1)目标人群 2)核心卖点 3)内容/文案角度3条 4)定价与转化建议',today:todayStr(),history:[]})});
-    var d=await r.json();box.innerHTML='<div class="ec-skel" style="background:var(--ac-ecom-l);border-color:#BFE3DB;color:#0E6B5C">'+esc(d.reply||'暂无分析')+'</div>';
+    var r=await fetch(AI_URL,{method:'POST',headers:headers,body:JSON.stringify({message:'请作为电商运营专家，分析这个热门商品：「'+x.n+'」（平台：'+parts[0]+'，热度：'+x.h+'，参考价：'+x.price+'，标签：'+x.tag+'）。要求分点输出，用 1)2)3) 编号，关键结论用 **加粗**，包含：1)目标人群 2)核心卖点 3)内容/文案角度3条 4)定价与转化建议',today:todayStr(),history:[]})});
+    var d=await r.json();box.innerHTML='<div class="ec-skel" style="background:var(--ac-ecom-l);border-color:#BFE3DB;color:#0E6B5C">'+mdLite(d.reply||'暂无分析')+'</div>';
   }catch(e){box.innerHTML='<div class="ec-skel" style="border-color:#E4C3BD;background:var(--rust-l);color:var(--rust)">分析失败：'+esc(e.message)+'</div>';}}
 
 // ===== 今日热度榜 =====
@@ -1709,7 +1739,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260812l';
+var APP_VER='20260812m';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
