@@ -368,7 +368,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="grid g2">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><h3>今日概览</h3></div><div class="bd"><div class="stats" id="topStats"></div><div id="topToday"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>未来天气</h3><div class="sp"><span class="mut2" id="weatherCity">定位中…</span></div></div><div class="bd"><div class="form" style="margin-bottom:10px"><input id="wcity" class="f1" list="cityList" autocomplete="off" placeholder="选择或输入城市，如 上海" style="min-height:38px"><button class="btn pri sm" onclick="setWeatherCity()">设置</button><button class="btn sm ghost" onclick="locateWeather()" title="使用浏览器GPS定位">📍 自动定位</button><button class="btn sm ghost" onclick="toggleWsrc()" title="天气数据源设置">⚙</button></div><div id="wsrcPanel" style="display:none;margin:8px 0;padding:10px;background:var(--sand2);border-radius:10px"><div class="form" style="margin-bottom:6px"><input id="qw_key" class="f1" placeholder="和风 Weather Key（选填）" style="min-height:36px"><input id="qw_host" class="f1" placeholder="专属 Host，如 xxx.qweatherapi.com" style="min-height:36px"></div><div class="form"><button class="btn pri sm" onclick="saveWeatherSrc()">保存</button><a class="mut2" href="https://console.qweather.com" target="_blank" rel="noopener" style="font-size:12px">免费申请 ↗</a><span id="wsrcHint" class="mut2" style="font-size:12px"></span></div><div class="mut2" style="font-size:12px;margin-top:4px">填了走和风（含空气质量/预警/生活指数/分钟降水）；留空自动用 Open-Meteo 兜底（免 Key）。</div><div class="form" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px"><input id="hub_name" class="f1" placeholder="我的称呼（选填，如 松屿）" style="min-height:36px"><button class="btn pri sm" onclick="saveHubName()">保存称呼</button></div>
-<div class="form" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px"><input id="agnes_key" type="password" class="f1" placeholder="Agnes API Key（sk-...，agnes-ai.cn 后台获取）" style="min-height:36px"><button class="btn pri sm" onclick="saveAgnesKey()">保存Key</button><span id="agnesKeyHint" class="mut2" style="font-size:12px"></span></div><div class="mut2" style="font-size:12px;margin-top:4px">Key 仅存本机浏览器，不上传；用于 AI 导演真实出图/出视频。</div></div><div class="forecast" id="forecastBox"></div></div></div>
+<div id="agnesKeyRow" class="form" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px"><input id="agnes_key" type="password" class="f1" placeholder="Agnes API Key（sk-...，agnes-ai.cn 后台获取）" style="min-height:36px"><button class="btn pri sm" onclick="saveAgnesKey()">保存Key</button><span id="agnesKeyHint" class="mut2" style="font-size:12px"></span></div><div id="vdirProxyNote" class="mut2" style="display:none;font-size:12px;color:#3aa655;margin-top:4px">AI 服务已由后端代理（agnes-media），无需填写 Key</div><div class="mut2" style="font-size:12px;margin-top:4px">Key 仅存本机浏览器，不上传；用于 AI 导演真实出图/出视频。</div></div><div class="forecast" id="forecastBox"></div></div></div>
 </div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>提醒中心</h3><div class="sp"><span class="mut2" id="notifState"></span></div></div><div class="bd">
 <div class="form"><input id="rem_min" type="number" inputmode="numeric" placeholder="分钟后" style="width:92px;min-height:40px"><input id="rem_txt" class="f1" placeholder="提醒内容（如：该起来走走了）"><button class="btn pri" onclick="scheduleCountdown()">倒计时提醒</button></div>
@@ -407,7 +407,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 .vdir-g .cap{font-size:11px;padding:5px 7px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vdir-out-media{max-width:100%;border-radius:10px;margin-top:6px;background:#000}
 </style>
-<div id="vdirKeyBar" class="mut2" style="display:none;margin:0 0 10px;font-size:12px;color:#c0392b">注意：尚未配置 Agnes API Key，点天气面板的「设置」按钮 → 填入 sk-...（免费，agnes-ai.cn 后台获取）。</div>
+<div id="vdirKeyBar" class="mut2" style="display:none;margin:0 0 10px;font-size:12px;color:#c0392b">注意：尚未配置 Agnes API Key。可在设置中填入 sk-...（agnes-ai.cn 后台获取），或部署后端代理 agnes-media 后自动免 Key。</div>
 <div class="vdir-tabs">
  <button class="on" data-m="chat" onclick="vdirTab('chat')">对话</button>
  <button data-m="img" onclick="vdirTab('img')">文生图</button>
@@ -523,31 +523,56 @@ var STUDIO_URL='https://wcnssyiqitugqfmcbdhe.functions.supabase.co/ai-studio';
 // 模型名集中在下面，后期换模型/接 API 只改这里。Key 存本地 localStorage（设置里填），不进代码、不外发。
 var AGNES_BASE='https://api.agnes-ai.cn/v1';
 var AGNES_POLL='https://api.agnes-ai.cn/agnesapi';
+var AGNES_PROXY=SB_URL+'/functions/v1/agnes-media';
 var AGNES_MODEL={chat:'agnes-2.0-flash',img:'agnes-image-2.1-flash',video:'agnes-video-v2.0'};
+var agnesProxyOk=null;
 function agnesKey(){try{return localStorage.getItem('wb_personal_hub_agnes_key')||'';}catch(e){return '';}}
 function agnesSetKey(v){try{localStorage.setItem('wb_personal_hub_agnes_key',v.trim());}catch(e){}}
-function agnesHeaders(){return {'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()};}
+function agnesCheckProxy(){
+  if(agnesProxyOk!==null)return Promise.resolve(agnesProxyOk);
+  return fetch(AGNES_PROXY,{method:'POST',headers:{'apikey':SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({route:'chat',model:AGNES_MODEL.chat,messages:[{role:'user',content:'hi'}],stream:false,max_tokens:5})})
+    .then(function(r){agnesProxyOk=r.ok;if(agnesProxyOk){var kb=$('vdirKeyBar');if(kb)kb.style.display='none';var pn=$('vdirProxyNote');if(pn)pn.style.display='block';var ki=$('agnesKeyRow');if(ki)ki.style.display='none';}return r.ok;})
+    .catch(function(){agnesProxyOk=false;return false;});
+}
+async function agnesEnsureReady(){
+  if(agnesProxyOk===null)await agnesCheckProxy();
+  if(agnesProxyOk)return true;
+  if(agnesKey())return true;
+  vdirWarnKey();return false;
+}
 function renderVideoModels(){var k=($('vdir_task')?$('vdir_task').value:'img');var lbl={img:'文生图 · '+AGNES_MODEL.img,video:'文生视频 · '+AGNES_MODEL.video,i2v:'图生视频 · '+AGNES_MODEL.video}[k]||'';
  if($('vdirModelTag'))$('vdirModelTag').textContent=lbl;
- if($('vdirModelNote'))$('vdirModelNote').textContent='当前模型：'+lbl+' · 换模型改代码顶部 AGNES_MODEL';}
-function vdirEsc(s){return String(s).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+ if($('vdirModelNote'))$('vdirModelNote').textContent='当前模型：'+lbl+(agnesProxyOk?' · 后端代理模式':' · 直连模式')+' · 换模型改 AGNES_MODEL';}
+function vdirEsc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function vdirAddMsg(role,text,html){var box=$('vdir_chat');if(!box)return;var em=box.querySelector('.ai-empty');if(em)em.remove();
  var d=document.createElement('div');d.className='ai-msg '+(role==='bot'?'bot':'user');if(html)d.innerHTML=html;else d.textContent=text;box.appendChild(d);box.scrollTop=box.scrollHeight;}
-function vdirWarnKey(){var b=$('vdirKeyBar');if(b)b.style.display='block';toast('请先在设置（天气面板设置按钮）填入 Agnes API Key');}
-function vdirChatSend(messages,onDelta,onDone){return fetch(AGNES_BASE+'/chat/completions',{method:'POST',headers:agnesHeaders(),body:JSON.stringify({model:AGNES_MODEL.chat,messages:messages,stream:true,max_tokens:4000})})
- .then(function(r){if(!r.ok)return r.json().then(function(j){throw new Error((j.error&&(j.error.message||j.error.msg))||('HTTP '+r.status));});
-   var rd=r.body.getReader();var dec=new TextDecoder();var buf='';var full='';var reason='';
-   return new Promise(function(res,rej){function step(){rd.read().then(function(o){if(o.done){if(onDone)onDone(full,reason);return res(full);}buf+=dec.decode(o.value,{stream:true});var i;while((i=buf.indexOf('\n'))>=0){var line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith('data:'))continue;var p=line.slice(5).trim();if(!p||p==='[DONE]')continue;try{var j=JSON.parse(p);var c=j.choices&&j.choices[0]&&j.choices[0].delta;if(c){if(c.reasoning_content)reason+=c.reasoning_content;if(c.content){full+=c.content;if(onDelta)onDelta(c.content);}}}catch(e){}}step();}).catch(function(e){rej(e);});}step();});});}
-function vdirSend(){var inp=$('vdir_input');if(!inp)return;var m=inp.value.trim();if(!m)return;inp.value='';if(!agnesKey()){vdirWarnKey();return;}
+function vdirWarnKey(){var b=$('vdirKeyBar');if(b)b.style.display='block';toast('请先在设置填入 Agnes API Key，或部署后端代理 agnes-media');}
+function vdirChatSend(messages,onDelta,onDone){
+  var url,hdr,body;
+  if(agnesProxyOk){
+    url=AGNES_PROXY;hdr={'apikey':SB_ANON,'Content-Type':'application/json'};
+    body=JSON.stringify({route:'chat',model:AGNES_MODEL.chat,messages:messages,stream:true,max_tokens:4000});
+  }else{
+    url=AGNES_BASE+'/chat/completions';hdr={'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()};
+    body=JSON.stringify({model:AGNES_MODEL.chat,messages:messages,stream:true,max_tokens:4000});
+  }
+  return fetch(url,{method:'POST',headers:hdr,body:body})
+    .then(function(r){if(!r.ok)return r.json().then(function(j){throw new Error((j.error&&(j.error.message||j.error.msg))||('HTTP '+r.status));});
+      var rd=r.body.getReader();var dec=new TextDecoder();var buf='';var full='';var reason='';
+      return new Promise(function(res,rej){function step(){rd.read().then(function(o){if(o.done){if(onDone)onDone(full,reason);return res(full);}buf+=dec.decode(o.value,{stream:true});var i;while((i=buf.indexOf('\n'))>=0){var line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith('data:'))continue;var p=line.slice(5).trim();if(!p||p==='[DONE]')continue;try{var j=JSON.parse(p);var c=j.choices&&j.choices[0]&&j.choices[0].delta;if(c){if(c.reasoning_content)reason+=c.reasoning_content;if(c.content){full+=c.content;if(onDelta)onDelta(c.content);}}}catch(e){}}step();}).catch(function(e){rej(e);});}step();});});
+}
+async function vdirSend(){var inp=$('vdir_input');if(!inp)return;var m=inp.value.trim();if(!m)return;inp.value='';
+ if(!(await agnesEnsureReady()))return;
  vdirAddMsg('user',m);var node=vdirAddMsg('bot','');var acc='';
  vdirChatSend([{role:'system',content:'你是松屿工作台的 AI 视频导演，基于 Agnes 免费模型（agnes-2.0-flash 对话 / agnes-image-2.1-flash 文生图 / agnes-video-v2.0 文生视频）。用简洁中文一步步帮用户规划视频、写可直接用的提示词。'},{role:'user',content:m}],
   function(d){acc+=d;node.textContent=acc;var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;},
-  function(full){window.__vdirLast=full;var b=$('vdir_chat');if(b){var d=document.createElement('div');d.className='ai-msg bot';d.innerHTML='<div style=\"margin:6px 0\"><button class=\"btn xs\" onclick=\"vdirUseAsPrompt()\">用这条生成视频</button> <button class=\"btn xs\" onclick=\"vdirApplyPromptText()\">存为提示词</button></div>';b.appendChild(d);b.scrollTop=b.scrollHeight;}}).catch(function(e){node.textContent='出错了：'+(e.message||e);});}
-function vdirPlan(){var idea=$('vdir_idea').value.trim();if(!idea){toast('先输入视频主题');return;}if(!agnesKey()){vdirWarnKey();return;}
+  function(full){window.__vdirLast=full;var b=$('vdir_chat');if(b){var d=document.createElement('div');d.className='ai-msg bot';d.innerHTML='<div style="margin:6px 0"><button class="btn xs" onclick="vdirUseAsPrompt()">用这条生成视频</button> <button class="btn xs" onclick="vdirApplyPromptText()">存为提示词</button></div>';b.appendChild(d);b.scrollTop=b.scrollHeight;}}).catch(function(e){node.textContent='出错了：'+(e.message||e);});}
+async function vdirPlan(){var idea=$('vdir_idea').value.trim();if(!idea){toast('先输入视频主题');return;}
+ if(!(await agnesEnsureReady()))return;
  vdirAddMsg('user','主题：'+idea);var node=vdirAddMsg('bot','生成中…');var acc='';
  vdirChatSend([{role:'system',content:'你是视频导演。请基于 Agnes 免费能力，为视频主题输出结构化方案：1)一句话创意 2)分镜列表（每条含镜号、画面描述、秒数）3)图片提示词（文生图用，agnes-image-2.1-flash）4)视频提示词（文生/图生视频用，agnes-video-v2.0）5)建议模型。'},{role:'user',content:'主题：'+idea}],
   function(d){acc+=d;node.textContent=acc;var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;},
-  function(full){window.__vdirPlan=full;var b=$('vdir_chat');if(b){var d=document.createElement('div');d.className='ai-msg bot';d.innerHTML='<div style=\"margin:6px 0\"><button class=\"btn xs\" onclick=\"vdirApplyShots()\">拆为分镜</button> <button class=\"btn xs\" onclick=\"vdirApplyPrompt()\">存为提示词</button> <button class=\"btn xs\" onclick=\"vdirUsePlanGen()\">生成示例视频</button></div>';b.appendChild(d);b.scrollTop=b.scrollHeight;}}).catch(function(e){node.textContent='出错了：'+(e.message||e);});}
+  function(full){window.__vdirPlan=full;var b=$('vdir_chat');if(b){var d=document.createElement('div');d.className='ai-msg bot';d.innerHTML='<div style="margin:6px 0"><button class="btn xs" onclick="vdirApplyShots()">拆为分镜</button> <button class="btn xs" onclick="vdirApplyPrompt()">存为提示词</button> <button class="btn xs" onclick="vdirUsePlanGen()">生成示例视频</button></div>';b.appendChild(d);b.scrollTop=b.scrollHeight;}}).catch(function(e){node.textContent='出错了：'+(e.message||e);});}
 function vdirApplyShots(){if(!window.__vdirPlan){toast('先生成方案');return;}
  var lines=window.__vdirPlan.split(/\n+/).map(function(s){return s.trim();}).filter(function(s){return s.length>0;});
  var picked=lines.filter(function(s){return /^\d+[.、]/.test(s)||/^[Ss]\d/.test(s)||/镜\s*\d/.test(s);});
@@ -564,28 +589,103 @@ function vdirTab(m){var btns=document.querySelectorAll('.vdir-tabs button');for(
  var ib=$('vdir_imgbox');if(ib)ib.style.display=(m==='i2v')?'block':'none';
  if(m!=='chat')renderVideoModels();}
 function vdirImgPreview(){var f=$('vdir_img')&&$('vdir_img').files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var im=$('vdir_imgprev');if(im){im.src=rd.result;im.style.display='block';}window.__vdirImg=rd.result;};rd.readAsDataURL(f);}
-function vdirGenerate(){var k=$('vdir_task').value;var p=$('vdir_prompt').value.trim();if(!p){toast('先写提示词');return;}if(!agnesKey()){vdirWarnKey();return;}
- var out=$('vdirOut');if(out)out.innerHTML='<div class=\"mut2\">生成中…</div>';
+async function vdirGenerate(){var k=$('vdir_task').value;var p=$('vdir_prompt').value.trim();if(!p){toast('先写提示词');return;}
+ if(!(await agnesEnsureReady()))return;
+ var out=$('vdirOut');if(out)out.innerHTML='<div class="mut2">生成中…</div>';
  if(k==='img')return vdirGenImage(p,out);
  vdirGenVideo(p,out,(k==='i2v')?(window.__vdirImg||null):null);}
-function vdirGenImage(prompt,out){fetch(AGNES_BASE+'/images/generations',{method:'POST',headers:agnesHeaders(),body:JSON.stringify({model:AGNES_MODEL.img,prompt:prompt,size:'1K',ratio:'16:9',extra_body:{response_format:'url'}})})
+function vdirGenImage(prompt,out){
+  var url,hdr,body;
+  if(agnesProxyOk){
+    url=AGNES_PROXY;hdr={'apikey':SB_ANON,'Content-Type':'application/json'};
+    body=JSON.stringify({route:'image',model:AGNES_MODEL.img,prompt:prompt,size:'1K',ratio:'16:9',extra_body:{response_format:'url'}});
+  }else{
+    url=AGNES_BASE+'/images/generations';hdr={'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()};
+    body=JSON.stringify({model:AGNES_MODEL.img,prompt:prompt,size:'1K',ratio:'16:9',extra_body:{response_format:'url'}});
+  }
+  fetch(url,{method:'POST',headers:hdr,body:body})
  .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error((j.error&&(j.error.message||j.error.msg))||('HTTP '+r.status));return j;});})
- .then(function(j){var url=(j.data&&j.data[0]&&j.data[0].url)||'';if(!url)throw new Error('未返回图片');if(out)out.innerHTML='<img class=\"vdir-out-media\" src=\''+url+'\' alt=\"生成结果\">';vdirSaveMedia({t:'image',src:url,prompt:prompt,m:AGNES_MODEL.img,ct:todayStr()});vdirGallery();toast('已生成并存入画廊');})
- .catch(function(e){if(out)out.innerHTML='<div class=\"mut2\" style=\"color:#c0392b\">生成失败：'+(e.message||e)+'</div>';});}
-function vdirGenVideo(prompt,out,imageData){var body={model:AGNES_MODEL.video,prompt:prompt,width:1152,height:768,num_frames:121,frame_rate:24};if(imageData)body.image=imageData;
- fetch(AGNES_BASE+'/videos',{method:'POST',headers:agnesHeaders(),body:JSON.stringify(body)})
+ .then(function(j){var imgUrl=(j.data&&j.data[0]&&j.data[0].url)||'';if(!imgUrl)throw new Error('未返回图片');if(out)out.innerHTML='<img class="vdir-out-media" src="'+imgUrl+'" alt="生成结果">';vdirSaveMedia({t:'image',src:imgUrl,prompt:prompt,m:AGNES_MODEL.img,ct:todayStr()});vdirGallery();toast('已生成并存入画廊');})
+ .catch(function(e){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">生成失败：'+(e.message||e)+'</div>';});}
+function vdirGenVideo(prompt,out,imageData){
+  var vbody={model:AGNES_MODEL.video,prompt:prompt,width:1152,height:768,num_frames:121,frame_rate:24};if(imageData)vbody.image=imageData;
+  var url,hdr,body;
+  if(agnesProxyOk){
+    url=AGNES_PROXY;hdr={'apikey':SB_ANON,'Content-Type':'application/json'};
+    body=JSON.stringify({route:'video',model:vbody.model,prompt:vbody.prompt,width:vbody.width,height:vbody.height,num_frames:vbody.num_frames,frame_rate:vbody.frame_rate,image:imageData||undefined});
+  }else{
+    url=AGNES_BASE+'/videos';hdr={'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()};
+    body=JSON.stringify(vbody);
+  }
+  fetch(url,{method:'POST',headers:hdr,body:body})
   .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error((j.error&&(j.error.message||j.error.msg))||('HTTP '+r.status));return j;});})
   .then(function(j){var vid=j.video_id||j.task_id||j.id;if(!vid)throw new Error('未返回任务ID');
-    vdirSaveMedia({t:'video',src:'',prompt:prompt,m:AGNES_MODEL.video,ct:todayStr(),vid:vid,status:'处理中'});vdirGallery();
-    if(out)out.innerHTML='<div class=\"mut2\">视频生成中（约1-3分钟），已在「生成画廊」跟踪…</div>';vdirPoll(vid,out);})
-  .catch(function(e){if(out)out.innerHTML='<div class=\"mut2\" style=\"color:#c0392b\">创建失败：'+(e.message||e)+'</div>';});}
-function vdirPoll(vid,out){var tries=0;var iv=setInterval(function(){tries++;fetch(AGNES_POLL+'?video_id='+encodeURIComponent(vid),{headers:{'Authorization':'Bearer '+agnesKey()}}).then(function(r){return r.json();}).then(function(j){var done=(j.status==='done'||j.status==='completed'||j.state==='done'||j.status==='succeeded');var url=j.video_url||j.url||(j.data&&j.data[0]&&j.data[0].url)||'';if(done&&url){clearInterval(iv);var arr=D.vmedia||[];for(var i=0;i<arr.length;i++){if(arr[i].vid===vid){arr[i].src=url;arr[i].status='完成';}}saveLocal();scheduleCloudSync();vdirGallery();if(out)out.innerHTML='<video class=\"vdir-out-media\" src=\''+url+'\' controls autoplay loop></video>';toast('视频生成完成');}else if(tries>=36){clearInterval(iv);if(out)out.innerHTML='<div class=\"mut2\">仍在处理，可稍后在画廊查看</div>';}}).catch(function(){});},5000);}
+    vdirSaveMedia({t:'video',src:'',prompt:prompt,m:AGNES_MODEL.video,ct:todayStr(),vid:vid,status:'处理中',elapsed:0,retries:0});vdirGallery();
+    if(out)out.innerHTML=vdirProgressHTML(0,0);vdirPoll(vid,out);})
+  .catch(function(e){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">创建失败：'+(e.message||e)+'</div>';});}
+function vdirProgressHTML(elapsed,retries){
+  var pct=Math.min(Math.round(elapsed/180*100),95);
+  var bar='';for(var i=0;i<20;i++){bar+=(i<Math.floor(pct/5)?'█':'░');}
+  return '<div style="text-align:center;padding:20px">'
+    +'<div style="font-size:13px;color:#888;margin-bottom:8px">视频生成中… 已等待 '+elapsed+'s</div>'
+    +'<div style="font-family:monospace;font-size:11px;color:#6c5ce7;letter-spacing:1px">'+bar+'</div>'
+    +'<div style="font-size:12px;color:#aaa;margin-top:6px">预计 1-3 分钟'+(retries>0?' · 重试 '+retries+'/3':'')+'</div>'
+    +'</div>';}
+function vdirPoll(vid,out){var tries=0,retries=0,startTime=Date.now();
+  function poll(){
+    tries++;
+    var elapsed=Math.round((Date.now()-startTime)/1000);
+    var url,hdr;
+    if(agnesProxyOk){url=AGNES_PROXY+'?video_id='+encodeURIComponent(vid);hdr={'apikey':SB_ANON};}
+    else{url=AGNES_POLL+'?video_id='+encodeURIComponent(vid);hdr={'Authorization':'Bearer '+agnesKey()};}
+    fetch(url,{headers:hdr}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+    .then(function(j){
+      var done=(j.status==='done'||j.status==='completed'||j.state==='done'||j.status==='succeeded');
+      var vurl=j.video_url||j.url||(j.data&&j.data[0]&&j.data[0].url)||'';
+      if(done&&vurl){
+        var arr=D.vmedia||[];for(var i=0;i<arr.length;i++){if(arr[i].vid===vid){arr[i].src=vurl;arr[i].status='完成';}}
+        saveLocal();scheduleCloudSync();vdirGallery();
+        if(out)out.innerHTML='<video class="vdir-out-media" src="'+vurl+'" controls autoplay loop></video>';
+        toast('视频生成完成');
+      }else if(tries>=72){
+        if(out)out.innerHTML='<div class="mut2">超时（6分钟），请稍后在画廊查看</div>';
+      }else{
+        if(out)out.innerHTML=vdirProgressHTML(elapsed,retries);
+        var arr2=D.vmedia||[];for(var i=0;i<arr2.length;i++){if(arr2[i].vid===vid){arr2[i].elapsed=elapsed;arr2[i].retries=retries;}}
+        vdirGallery();
+        setTimeout(poll,5000);
+      }
+    }).catch(function(e){
+      retries++;
+      if(retries>=3){
+        if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">轮询失败（重试3次）：'+(e.message||e)+'<br>可稍后在画廊查看</div>';
+      }else{
+        if(out)out.innerHTML=vdirProgressHTML(elapsed,retries);
+        var arr3=D.vmedia||[];for(var i=0;i<arr3.length;i++){if(arr3[i].vid===vid){arr3[i].elapsed=elapsed;arr3[i].retries=retries;}}
+        vdirGallery();
+        setTimeout(poll,5000);
+      }
+    });
+  }
+  poll();}
 function vdirSaveMedia(it){if(!D.vmedia)D.vmedia=[];it.id=uid();D.vmedia.unshift(it);saveLocal();scheduleCloudSync();}
-function vdirGallery(){var box=$('vdirGallery');if(!box)return;var arr=D.vmedia||[];if(!arr.length){box.innerHTML='<div class=\"mut2\">还没有生成记录</div>';return;}
- box.innerHTML=arr.map(function(it){var media=it.t==='video'?(it.src?'<video src=\''+it.src+'\' controls></video>':'<div class=\"mut2\" style=\"padding:24px;text-align:center\">'+(it.status||'处理中')+'…</div>'):'<img src=\''+it.src+'\' alt=\"\">';return '<div class=\"vdir-g\">'+media+'<div class=\"cap\">'+vdirEsc(it.prompt||'')+'</div></div>';}).join('');}
+function vdirGallery(){var box=$('vdirGallery');if(!box)return;var arr=D.vmedia||[];if(!arr.length){box.innerHTML='<div class="mut2">还没有生成记录</div>';return;}
+ box.innerHTML=arr.map(function(it){
+   var media;
+   if(it.t==='video'){
+     if(it.src){
+       media='<video src="'+it.src+'" controls></video>';
+     }else{
+       media=vdirProgressHTML(it.elapsed||0,it.retries||0);
+     }
+   }else{
+     media='<img src="'+it.src+'" alt="">';
+   }
+   return '<div class="vdir-g">'+media+'<div class="cap">'+vdirEsc(it.prompt||'')+'</div></div>';
+ }).join('');}
 function vdirCopy(){var t=$('vdir_prompt').value.trim();if(!t){toast('先写提示词');return;}navigator.clipboard.writeText(t).then(function(){toast('已复制')},function(){toast('复制失败');});}
 function vdirSavePrompt(){var t=$('vdir_prompt').value.trim();if(!t){toast('先写提示词');return;}var k=$('vdir_task').value;var m={img:AGNES_MODEL.img,video:AGNES_MODEL.video,i2v:AGNES_MODEL.video}[k]||k;D.prompts.push({id:uid(),n:'提示词 '+todayStr(),m:m,s:4,x:t,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
-renderVideoModels();vdirGallery();if(!agnesKey()){var kb=$('vdirKeyBar');if(kb)kb.style.display='block';}
+renderVideoModels();vdirGallery();agnesCheckProxy().then(function(ok){renderVideoModels();if(!ok&&!agnesKey()){var kb=$('vdirKeyBar');if(kb)kb.style.display='block';}});
 
 var SK='ph_session_v1',DK='ph_data_v1';
 var session=null,isOffline=false,curTab='top',syncTimer=null;
@@ -1598,7 +1698,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260812d';
+var APP_VER='20260812e';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
