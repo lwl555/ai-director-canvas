@@ -587,8 +587,7 @@ function vdirApplyShots(){if(!window.__vdirPlan){toast('先生成方案');return
  if(!picked.length)picked=lines;var n=0;
  picked.slice(0,20).forEach(function(ln){D.shots.push({id:uid(),pj:'',no:'',de:ln.replace(/^\d+[.、]\s*/,''),du:0,dd:'',st:'待拍摄',ct:todayStr()});n++;});
  saveLocal();scheduleCloudSync();renderShots();renderShotTimeline();renderToday();toast('已拆入 '+n+' 个分镜');}
-function vdirApplyPrompt(){if(!window.__vdirPlan){toast('先生成方案');return;}var k=$('vdir_task').value;
- D.prompts.push({id:uid(),n:'视频方案 '+todayStr(),m:AGNES_MODEL.img,s:4,x:window.__vdirPlan,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
+function vdirApplyPrompt(){if(!window.__vdirPlan){toast('先生成方案');return;}D.prompts.push({id:uid(),n:'视频方案 '+todayStr(),m:AGNES_MODEL.img,s:4,x:window.__vdirPlan,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
 function vdirUseAsPrompt(){if(!window.__vdirLast){toast('先和导演聊一下');return;}vdirSetMode('video');$('vdir_input').value=window.__vdirLast;vdirGenerateInline();}
 function vdirApplyPromptText(){if(!window.__vdirLast){toast('先聊一下');return;}D.prompts.push({id:uid(),n:'视频方案 '+todayStr(),m:AGNES_MODEL.chat,s:4,x:window.__vdirLast,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
 function vdirUsePlanGen(){if(!window.__vdirPlan){toast('先生成方案');return;}vdirSetMode('video');$('vdir_input').value=window.__vdirPlan;vdirGenerateInline();}
@@ -614,7 +613,7 @@ function vdirLogGen(mode,prompt,status){
  else D.genLog.push({t:nowStr(),mode:mode,prompt:prompt,status:status});
  saveLocal();if($('vdirMem')&&$('vdirMem').style.display!=='none')vdirRenderMem();}
 function nowStr(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
-function vdirImgPreview(){var f=$('vdir_img')&&$('vdir_img').files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var im=$('vdir_imgprev');if(im){im.src=rd.result;im.style.display='block';}window.__vdirImg=rd.result;};rd.readAsDataURL(f);}
+// (removed: superseded by vdirRefPreview)
 async function vdirGenerate(){vdirGenerateInline();}
 function vdirGenImage(prompt,out){
   var url,hdr,body;
@@ -712,7 +711,7 @@ function vdirGallery(){if(!D)D=defaultD();var box=$('vdirGallery');if(!box)retur
    }
    return '<div class="vdir-g">'+media+'<div class="cap">'+vdirEsc(it.prompt||'')+'</div></div>';
  }).join('');}
-function vdirCopy(){var t=$('vdir_prompt').value.trim();if(!t){toast('先写提示词');return;}navigator.clipboard.writeText(t).then(function(){toast('已复制')},function(){toast('复制失败');});}
+function vdirCopy(){var t=$('vdir_input').value.trim();if(!t){toast('先写提示词');return;}navigator.clipboard.writeText(t).then(function(){toast('已复制')},function(){toast('复制失败');});}
 function vdirSavePrompt(){var t=$('vdir_input').value.trim();if(!t){toast('先写提示词');return;}var m={img:AGNES_MODEL.img,video:AGNES_MODEL.video,i2v:AGNES_MODEL.video}[vdirMode]||vdirMode;D.prompts.push({id:uid(),n:'提示词 '+todayStr(),m:m,s:4,x:t,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
 /* video panel init moved to DOMContentLoaded + renderAll (D not yet ready here) */
 
@@ -1219,7 +1218,7 @@ document.documentElement.style.setProperty('--ac', AC[t]||'var(--ac-top)');
   if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video')renderShotTimeline();if(t==='ecom'){renderEcomBoard();renderHotProducts();}}
 
 // ===== RENDER ALL =====
-function renderAll(){switchCat();renderKanban();renderAssets();renderStats();renderShots();renderShotTimeline();renderPrompts();renderVideos();renderLedger();renderHabits();renderTodos();renderProducts();renderEcomBoard();renderHotProducts();renderDiary();renderToday();renderTop();initHot();checkTip();var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;renderChatHistory();/* agnes video panel init (D ready here) */try{renderVideoModels();vdirGallery();}catch(e){console.warn('vdir init',e);}if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){try{renderVideoModels();}catch(e){}if(!ok&&!agnesKey()){var kb=$('vdirKeyBar');if(kb)kb.style.display='block';}});}}
+function renderAll(){switchCat();renderKanban();renderAssets();renderStats();renderShots();renderShotTimeline();renderPrompts();renderVideos();renderLedger();renderHabits();renderTodos();renderProducts();renderEcomBoard();renderHotProducts();renderDiary();renderToday();renderTop();initHot();checkTip();var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;renderChatHistory();/* agnes video panel init (D ready here) */try{vdirGallery();}catch(e){console.warn('vdir init',e);}if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb=$('vdirKeyBar');if(kb)kb.style.display='block';}});}}
 
 // ===== TODAY HOME =====
 function hubName(){try{var n=localStorage.getItem('wb_personal_hub_name');if(n&&n.trim())return n.trim();}catch(e){}if(session&&session.user&&session.user.email)return session.user.email.split('@')[0];return '';}
@@ -1814,7 +1813,7 @@ window.addEventListener('DOMContentLoaded',function(){
   initStatPlat();switchCat();
   var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;
   if(restoreSession()){if(!isTokenExpired()){enterApp();}else{refreshToken().then(function(ok){if(ok)enterApp();else showAuth();});}}
-  else{showAuth();loadLocal();try{renderVideoModels();vdirGallery();}catch(e){console.warn('vdir init2',e);}}/* one-time proxy detection for the video panel */if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){try{renderVideoModels();}catch(e){}if(!ok&&!agnesKey()){var kb2=$('vdirKeyBar');if(kb2)kb2.style.display='block';}});}
+  else{showAuth();loadLocal();try{vdirGallery();}catch(e){console.warn('vdir init2',e);}}/* one-time proxy detection for the video panel */if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb2=$('vdirKeyBar');if(kb2)kb2.style.display='block';}});}
   // 注册 Service Worker（仅 https 环境；让手机端可"安装到主屏幕"）
   // 关键：新版本自动激活 + 刷新一次，确保用户不会一直看到旧的缓存页面
   if(location.protocol==='https:' && 'serviceWorker' in navigator){
