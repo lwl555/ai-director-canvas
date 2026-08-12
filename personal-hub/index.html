@@ -530,7 +530,7 @@ function agnesKey(){try{return localStorage.getItem('wb_personal_hub_agnes_key')
 function agnesSetKey(v){try{localStorage.setItem('wb_personal_hub_agnes_key',v.trim());}catch(e){}}
 function agnesCheckProxy(){
   if(agnesProxyOk!==null)return Promise.resolve(agnesProxyOk);
-  return fetch(AGNES_PROXY,{method:'POST',headers:{'apikey':SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({route:'chat',model:AGNES_MODEL.chat,messages:[{role:'user',content:'hi'}],stream:false,max_tokens:5})})
+  return fetch(AGNES_PROXY,{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({route:'chat',model:AGNES_MODEL.chat,messages:[{role:'user',content:'hi'}],stream:false,max_tokens:5})})
     .then(function(r){agnesProxyOk=r.ok;if(agnesProxyOk){var kb=$('vdirKeyBar');if(kb)kb.style.display='none';var pn=$('vdirProxyNote');if(pn)pn.style.display='block';var ki=$('agnesKeyRow');if(ki)ki.style.display='none';}return r.ok;})
     .catch(function(){agnesProxyOk=false;return false;});
 }
@@ -550,7 +550,7 @@ function vdirWarnKey(){var b=$('vdirKeyBar');if(b)b.style.display='block';toast(
 function vdirChatSend(messages,onDelta,onDone){
   var url,hdr,body;
   if(agnesProxyOk){
-    url=AGNES_PROXY;hdr={'apikey':SB_ANON,'Content-Type':'application/json'};
+    url=AGNES_PROXY;hdr={'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'};
     body=JSON.stringify({route:'chat',model:AGNES_MODEL.chat,messages:messages,stream:true,max_tokens:4000});
   }else{
     url=AGNES_BASE+'/chat/completions';hdr={'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()};
@@ -597,7 +597,7 @@ async function vdirGenerate(){var k=$('vdir_task').value;var p=$('vdir_prompt').
 function vdirGenImage(prompt,out){
   var url,hdr,body;
   if(agnesProxyOk){
-    url=AGNES_PROXY;hdr={'apikey':SB_ANON,'Content-Type':'application/json'};
+    url=AGNES_PROXY;hdr={'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'};
     body=JSON.stringify({route:'image',model:AGNES_MODEL.img,prompt:prompt,size:'1K',ratio:'16:9',extra_body:{response_format:'url'}});
   }else{
     url=AGNES_BASE+'/images/generations';hdr={'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()};
@@ -611,7 +611,7 @@ function vdirGenVideo(prompt,out,imageData){
   var vbody={model:AGNES_MODEL.video,prompt:prompt,width:1152,height:768,num_frames:121,frame_rate:24};if(imageData)vbody.image=imageData;
   var url,hdr,body;
   if(agnesProxyOk){
-    url=AGNES_PROXY;hdr={'apikey':SB_ANON,'Content-Type':'application/json'};
+    url=AGNES_PROXY;hdr={'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'};
     body=JSON.stringify({route:'video',model:vbody.model,prompt:vbody.prompt,width:vbody.width,height:vbody.height,num_frames:vbody.num_frames,frame_rate:vbody.frame_rate,image:imageData||undefined});
   }else{
     url=AGNES_BASE+'/videos';hdr={'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()};
@@ -636,7 +636,7 @@ function vdirPoll(vid,out){var tries=0,retries=0,startTime=Date.now();
     tries++;
     var elapsed=Math.round((Date.now()-startTime)/1000);
     var url,hdr;
-    if(agnesProxyOk){url=AGNES_PROXY+'?video_id='+encodeURIComponent(vid);hdr={'apikey':SB_ANON};}
+    if(agnesProxyOk){url=AGNES_PROXY+'?video_id='+encodeURIComponent(vid);hdr={'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON};}
     else{url=AGNES_POLL+'?video_id='+encodeURIComponent(vid);hdr={'Authorization':'Bearer '+agnesKey()};}
     fetch(url,{headers:hdr}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
     .then(function(j){
@@ -712,12 +712,12 @@ function checkTip(){var n=0;['posts','assets','stats','shots','prompts','videos'
 // ===== AUTH =====
 function authTab(t){document.querySelectorAll('[data-at]').forEach(function(b){b.classList.toggle('on',b.dataset.at===t)});$('loginForm').style.display=t==='login'?'':'none';$('signupForm').style.display=t==='signup'?'':'none';}
 async function doLogin(e){e.preventDefault();$('li_err').textContent='';
-  try{var r=await fetch(SB_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({email:$('li_email').value,password:$('li_pwd').value})});
+  try{var r=await fetch(SB_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({email:$('li_email').value,password:$('li_pwd').value})});
     var d=await r.json();if(!r.ok)throw new Error(d.error_description||d.msg||d.message||'登录失败');
     session=d;saveSession();enterApp();
   }catch(err){$('li_err').textContent=err.message}}
 async function doSignup(e){e.preventDefault();$('su_err').textContent='';
-  try{var r=await fetch(SB_URL+'/auth/v1/signup',{method:'POST',headers:{'apikey':SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({email:$('su_email').value,password:$('su_pwd').value})});
+  try{var r=await fetch(SB_URL+'/auth/v1/signup',{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({email:$('su_email').value,password:$('su_pwd').value})});
     var d=await r.json();if(!r.ok)throw new Error(d.error_description||d.msg||d.message||'注册失败');
     if(d.access_token){session=d;saveSession();enterApp();}
     else{$('su_err').textContent='注册成功！如已关闭邮箱验证可直接登录';authTab('login');$('li_email').value=$('su_email').value;$('li_pwd').value=$('su_pwd').value;}
@@ -728,10 +728,10 @@ function saveSession(){if(session)localStorage.setItem(SK,JSON.stringify(session
 function restoreSession(){var s=localStorage.getItem(SK);if(s){try{session=JSON.parse(s)}catch(e){session=null}}return session;}
 function isTokenExpired(){if(!session||!session.access_token)return true;try{var p=JSON.parse(atob(session.access_token.split('.')[1]));return Date.now()>=p.exp*1000-30000}catch(e){return true}}
 async function refreshToken(){if(!session||!session.refresh_token)return false;
-  try{var r=await fetch(SB_URL+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'apikey':SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:session.refresh_token})});
+  try{var r=await fetch(SB_URL+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:session.refresh_token})});
     var d=await r.json();if(!r.ok)throw new Error('refresh failed');session=d;saveSession();return true;
   }catch(e){return false}}
-async function getHeaders(json){if(isOffline||!session)return{'apikey':SB_ANON};if(isTokenExpired())await refreshToken();var h={'apikey':SB_ANON,'Authorization':'Bearer '+(session?session.access_token:'')};if(json){h['Content-Type']='application/json';}return h;}
+async function getHeaders(json){if(isOffline||!session)return{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON};if(isTokenExpired())await refreshToken();var h={'apikey':SB_ANON,'Authorization':'Bearer '+(session?session.access_token:'')};if(json){h['Content-Type']='application/json';}return h;}
 function showAuth(){$('authBg').style.display='flex';$('mainApp').style.display='none';}
 async function enterApp(){
   $('authBg').style.display='none';$('mainApp').style.display='';
@@ -1698,7 +1698,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260812e';
+var APP_VER='20260812f';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
