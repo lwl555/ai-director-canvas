@@ -393,7 +393,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M4.5 6.5h11a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 16V8a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M17 11l4-2.6v7.2L17 13z"/></svg><h3>成片产出</h3><div class="sp"><span class="mut2" id="vdCnt"></span></div></div><div class="bd"><div class="form"><input class="fw" id="vd_t" placeholder="成片标题"><input class="w110 half" id="vd_d" type="number" inputmode="numeric" placeholder="时长秒"><select class="w130 half" id="vd_s"><option>生成中</option><option>待剪辑</option><option>待审</option><option>已发布</option></select><input class="fw" id="vd_p" placeholder="发布平台/备注"><button class="btn pri" onclick="addVideo()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>登记</button></div><div class="stats" id="vdStats"></div><div id="vdList"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9v6M12 9v6M17 9v6"/></svg><h3>分镜时间轴</h3><div class="sp"><span class="mut2">点击镜头块切换 待拍摄→拍摄中→已交付</span></div></div><div class="bd"><div id="shotTimeline"></div></div></div>
 </div>
-<div class="card vdir"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI 导演 · Agnes 创作</h3><div class="sp"><span class="mut2">真实出图/出视频</span></div></div><div class="bd">
+<div class="card vdir"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI 助手 · Agnes</h3><div class="sp"><span class="mut2">联网搜索 · 通用助手</span></div></div><div class="bd">
 <style>
 .vdir-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:768px){.vdir-cols{grid-template-columns:1fr}}
@@ -407,6 +407,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 .vdir-g .cap{font-size:11px;padding:5px 7px;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .vdir-out-media{max-width:100%;border-radius:10px;margin-top:6px;background:#000}
 .ai-actions{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}
+.ai-tag{font-size:11px;font-weight:700;color:var(--ac);letter-spacing:.4px;margin-bottom:4px}
 </style>
 <div id="vdirKeyBar" class="mut2" style="display:none;margin:0 0 10px;font-size:12px;color:#c0392b">注意：尚未配置 Agnes API Key。可在设置中填入 sk-...（agnes-ai.cn 后台获取），或部署后端代理 agnes-media 后自动免 Key。</div>
 <div class="vdir-tabs">
@@ -416,8 +417,8 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
  <button data-m="i2v" onclick="vdirTab('i2v')">图生视频</button>
 </div>
 <div id="vdirViewChat">
-  <div class="mut2" style="margin-bottom:6px">跟导演聊：说想法，它一步步帮你出方案、写提示词；或点「完整方案」直接用上方内容生成分镜</div>
-  <div class="ai-chat" id="vdir_chat" style="height:320px"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>我是你的 AI 视频导演，基于 Agnes 免费模型帮你创作</div></div></div>
+  <div class="mut2" style="margin-bottom:6px">通用 AI 助手：说需求，它联网搜索、拆解任务、整理视频/图文生成方案；需求模糊时会主动追问。或点「完整方案」用上方内容生成分镜</div>
+  <div class="ai-chat" id="vdir_chat" style="height:320px"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>我是你的通用 AI 助手（基于 Agnes 免费模型），可以联网搜索、帮你规划视频、写提示词，有疑问会主动问你</div></div></div>
   <div class="ai-input" style="margin-top:8px"><textarea id="vdir_input" placeholder="例如：做一个30秒的国风茶饮宣传视频…" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();vdirSend()}"></textarea><button class="btn" onclick="vdirPlan()" title="用上方内容生成完整分镜方案">完整方案</button><button class="btn pri ai-send" onclick="vdirSend()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
 </div>
 <div id="vdirViewGen" style="display:none">
@@ -544,11 +545,13 @@ function vdirAddMsg(role,text,html){var box=$('vdir_chat');if(!box)return;var em
  var av=document.createElement('div');av.className='av';
  av.innerHTML=role==='bot'?'<svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z" fill="currentColor"/></svg>':'<svg class="ico" viewBox="0 0 24 24"><path d="M12 12c2.2 0 4-1.8 4-4s-1.8-4-4-4-4 1.8-4 4 1.8 4 4 4zm0 2c-2.7 0-8 1.3-8 4v2h16v-2c0-2.7-5.3-4-8-4z" fill="currentColor"/></svg>';
  var bub=document.createElement('div');bub.className='bubble';
+ if(role==='bot'){var tag=document.createElement('div');tag.className='ai-tag';tag.textContent='# 松屿AI';bub.appendChild(tag);}
  var body=document.createElement('div');body.className='ai-body';
  if(html)body.innerHTML=html;else body.textContent=text;
  bub.appendChild(body);d.appendChild(av);d.appendChild(bub);box.appendChild(d);box.scrollTop=box.scrollHeight;
  return d;}
 function vdirWarnKey(){var b=$('vdirKeyBar');if(b)b.style.display='block';toast('请先在设置填入 Agnes API Key，或部署后端代理 agnes-media');}
+function agnesSearch(q){return new Promise(function(res){if(!agnesProxyOk){res('');return;}fetch(AGNES_PROXY,{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({route:'search',query:q})}).then(function(r){return r.json();}).then(function(j){if(!j||!j.results||!j.results.length){res('');return;}var s='【联网搜索结果】\n';j.results.forEach(function(x,i){s+=(i+1)+'. '+(x.title||'')+'\n   '+(x.snippet||'').replace(/\n/g,' ')+'\n   '+(x.url||'')+'\n';});res(s);}).catch(function(){res('');});});}
 function vdirChatSend(messages,onDelta,onDone){
   var url,hdr,body;
   if(agnesProxyOk){
@@ -566,13 +569,17 @@ function vdirChatSend(messages,onDelta,onDone){
 async function vdirSend(){var inp=$('vdir_input');if(!inp)return;var m=inp.value.trim();if(!m)return;inp.value='';
  if(!(await agnesEnsureReady()))return;
  vdirAddMsg('user',m);var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';var acc='';
- vdirChatSend([{role:'system',content:'你是松屿工作台的 AI 视频导演，基于 Agnes 免费模型（agnes-2.0-flash 对话 / agnes-image-2.1-flash 文生图 / agnes-video-v2.0 文生视频）。用简洁中文一步步帮用户规划视频、写可直接用的提示词。'},{role:'user',content:m}],
+ var ctx='';try{ctx=await agnesSearch(m);}catch(e){ctx='';}
+ var msgs=[{role:'system',content:'你是松屿工作台的通用 AI 助手（不限视频领域）。你的定位：像一个靠谱的人类助手——理解用户需求、按需联网搜索资料、把复杂任务拆成可执行步骤、整理视频/图文生成方案，并在需求模糊时主动追问 1-2 个关键问题。\n你具备联网搜索能力：平台会把搜索到的网页摘要作为「联网搜索结果」上下文发给你，请基于它们作答，并尽量标注来源（URL）。若没有搜索结果，就基于自身知识回答并说明。\n回答要简洁、条理清晰、用中文。涉及视频/图片生成时，给出可直接用的提示词（agnes 模型：agnes-image-2.1-flash 文生图 / agnes-video-v2.0 文生视频·图生视频），并说明生成步骤。'}];
+ if(ctx)msgs.push({role:'system',content:ctx});
+ msgs.push({role:'user',content:m});
+ vdirChatSend(msgs,
   function(d){acc+=d;if(body)body.textContent=acc;var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;},
   function(full){window.__vdirLast=full;if(!body)return;var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="vdirUseAsPrompt()">用这条生成视频</button> <button class="btn xs" onclick="vdirApplyPromptText()">存为提示词</button>';body.parentNode.appendChild(act);var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;}).catch(function(e){if(body)body.textContent='出错了：'+(e.message||e);});}
 async function vdirPlan(idea){if(idea===undefined){var inp=$('vdir_input');idea=inp?inp.value.trim():'';}if(!idea){toast('先在上方输入视频主题，或和导演聊完再生成');return;}
  if(!(await agnesEnsureReady()))return;
  vdirAddMsg('user','主题：'+idea);var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';var acc='';
- vdirChatSend([{role:'system',content:'你是视频导演。请基于 Agnes 免费能力，为视频主题输出结构化方案：1)一句话创意 2)分镜列表（每条含镜号、画面描述、秒数）3)图片提示词（文生图用，agnes-image-2.1-flash）4)视频提示词（文生/图生视频用，agnes-video-v2.0）5)建议模型。'},{role:'user',content:'主题：'+idea}],
+ vdirChatSend([{role:'system',content:'你是视频创作助手。请基于 Agnes 免费能力，为视频主题输出结构化方案：1)一句话创意 2)分镜列表（每条含镜号、画面描述、秒数）3)图片提示词（文生图用，agnes-image-2.1-flash）4)视频提示词（文生/图生视频用，agnes-video-v2.0）5)建议模型。'},{role:'user',content:'主题：'+idea}],
   function(d){acc+=d;if(body)body.textContent=acc;var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;},
   function(full){window.__vdirPlan=full;if(!body)return;var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="vdirApplyShots()">拆为分镜</button> <button class="btn xs" onclick="vdirApplyPrompt()">存为提示词</button> <button class="btn xs" onclick="vdirUsePlanGen()">生成示例视频</button>';body.parentNode.appendChild(act);var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;}).catch(function(e){if(body)body.textContent='出错了：'+(e.message||e);});}
 function vdirApplyShots(){if(!window.__vdirPlan){toast('先生成方案');return;}
@@ -900,7 +907,8 @@ function aiAddMsg(role,content,ts,images){var chat=$('ai_chat');var empty=chat.q
   var div=document.createElement('div');div.className='ai-msg '+role;
   var av=role==='user'?'<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>':'<svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>';
   var imgHtml='';if(images&&images.length)imgHtml=images.map(function(s){return '<img class="shot" src="'+s+'" alt="图片">'}).join('');
-  div.innerHTML='<div class="av">'+av+'</div><div class="bubble">'+imgHtml+esc(content).replace(/\n/g,'<br>')+'<div class="ts">'+(ts||'')+'</div></div>';
+  var tag=role==='bot'?'<div class="ai-tag"># 松屿AI</div>':'';
+  div.innerHTML='<div class="av">'+av+'</div><div class="bubble">'+tag+imgHtml+esc(content).replace(/\n/g,'<br>')+'<div class="ts">'+(ts||'')+'</div></div>';
   chat.appendChild(div);chat.scrollTop=chat.scrollHeight;}
 function aiShowTyping(){var chat=$('ai_chat');var empty=chat.querySelector('.ai-empty');if(empty)empty.remove();
   var div=document.createElement('div');div.className='ai-msg bot';div.id='aiTyping';
@@ -1701,7 +1709,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260812j';
+var APP_VER='20260812k';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
