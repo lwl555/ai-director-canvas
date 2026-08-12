@@ -561,13 +561,13 @@ async function vdirSend(){var inp=$('vdir_input');if(!inp)return;var m=inp.value
  vdirAddMsg('user',m);var node=vdirAddMsg('bot','');var acc='';
  vdirChatSend([{role:'system',content:'你是松屿工作台的 AI 视频导演，基于 Agnes 免费模型（agnes-2.0-flash 对话 / agnes-image-2.1-flash 文生图 / agnes-video-v2.0 文生视频）。用简洁中文一步步帮用户规划视频、写可直接用的提示词。'},{role:'user',content:m}],
   function(d){acc+=d;node.textContent=acc;var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;},
-  function(full){window.__vdirLast=full;var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="vdirUseAsPrompt()">用这条生成视频</button> <button class="btn xs" onclick="vdirApplyPromptText()">存为提示词</button>';node.appendChild(act);var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;}}).catch(function(e){node.textContent='出错了：'+(e.message||e);});}
+  function(full){window.__vdirLast=full;var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="vdirUseAsPrompt()">用这条生成视频</button> <button class="btn xs" onclick="vdirApplyPromptText()">存为提示词</button>';node.appendChild(act);var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;}).catch(function(e){node.textContent='出错了：'+(e.message||e);});}
 async function vdirPlan(idea){if(idea===undefined){var inp=$('vdir_input');idea=inp?inp.value.trim():'';}if(!idea){toast('先在上方输入视频主题，或和导演聊完再生成');return;}
  if(!(await agnesEnsureReady()))return;
  vdirAddMsg('user','主题：'+idea);var node=vdirAddMsg('bot','生成中…');var acc='';
  vdirChatSend([{role:'system',content:'你是视频导演。请基于 Agnes 免费能力，为视频主题输出结构化方案：1)一句话创意 2)分镜列表（每条含镜号、画面描述、秒数）3)图片提示词（文生图用，agnes-image-2.1-flash）4)视频提示词（文生/图生视频用，agnes-video-v2.0）5)建议模型。'},{role:'user',content:'主题：'+idea}],
   function(d){acc+=d;node.textContent=acc;var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;},
-  function(full){window.__vdirPlan=full;var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="vdirApplyShots()">拆为分镜</button> <button class="btn xs" onclick="vdirApplyPrompt()">存为提示词</button> <button class="btn xs" onclick="vdirUsePlanGen()">生成示例视频</button>';node.appendChild(act);var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;}}).catch(function(e){node.textContent='出错了：'+(e.message||e);});}
+  function(full){window.__vdirPlan=full;var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="vdirApplyShots()">拆为分镜</button> <button class="btn xs" onclick="vdirApplyPrompt()">存为提示词</button> <button class="btn xs" onclick="vdirUsePlanGen()">生成示例视频</button>';node.appendChild(act);var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;}).catch(function(e){node.textContent='出错了：'+(e.message||e);});}
 function vdirApplyShots(){if(!window.__vdirPlan){toast('先生成方案');return;}
  var lines=window.__vdirPlan.split(/\n+/).map(function(s){return s.trim();}).filter(function(s){return s.length>0;});
  var picked=lines.filter(function(s){return /^\d+[.、]/.test(s)||/^[Ss]\d/.test(s)||/镜\s*\d/.test(s);});
@@ -1694,7 +1694,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260812h';
+var APP_VER='20260812i';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
