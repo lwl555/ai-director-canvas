@@ -540,7 +540,7 @@ async function agnesEnsureReady(){
   if(agnesKey())return true;
   vdirWarnKey();return false;
 }
-function renderVideoModels(){var k=($('vdir_task')?$('vdir_task').value:'img');var lbl={img:'文生图 · '+AGNES_MODEL.img,video:'文生视频 · '+AGNES_MODEL.video,i2v:'图生视频 · '+AGNES_MODEL.video}[k]||'';
+function renderVideoModels(){if(!D)D=defaultD();var k=($('vdir_task')?$('vdir_task').value:'img');var lbl={img:'文生图 · '+AGNES_MODEL.img,video:'文生视频 · '+AGNES_MODEL.video,i2v:'图生视频 · '+AGNES_MODEL.video}[k]||'';
  if($('vdirModelTag'))$('vdirModelTag').textContent=lbl;
  if($('vdirModelNote'))$('vdirModelNote').textContent='当前模型：'+lbl+(agnesProxyOk?' · 后端代理模式':' · 直连模式')+' · 换模型改 AGNES_MODEL';}
 function vdirEsc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -669,7 +669,7 @@ function vdirPoll(vid,out){var tries=0,retries=0,startTime=Date.now();
   }
   poll();}
 function vdirSaveMedia(it){if(!D.vmedia)D.vmedia=[];it.id=uid();D.vmedia.unshift(it);saveLocal();scheduleCloudSync();}
-function vdirGallery(){var box=$('vdirGallery');if(!box)return;var arr=D.vmedia||[];if(!arr.length){box.innerHTML='<div class="mut2">还没有生成记录</div>';return;}
+function vdirGallery(){if(!D)D=defaultD();var box=$('vdirGallery');if(!box)return;var arr=D.vmedia||[];if(!arr.length){box.innerHTML='<div class="mut2">还没有生成记录</div>';return;}
  box.innerHTML=arr.map(function(it){
    var media;
    if(it.t==='video'){
@@ -685,7 +685,7 @@ function vdirGallery(){var box=$('vdirGallery');if(!box)return;var arr=D.vmedia|
  }).join('');}
 function vdirCopy(){var t=$('vdir_prompt').value.trim();if(!t){toast('先写提示词');return;}navigator.clipboard.writeText(t).then(function(){toast('已复制')},function(){toast('复制失败');});}
 function vdirSavePrompt(){var t=$('vdir_prompt').value.trim();if(!t){toast('先写提示词');return;}var k=$('vdir_task').value;var m={img:AGNES_MODEL.img,video:AGNES_MODEL.video,i2v:AGNES_MODEL.video}[k]||k;D.prompts.push({id:uid(),n:'提示词 '+todayStr(),m:m,s:4,x:t,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
-renderVideoModels();vdirGallery();agnesCheckProxy().then(function(ok){renderVideoModels();if(!ok&&!agnesKey()){var kb=$('vdirKeyBar');if(kb)kb.style.display='block';}});
+/* video panel init moved to DOMContentLoaded + renderAll (D not yet ready here) */
 
 var SK='ph_session_v1',DK='ph_data_v1';
 var session=null,isOffline=false,curTab='top',syncTimer=null;
@@ -1178,7 +1178,7 @@ document.documentElement.style.setProperty('--ac', AC[t]||'var(--ac-top)');
   if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video')renderShotTimeline();if(t==='ecom'){renderEcomBoard();renderHotProducts();}}
 
 // ===== RENDER ALL =====
-function renderAll(){switchCat();renderKanban();renderAssets();renderStats();renderShots();renderShotTimeline();renderPrompts();renderVideos();renderLedger();renderHabits();renderTodos();renderProducts();renderEcomBoard();renderHotProducts();renderDiary();renderToday();renderTop();initHot();checkTip();var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;renderChatHistory();}
+function renderAll(){switchCat();renderKanban();renderAssets();renderStats();renderShots();renderShotTimeline();renderPrompts();renderVideos();renderLedger();renderHabits();renderTodos();renderProducts();renderEcomBoard();renderHotProducts();renderDiary();renderToday();renderTop();initHot();checkTip();var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;renderChatHistory();/* agnes video panel init (D ready here) */try{renderVideoModels();vdirGallery();}catch(e){console.warn('vdir init',e);}if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){try{renderVideoModels();}catch(e){}if(!ok&&!agnesKey()){var kb=$('vdirKeyBar');if(kb)kb.style.display='block';}});}}
 
 // ===== TODAY HOME =====
 function hubName(){try{var n=localStorage.getItem('wb_personal_hub_name');if(n&&n.trim())return n.trim();}catch(e){}if(session&&session.user&&session.user.email)return session.user.email.split('@')[0];return '';}
@@ -1698,7 +1698,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260812f';
+var APP_VER='20260812g';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -1773,7 +1773,7 @@ window.addEventListener('DOMContentLoaded',function(){
   initStatPlat();switchCat();
   var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;
   if(restoreSession()){if(!isTokenExpired()){enterApp();}else{refreshToken().then(function(ok){if(ok)enterApp();else showAuth();});}}
-  else{showAuth();loadLocal();}
+  else{showAuth();loadLocal();try{renderVideoModels();vdirGallery();}catch(e){console.warn('vdir init2',e);}}/* one-time proxy detection for the video panel */if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){try{renderVideoModels();}catch(e){}if(!ok&&!agnesKey()){var kb2=$('vdirKeyBar');if(kb2)kb2.style.display='block';}});}
   // 注册 Service Worker（仅 https 环境；让手机端可"安装到主屏幕"）
   // 关键：新版本自动激活 + 刷新一次，确保用户不会一直看到旧的缓存页面
   if(location.protocol==='https:' && 'serviceWorker' in navigator){
