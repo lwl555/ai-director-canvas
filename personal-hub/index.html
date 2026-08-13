@@ -387,7 +387,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M4 19.5h16M5.5 19.5V15M10.2 19.5V8.6M14.8 19.5v-6.4M19.5 19.5V5"/></svg><h3>数据复盘</h3><div class="sp"><select class="btn sm" id="stPlat" onchange="renderStats()" style="min-height:34px;padding:0 9px;font-size:13px"></select></div></div><div class="bd"><div class="form"><input class="w150 half" id="sd_d" type="date"><select class="w130 half" id="sd_p"><option>小红书</option><option>抖音</option><option>视频号</option><option>B站</option><option>公众号</option><option>知乎</option></select><input class="half" id="sd_v" type="number" inputmode="numeric" placeholder="播放"><input class="half" id="sd_l" type="number" inputmode="numeric" placeholder="点赞"><input class="half" id="sd_f" type="number" inputmode="numeric" placeholder="涨粉"><button class="btn pri" onclick="addStat()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>记录</button></div><div id="statChart"></div><div id="statList"></div></div></div>
 </div></div></section>
 <section class="panel" id="p-video"><div class="grid">
-<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M3 9.2h18M3 14.8h18M8 4.5v15M16 4.5v15"/></svg><h3>分镜脚本</h3><div class="sp"><span class="mut2" id="shotCnt"></span></div></div><div class="bd"><div class="form"><input class="w150 half" id="sh_pj" placeholder="项目名"><input class="w110 half" id="sh_no" placeholder="镜号S03"><input class="f2" id="sh_de" placeholder="画面描述"><input class="w110 half" id="sh_du" type="number" inputmode="numeric" placeholder="秒"><input class="w150 half" id="sh_dd" type="date" title="交付日"><button class="btn pri" onclick="addShot()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>加分镜</button></div><div id="shotList"></div></div></div>
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M3 9.2h18M3 14.8h18M8 4.5v15M16 4.5v15"/></svg><h3>分镜脚本</h3><div class="sp"><span class="mut2" id="shotCnt"></span></div></div><div class="bd"><div class="form"><input class="w150 half" id="sh_pj" placeholder="项目名"><input class="w110 half" id="sh_no" placeholder="镜号S03"><input class="f2" id="sh_de" placeholder="画面描述"><input class="w110 half" id="sh_du" type="number" inputmode="numeric" placeholder="秒"><input class="w150 half" id="sh_dd" type="date" title="交付日"><button class="btn pri" onclick="addShot()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>加分镜</button><button class="btn" onclick="vdirBatchFilm()" style="margin-left:8px">🎬 分镜成片（自动切段）</button></div><div id="shotList"></div></div></div>
 <div class="grid g2">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M7.5 4.5h11a1.5 1.5 0 0 1 1.5 1.5v13.5l-4-2.6-4 2.6-4-2.6V6a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M10 9h6M10 12.5h4"/></svg><h3>提示词库</h3><div class="sp"><span class="mut2" id="prCnt"></span></div></div><div class="bd"><div class="form"><input class="f1" id="pr_n" placeholder="名称"><select class="w130 half" id="pr_m"><option>agnes-image-2.1-flash（文生图）</option><option>agnes-video-v2.0（文生视频）</option><option>agnes-video-v2.0（图生视频）</option><option>agnes-2.0-flash（对话）</option><option>其他</option></select><select class="w110 half" id="pr_s"><option value="5">★★★★★</option><option value="4" selected>★★★★</option><option value="3">★★★</option><option value="2">★★</option><option value="1">★</option></select><textarea class="fw" id="pr_x" placeholder="提示词正文"></textarea><button class="btn pri" onclick="addPrompt()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>存入词库</button></div><div id="prList"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M4.5 6.5h11a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 16V8a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M17 11l4-2.6v7.2L17 13z"/></svg><h3>成片产出</h3><div class="sp"><span class="mut2" id="vdCnt"></span></div></div><div class="bd"><div class="form"><input class="fw" id="vd_t" placeholder="成片标题"><input class="w110 half" id="vd_d" type="number" inputmode="numeric" placeholder="时长秒"><select class="w130 half" id="vd_s"><option>生成中</option><option>待剪辑</option><option>待审</option><option>已发布</option></select><input class="fw" id="vd_p" placeholder="发布平台/备注"><button class="btn pri" onclick="addVideo()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>登记</button></div><div class="stats" id="vdStats"></div><div id="vdList"></div></div></div>
@@ -633,9 +633,9 @@ function vdirGenImage(prompt,out){
  .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error((j.error&&(j.error.message||j.error.msg))||('HTTP '+r.status));return j;});})
  .then(function(j){var imgUrl=(j.data&&j.data[0]&&j.data[0].url)||'';if(!imgUrl)throw new Error('未返回图片');if(out)out.innerHTML='<img class="vdir-out-media" src="'+imgUrl+'" alt="生成结果">';vdirSaveMedia({t:'image',src:imgUrl,prompt:prompt,m:AGNES_MODEL.img,ct:todayStr()});vdirGallery();toast('已生成并存入画廊');vdirLogGen('img',prompt,'成功');window.__vdirLast=prompt;if(out&&out.parentNode){var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="vdirApplyPromptText()">存为提示词</button>';out.parentNode.appendChild(act);}})
  .catch(function(e){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">生成失败：'+(e.message||e)+'</div>';vdirLogGen('img',prompt,'失败:'+(e.message||e));});}
-function vdirGenVideo(prompt,out,imageData,attempt){
+function vdirGenVideo(prompt,out,imageData,attempt,cb,framesIn){
   if(attempt===undefined)attempt=0;
-  var frames=attempt>0?97:121;
+  var frames=framesIn||(attempt>0?97:121);
   var vbody={model:AGNES_MODEL.video,prompt:prompt,width:1152,height:768,num_frames:frames,frame_rate:24};if(imageData)vbody.image=imageData;
   var url,hdr,body;
   if(agnesProxyOk){
@@ -649,10 +649,10 @@ function vdirGenVideo(prompt,out,imageData,attempt){
   .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error((j.error&&(j.error.message||j.error.msg))||('HTTP '+r.status));return j;});})
   .then(function(j){var vid=j.video_id||j.task_id||j.id;if(!vid)throw new Error('未返回任务ID');
     vdirSaveMedia({t:'video',src:'',prompt:prompt,m:AGNES_MODEL.video,ct:todayStr(),vid:vid,status:'处理中',elapsed:0,retries:0});vdirGallery();
-    if(out)out.innerHTML=vdirProgressHTML(0,0);vdirPoll(vid,out,prompt);})
+    if(out)out.innerHTML=vdirProgressHTML(0,0);vdirPoll(vid,out,prompt,cb);})
   .catch(function(e){
     if(attempt<1){vdirLogGen('video',prompt,'创建失败→自动降低时长重试');vdirGenVideo(prompt,out,imageData,1);}
-    else{if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">创建失败：'+(e.message||e)+'</div>';vdirLogGen('video',prompt,'失败:'+(e.message||e));}
+    else{if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">创建失败：'+(e.message||e)+'</div>';vdirLogGen('video',prompt,'失败:'+(e.message||e));if(cb)cb(null,e);}
   });}
 function vdirProgressHTML(elapsed,retries){
   var pct=Math.min(Math.round(elapsed/180*100),95);
@@ -662,7 +662,7 @@ function vdirProgressHTML(elapsed,retries){
     +'<div style="font-family:monospace;font-size:11px;color:#6c5ce7;letter-spacing:1px">'+bar+'</div>'
     +'<div style="font-size:12px;color:#aaa;margin-top:6px">预计 1-3 分钟'+(retries>0?' · 重试 '+retries+'/3':'')+'</div>'
     +'</div>';}
-function vdirPoll(vid,out,prompt){var tries=0,retries=0,startTime=Date.now();
+function vdirPoll(vid,out,prompt,cb){var tries=0,retries=0,startTime=Date.now();
   function poll(){
     tries++;
     var elapsed=Math.round((Date.now()-startTime)/1000);
@@ -677,10 +677,10 @@ function vdirPoll(vid,out,prompt){var tries=0,retries=0,startTime=Date.now();
         var arr=D.vmedia||[];for(var i=0;i<arr.length;i++){if(arr[i].vid===vid){arr[i].src=vurl;arr[i].status='完成';}}
         saveLocal();scheduleCloudSync();vdirGallery();
         if(out)out.innerHTML='<video class="vdir-out-media" src="'+vurl+'" controls autoplay loop></video>';
-        vdirLogGen('video',prompt||'','成功');toast('视频生成完成');
+        vdirLogGen('video',prompt||'','成功');toast('视频生成完成');if(cb)cb(vurl,null);
       }else if(tries>=72){
         if(out)out.innerHTML='<div class="mut2">超时（6分钟），请稍后在画廊查看</div>';
-        vdirLogGen('video',prompt||'','超时');
+        vdirLogGen('video',prompt||'','超时');if(cb)cb(null,new Error('timeout'));
       }else{
         if(out)out.innerHTML=vdirProgressHTML(elapsed,retries);
         var arr2=D.vmedia||[];for(var i=0;i<arr2.length;i++){if(arr2[i].vid===vid){arr2[i].elapsed=elapsed;arr2[i].retries=retries;}}
@@ -691,7 +691,7 @@ function vdirPoll(vid,out,prompt){var tries=0,retries=0,startTime=Date.now();
       retries++;
       if(retries>=3){
         if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">轮询失败（重试3次）：'+(e.message||e)+'<br>可稍后在画廊查看</div>';
-        vdirLogGen('video',prompt||'','轮询失败');
+        vdirLogGen('video',prompt||'','轮询失败');if(cb)cb(null,e);
       }else{
         if(out)out.innerHTML=vdirProgressHTML(elapsed,retries);
         var arr3=D.vmedia||[];for(var i=0;i<arr3.length;i++){if(arr3[i].vid===vid){arr3[i].elapsed=elapsed;arr3[i].retries=retries;}}
@@ -701,6 +701,126 @@ function vdirPoll(vid,out,prompt){var tries=0,retries=0,startTime=Date.now();
     });
   }
   poll();}
+
+// ===== 长视频：按模型上限自动切段 + 顺序生成 + 连播成片 =====
+// 模型单次上限：agnes-video-v2.0 约 121 帧 @24fps ≈ 5 秒
+var VIDEO_MAX_FRAMES=121, VIDEO_FPS=24, VIDEO_MAX_SEC=Math.floor(VIDEO_MAX_FRAMES/VIDEO_FPS);
+var vdirFilm=null;
+
+// 把分镜列表按"每段≤模型上限(5秒)"切成片段队列
+function vdirBuildSegs(){
+  var segs=[];
+  (D.shots||[]).forEach(function(s){
+    if(!s.de)return;
+    var dur=Math.max(1, Number(s.du)||VIDEO_MAX_SEC); // 没填秒数默认 5 秒/镜
+    var parts=Math.max(1, Math.ceil(dur/VIDEO_MAX_SEC));
+    for(var p=0;p<parts;p++){
+      var last=(p===parts-1);
+      var f= last ? Math.max(8, Math.round((dur-(parts-1)*VIDEO_MAX_SEC)*VIDEO_FPS)) : VIDEO_MAX_FRAMES;
+      segs.push({shotId:s.id, no:s.no||'', prompt:s.de, part:p+1, total:parts, frames:f});
+    }
+  });
+  return segs;
+}
+
+async function vdirBatchFilm(){
+  if(!(D.shots&&D.shots.length)){toast('先添加分镜脚本');return;}
+  if(!(await agnesEnsureReady()))return;
+  var segs=vdirBuildSegs();
+  if(!segs.length){toast('没有可生成的分镜');return;}
+  vdirFilm={segs:segs, results:new Array(segs.length).fill(null), done:0, urls:[]};
+  vdirFilmOpen();
+  vdirFilmRun(0);
+}
+
+function vdirFilmRun(i){
+  if(i>=vdirFilm.segs.length){vdirFilmFinish();return;}
+  var seg=vdirFilm.segs[i];
+  vdirFilmProg(i, '⏳ 生成 '+(seg.no?seg.no+' ':'')+'第 '+seg.part+'/'+seg.total+' 段');
+  vdirGenVideo(seg.prompt, null, null, 0, function(url){
+    if(url){vdirFilm.results[i]=url; vdirFilm.done++;}
+    vdirFilmProg(i, url?'✅':'❌');
+    vdirFilmRun(i+1);
+  }, seg.frames);
+}
+
+function vdirFilmOpen(){
+  if(!$('vdirFilmBox')){var d=document.createElement('div');d.id='vdirFilmBox';d.className='mask';document.body.appendChild(d);}
+  if(!$('vdirFilmStyle')){var st=document.createElement('style');st.id='vdirFilmStyle';st.textContent='.film-modal{max-width:560px;width:100%;background:var(--card);border:2px solid var(--ink);border-radius:18px;padding:18px 18px 14px;box-shadow:var(--sh);max-height:86vh;overflow:auto}.film-modal .hd{font-size:17px;font-weight:700;margin-bottom:10px}.film-prog{margin-bottom:10px}.film-segs{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.film-segs .seg{font-size:12px;padding:3px 8px;border-radius:7px;border:1px solid var(--line);background:var(--sand)}.film-segs .seg.ok{background:#e4f3e8;color:#1f7a3d;border-color:#bfe3c9}.film-segs .seg.run{background:var(--clay);color:#fff;border-color:var(--clay)}.film-player{margin:6px 0}.film-ctrls{display:flex;gap:10px;align-items:center;margin-top:8px}.film-acts{display:flex;gap:10px;margin-top:12px}';document.head.appendChild(st);}
+  var box=$('vdirFilmBox');box.style.display='flex';
+  box.innerHTML='<div class="film-modal"><div class="hd">🎬 分镜成片（按模型上限自动切段）</div>'
+    +'<div id="vdirFilmProgress" class="film-prog"></div>'
+    +'<div id="vdirFilmPlayer" class="film-player"></div>'
+    +'<div class="film-acts"><button class="btn" onclick="vdirFilmExport()">⤓ 导出拼接</button><button class="btn" onclick="vdirFilmClose()">关闭</button></div>'
+    +'<div id="vdirFilmMsg" class="mut2" style="margin-top:8px"></div></div>';
+}
+
+function vdirFilmProg(i,status){
+  var p=$('vdirFilmProgress'); if(!p||!vdirFilm)return;
+  var segs=vdirFilm.segs, n=segs.length, ok=vdirFilm.done, fail=n-ok;
+  var h='<div>共 '+n+' 段 · 完成 '+ok+' · 失败 '+fail+'</div><div class="film-segs">';
+  for(var k=0;k<n;k++){
+    var cls=vdirFilm.results[k]?'ok':(k===i?'run':'wait');
+    h+='<span class="seg '+cls+'">'+(k+1)+(status&&k===i?': '+status:'')+'</span>';
+  }
+  h+='</div>'; p.innerHTML=h;
+}
+
+function vdirFilmFinish(){
+  var urls=vdirFilm.results.filter(Boolean); vdirFilm.urls=urls;
+  var pl=$('vdirFilmPlayer'); if(!pl)return;
+  if(!urls.length){pl.innerHTML='<div class="mut2" style="color:#c0392b">全部片段生成失败，请检查 Key/代理后重试</div>';return;}
+  pl.innerHTML='<video id="vdirFilmV" controls style="width:100%;border-radius:12px" crossorigin="anonymous"></video>'
+    +'<div class="film-ctrls"><button class="btn pri" onclick="vdirFilmPlay()">▶ 播放成片（'+urls.length+' 段连播）</button>'
+    +'<span class="mut2" id="vdirFilmIdx"></span></div>';
+  vdirFilm.playIdx=0;
+  var msg=$('vdirFilmMsg'); if(msg)msg.textContent='生成完成 '+urls.length+' 段，点"播放成片"可顺序连播为一条长视频。';
+}
+
+function vdirFilmPlay(){
+  var v=$('vdirFilmV'); if(!v||!vdirFilm||!vdirFilm.urls.length)return;
+  var urls=vdirFilm.urls; vdirFilm.playIdx=0;
+  function show(n){v.src=urls[n];var ix=$('vdirFilmIdx');if(ix)ix.textContent='第 '+(n+1)+'/'+urls.length+' 段';}
+  show(0); v.play();
+  v.onended=function(){var n=vdirFilm.playIdx+1;if(n<urls.length){vdirFilm.playIdx=n;show(n);v.play();}else{var ix=$('vdirFilmIdx');if(ix)ix.textContent='播放完毕';}};
+}
+
+function vdirFilmClose(){$('vdirFilmBox').style.display='none';}
+
+// 浏览器端尽力拼接（canvas+MediaRecorder）；不支持或跨域受限时自动改发各片段下载
+function vdirFilmExport(){
+  var urls=vdirFilm&&vdirFilm.urls; if(!urls||!urls.length){toast('还没有可导出片段');return;}
+  var msg=$('vdirFilmMsg'); if(msg)msg.textContent='拼接中…（浏览器端尽力拼接，不支持时自动改为逐段下载）';
+  vdirJoinVideos(urls,function(blob){
+    if(blob){var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='松屿成片_'+todayStr()+'.webm';a.click();if(msg)msg.textContent='已导出拼接文件（webm）✓';}
+    else{urls.forEach(function(u,i){var a=document.createElement('a');a.href=u;a.download='片段_'+(i+1)+'.mp4';a.click();});if(msg)msg.textContent='当前浏览器/跨域限制不支持一键拼接，已逐段下载（可手动剪辑合并）。';}
+  });
+}
+
+function vdirJoinVideos(urls,cb){
+  if(typeof MediaRecorder==='undefined'||!HTMLCanvasElement.prototype.captureStream){cb(null);return;}
+  var canvas=document.createElement('canvas');canvas.width=1152;canvas.height=768;
+  var ctx2=canvas.getContext('2d');
+  var stream;try{stream=canvas.captureStream(24);}catch(e){cb(null);return;}
+  var mr;try{mr=new MediaRecorder(stream,{mimeType:(MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm')});}catch(e){cb(null);return;}
+  var chunks=[];
+  mr.ondataavailable=function(e){if(e.data&&e.data.size)chunks.push(e.data);};
+  mr.onstop=function(){cb(new Blob(chunks,{type:'video/webm'}));};
+  mr.start();
+  var i=0;
+  function next(){
+    if(i>=urls.length){setTimeout(function(){if(mr.state!=='inactive')mr.stop();},300);return;}
+    var v=document.createElement('video');v.crossOrigin='anonymous';v.muted=true;v.src=urls[i];
+    var draw=setInterval(function(){if(v.readyState>=2)ctx2.drawImage(v,0,0,canvas.width,canvas.height);},33);
+    v.onended=function(){clearInterval(draw);i++;setTimeout(next,200);};
+    v.onerror=function(){clearInterval(draw);i++;setTimeout(next,200);};
+    v.onloadeddata=function(){if(v.videoWidth){canvas.width=v.videoWidth;canvas.height=v.videoHeight;}v.play();};
+    v.load();
+  }
+  setTimeout(function(){if(mr.state!=='inactive')mr.stop();},300000);
+  next();
+}
+
 function vdirSaveMedia(it){if(!D.vmedia)D.vmedia=[];it.id=uid();D.vmedia.unshift(it);saveLocal();scheduleCloudSync();}
 function vdirGallery(){if(!D)D=defaultD();var box=$('vdirGallery');if(!box)return;var arr=D.vmedia||[];if(!arr.length){box.innerHTML='<div class="mut2">还没有生成记录</div>';return;}
  box.innerHTML=arr.map(function(it){
