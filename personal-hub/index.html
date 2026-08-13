@@ -514,6 +514,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
   <div class="form" style="margin-bottom:8px"><input id="db_key" type="password" class="f1" placeholder="豆包 API Key（ark-...，仅存本机浏览器）" style="min-height:38px"><button class="btn pri sm" onclick="saveDoubaoKey()">保存Key</button><span id="dbKeyHint" class="mut2" style="font-size:12px"></span></div>
   <div class="mut2" style="font-size:12px;margin-bottom:8px">Key 只存你自己的浏览器（localStorage），不进源码/不进 git。部署后是公开页面，明文写进去会被人偷走。</div>
   <textarea id="db_prompt" class="f1" rows="3" placeholder="描述你想生成的画面，如：赛博朋克风格的城市夜景，霓虹灯，雨夜" style="min-height:64px;font-size:16px"></textarea>
+  <div class="form" style="margin:8px 0"><button class="btn ghost sm" onclick="dbOptimizePrompt()" id="dbOptBtn">✨ 优化提示词</button><span id="dbOptHint" class="mut2" style="font-size:12px"></span></div>
   <div class="form" style="margin:8px 0">
     <select id="db_size" class="f1" style="min-height:38px">
       <option value="1024x1024">1024×1024（方）</option>
@@ -1839,6 +1840,8 @@ function toggleWsrc(force){var p=$('wsrcPanel');if(!p)return;var show=(typeof fo
 /* ===== 豆包独立生图（火山引擎 Ark 图像 API）===== */
 function doubaoKey(){try{return localStorage.getItem('wb_personal_hub_doubao_key')||'';}catch(e){return '';}}
 function doubaoSetKey(v){try{localStorage.setItem('wb_personal_hub_doubao_key',(v||'').trim());}catch(e){}}
+function doubaoGet(k){try{return localStorage.getItem('wb_personal_hub_doubao_'+k)||'';}catch(e){return '';}}
+function doubaoSet(k,v){try{localStorage.setItem('wb_personal_hub_doubao_'+k,(v==null?'':v));}catch(e){}}
 function saveDoubaoKey(){var el=$('db_key');if(!el)return;var v=el.value.trim();doubaoSetKey(v);var h=$('dbKeyHint');if(h){h.style.color='#3aa655';h.textContent=v?'已保存':'已清除';}toast(v?'豆包 Key 已保存':'已清除');}
 function dbGen(){
   var key=doubaoKey();var out=$('db_out');
@@ -1849,6 +1852,10 @@ function dbGen(){
   var wh=size.split('x');var w=parseInt(wh[0],10)||1024;var h=parseInt(wh[1],10)||1024;
   var n=$('db_n')?Math.max(1,Math.min(4,parseInt($('db_n').value||'1',10)||1)):1;
   var model=$('db_model')?$('db_model').value.trim():'';
+  if(model)doubaoSet('ep',model);
+  doubaoSet('prompt',prompt);
+  var szEl=$('db_size');if(szEl)doubaoSet('size',szEl.value);
+  var nEl=$('db_n');if(nEl)doubaoSet('n',nEl.value);
   if(!model){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请先填写推理接入点 ID（ep-xxxx），在火山引擎 Ark 控制台从 Seedream 图像模型新建接入点获得</div>';return;}
   if(out)out.innerHTML='<div class="mut2">生成中…（豆包云端出图通常 10–40 秒）</div>';
   var body=JSON.stringify({model:model,prompt:prompt,width:w,height:h,n:n});
@@ -1884,6 +1891,38 @@ function renderDoubaoGallery(){
   }).join('');
 }
 function dbDel(id){D.doubao=(D.doubao||[]).filter(function(x){return x.id!==id;});saveLocal();renderDoubaoGallery();}
+// 提示词优化：优先用 agnes 模型，失败回退本地增强
+function dbChatText(j){if(!j)return '';if(j.choices&&j.choices[0]){var c=j.choices[0];if(c.message&&c.message.content)return c.message.content;if(c.content)return c.content;if(c.text)return c.text;}if(j.content)return j.content;if(j.output)return typeof j.output==='string'?j.output:JSON.stringify(j.output);return '';}
+async function dbCallChat(messages){
+  if(typeof agnesCheckProxy==='function'){try{await agnesCheckProxy();}catch(e){}}
+  if(agnesProxyOk){
+    var r=await fetch(AGNES_PROXY,{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({route:'chat',model:AGNES_MODEL.chat,messages:messages,stream:false,max_tokens:600})});
+    return dbChatText(await r.json());
+  }else if(agnesKey()){
+    var r2=await fetch(AGNES_BASE+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()},body:JSON.stringify({model:AGNES_MODEL.chat,messages:messages,stream:false,max_tokens:600})});
+    return dbChatText(await r2.json());
+  }
+  throw new Error('no-ai');
+}
+function dbLocalEnhance(raw,ta,hint){
+  var t=raw+'，电影级质感，8K 超高清，细节丰富，自然光影，氛围感强，构图平衡，主体突出，专业摄影，风格统一，色彩细腻';
+  ta.value=t;doubaoSet('prompt',t);
+  if(hint){hint.style.color='#b8860b';hint.textContent='已本地增强（未联网 AI）';}
+  toast('已本地增强提示词');
+}
+async function dbOptimizePrompt(){
+  var ta=$('db_prompt');if(!ta)return;var raw=ta.value.trim();
+  if(!raw){toast('先写点画面描述再优化');return;}
+  var btn=$('dbOptBtn'),hint=$('dbOptHint');
+  if(btn)btn.disabled=true;if(hint){hint.style.color='';hint.textContent='优化中…';}
+  var sys={role:'system',content:'你是顶尖的中文 AI 绘画提示词优化师。用户给出一句简短画面描述，请扩写成一段详细、富有电影感与画面张力、适合 Seedream/即梦/Midjourney 等文生图模型的提示词。必须包含：主体与特征、环境场景、光线氛围、构图、风格流派、画质词（如 8K、高清、细节丰富、电影级质感）。用中文输出，可穿插英文画质标签，不要解释、不要序号，直接给优化后的提示词本身。'};
+  try{
+    var t=await dbCallChat([sys,{role:'user',content:raw}]);
+    if(t&&t.trim()){ta.value=t.trim();doubaoSet('prompt',t.trim());if(hint){hint.style.color='#3aa655';hint.textContent='已优化 ✓';}toast('提示词已优化');}
+    else dbLocalEnhance(raw,ta,hint);
+  }catch(e){dbLocalEnhance(raw,ta,hint);}
+  finally{if(btn)btn.disabled=false;setTimeout(function(){if(hint)hint.textContent='';},2500);}
+}
 function saveHubName(){var nm=$('hub_name');if(!nm)return;var v=nm.value.trim();try{localStorage.setItem('wb_personal_hub_name',v);}catch(e){}var hint=$('wsrcHint');if(hint){hint.style.color='#3aa655';hint.textContent=v?('已保存称呼「'+v+'」，问候已更新'):'已清除称呼';}$('greetTx').textContent=getGreeting();}
 function saveAgnesKey(){var ak=$('agnes_key');if(!ak)return;var v=ak.value.trim();agnesSetKey(v);var hint=$('agnesKeyHint');if(hint){hint.style.color='#3aa655';hint.textContent=v?'已保存 Key，AI 导演可真实生成':'已清除';}var kb=$('vdirKeyBar');if(kb&&v)kb.style.display='none';vdirGallery();}
 // ===== 模型/参数 UI =====
@@ -2102,7 +2141,7 @@ window.addEventListener('DOMContentLoaded',function(){
   initStatPlat();switchCat();
   var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;
   if(restoreSession()){if(!isTokenExpired()){enterApp();}else{refreshToken().then(function(ok){if(ok)enterApp();else showAuth();});}}
-  else{showAuth();loadLocal();try{vdirGallery();}catch(e){console.warn('vdir init2',e);}}loadModels();try{var dbk=$('db_key');if(dbk)dbk.value=doubaoKey();renderDoubaoGallery();}catch(e){console.warn('doubao init',e);}/* one-time proxy detection for the video panel */if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb2=$('vdirKeyBar');if(kb2)kb2.style.display='block';}});}
+  else{showAuth();loadLocal();try{vdirGallery();}catch(e){console.warn('vdir init2',e);}}loadModels();try{var dbk=$('db_key');if(dbk)dbk.value=doubaoKey();var dbm=$('db_model');if(dbm)dbm.value=doubaoGet('ep');var dbp=$('db_prompt');if(dbp)dbp.value=doubaoGet('prompt');var dbs=$('db_size');if(dbs)dbs.value=doubaoGet('size')||'1024x1024';var dbn=$('db_n');if(dbn)dbn.value=doubaoGet('n')||'1';renderDoubaoGallery();}catch(e){console.warn('doubao init',e);}/* one-time proxy detection for the video panel */if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb2=$('vdirKeyBar');if(kb2)kb2.style.display='block';}});}
   // 注册 Service Worker（仅 https 环境；让手机端可"安装到主屏幕"）
   // 关键：新版本自动激活 + 刷新一次，确保用户不会一直看到旧的缓存页面
   if(location.protocol==='https:' && 'serviceWorker' in navigator){
