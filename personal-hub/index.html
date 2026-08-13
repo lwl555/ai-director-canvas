@@ -477,7 +477,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg><h3>商品库</h3><div class="sp"><span class="mut2" id="ecCnt"></span></div></div><div class="bd"><div class="form"><input class="f2" id="pd_n" placeholder="商品名"><input class="w110 half" id="pd_p" type="number" inputmode="decimal" step="0.01" placeholder="价格¥"><input class="w150 half" id="pd_c" placeholder="分类"><input class="fw" id="pd_f" placeholder="卖点"><button class="btn pri" onclick="addProduct()">加入</button></div><div id="ecProducts"></div></div></div>
 <div class="grid g2">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 14l3-4 3 3 4-6"/></svg><h3>电商运营看板</h3><div class="sp"><span class="mut2" id="ecBoardSub"></span></div></div><div class="bd ec-board"><div class="stats" id="ecStats"></div><div id="ecBoard"></div></div></div>
-<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>全平台热门商品</h3><div class="sp"><span class="mut2">AI 帮你盯热点</span></div></div><div class="bd"><div id="hotProducts"></div></div></div>
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>全平台热门商品</h3><div class="sp"><span class="mut2">AI 帮你盯热点 · 按平台切换</span></div></div><div class="bd"><div class="hot-src" id="hotTabs" style="margin-bottom:10px"></div><div id="hotProducts"></div></div></div>
 </div>
 </div></section>
 <section class="panel" id="p-hot"><div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>今日热度榜</h3><div class="sp"><span class="mut2" id="hotUpd"></span></div></div><div class="bd">
@@ -1321,21 +1321,52 @@ function mdLite(t){t=esc(t||'');
  t=t.replace(/^[\s]*[-*]\s+(.+)$/gm,'<div style="margin:2px 0 2px 12px">· $1</div>');
  t=t.replace(/\n{2,}/g,'<div style="height:6px"></div>').replace(/\n/g,'<br>');
  return t;}
-function renderHotProducts(){var box=$('hotProducts');if(!box)return;var html='<div class="mut2" style="margin-bottom:8px">⚠ 以下为<strong>参考样例热点</strong>（非实时抓取，用于选题灵感）。接入各平台开放数据后即可显示真实排名。</div>';
- Object.keys(HOT_SEED).forEach(function(p){
-  var arr=HOT_SEED[p].slice().sort(function(a,b){return b.h-a.h;});
-  html+='<div class="hot-plat"><div class="hot-plat-h"><span class="pf">'+esc(p)+'</span><span class="mut2">'+arr.length+' 个热点 · 按热度排名</span></div>';
-  html+=arr.map(function(x,i){var gi=p+'|'+HOT_SEED[p].indexOf(x);
-   return '<div class="hot-item"><div class="top"><span class="rk">#'+(i+1)+'</span><span class="nm">'+esc(x.n)+'</span><span class="pf sm">热度 '+x.h+'</span><button class="btn xs ghost" type="button" onclick="aiAnalyzeHot(\''+gi+'\')">AI分析</button></div>'
-    +'<div class="hot-meta"><span>'+esc(x.price)+'</span><span>'+esc(x.sales)+'</span><span class="tag">'+esc(x.tag)+'</span></div>'
-    +'<div class="hot-bar"><i style="width:'+x.h+'%"></i></div></div>';}).join('');
-  html+='</div>';});
- html+='<div id="ecAnalyze" style="margin-top:8px"></div>';box.innerHTML=html;}
-async function aiAnalyzeHot(key){var parts=String(key).split('|');var arr=HOT_SEED[parts[0]];var x=arr&&arr[Number(parts[1])];var box=$('ecAnalyze');if(!box)return;if(!x){box.innerHTML='<div class="ec-skel" style="border-color:#E4C3BD;background:var(--rust-l);color:var(--rust)">未找到该商品</div>';return;}box.innerHTML='<div class="ec-load"><span class="spin"></span>AI 正在分析「'+esc(x.n)+'」…</div>';
+var hotPlat='抖音';
+var hotChats={};
+var hotImgInput=null;
+function hotColor(h){if(h>=85)return 'linear-gradient(90deg,#E0533D,#D6457E)';if(h>=70)return 'linear-gradient(90deg,#E8A23D,#E0533D)';return 'linear-gradient(90deg,#3aa655,#1F9E8A)';}
+function hotRecScore(x){var h=Number(x.h)||0;var m=String(x.sales||'').match(/([\d.]+)\s*万/);var s=m?Math.min(100,Number(m[1])*10):30;return Math.round(h*0.55+s*0.45);}
+function hotRecLabel(s){if(s>=80)return ['强烈推荐','#E0533D'];if(s>=65)return ['可尝试','#E8A23D'];return ['观望','#7C8A92'];}
+function renderHotTabs(){var box=$('hotTabs');if(!box)return;box.innerHTML=Object.keys(HOT_SEED).map(function(p){return '<button type="button" data-h="'+p+'" class="'+(p===hotPlat?'on':'')+'" onclick="selectHotPlat(\''+p+'\')">'+esc(p)+'</button>';}).join('');}
+function selectHotPlat(p){hotPlat=p;renderHotTabs();renderHotProducts();}
+function renderHotProducts(){var box=$('hotProducts');if(!box)return;renderHotTabs();
+  var arr=(HOT_SEED[hotPlat]||[]).slice().sort(function(a,b){return b.h-a.h;});
+  var maxH=Math.max.apply(null,arr.map(function(x){return x.h}).concat([1]));
+  var html='<div class="mut2" style="margin-bottom:8px">⚠ 以下为<strong>'+esc(hotPlat)+'</strong>参考样例热点（非实时抓取，用于选题灵感）。</div>';
+  html+=arr.map(function(x,i){var gi=hotPlat+'|'+HOT_SEED[hotPlat].indexOf(x);
+    var pct=Math.round(x.h/maxH*100);var rc=hotRecScore(x),rl=hotRecLabel(rc);
+    return '<div class="hot-item"><div class="top"><span class="rk">#'+(i+1)+'</span><span class="nm">'+esc(x.n)+'</span>'
+      +'<span class="pf sm" style="background:'+rl[1]+'">'+rl[0]+' '+rc+'</span>'
+      +'<button class="btn xs ghost" type="button" onclick="aiAnalyzeHot(\''+gi+'\')">AI分析</button>'
+      +'<button class="btn xs ghost" type="button" onclick="hotPickImg(\''+gi+'\')">📷传图</button></div>'
+    +'<div class="hot-meta"><span>'+esc(x.price)+'</span><span>'+esc(x.sales)+'</span><span class="tag">'+esc(x.tag)+'</span><span class="mut2">热度 '+x.h+'（'+pct+'%）</span></div>'
+    +'<div class="hot-bar"><i style="width:'+pct+'%;background:'+hotColor(x.h)+'"></i></div>'
+    +'<div id="hotAi_'+gi+'"></div></div>';}).join('');
+  box.innerHTML=html;
+  Object.keys(hotChats).forEach(function(k){if($('hotAi_'+k))renderHotChat(k);});}
+async function aiAnalyzeHot(key,follow,imageData){var parts=String(key).split('|');var arr=HOT_SEED[parts[0]];var x=arr&&arr[Number(parts[1])];var box=$('hotAi_'+key);if(!box)return;if(!x){box.innerHTML='<div class="ec-skel" style="border-color:#E4C3BD;background:var(--rust-l);color:var(--rust)">未找到该商品</div>';return;}
+  if(!hotChats[key])hotChats[key]=[];
+  if(follow&&follow.trim())hotChats[key].push({role:'user',text:follow.trim()});
+  if(imageData)hotChats[key].push({role:'user',img:imageData,text:'[用户上传了商品参考图]'});
+  box.innerHTML='<div class="ec-load"><span class="spin"></span>AI 正在分析「'+esc(x.n)+'」…</div>';
   try{var headers={'Content-Type':'application/json'};if(session&&session.access_token)headers['Authorization']='Bearer '+session.access_token;
-    var r=await fetch(AI_URL,{method:'POST',headers:headers,body:JSON.stringify({message:'请作为电商运营专家，分析这个热门商品：「'+x.n+'」（平台：'+parts[0]+'，热度：'+x.h+'，参考价：'+x.price+'，标签：'+x.tag+'）。要求分点输出，用 1)2)3) 编号，关键结论用 **加粗**，包含：1)目标人群 2)核心卖点 3)内容/文案角度3条 4)定价与转化建议',today:todayStr(),history:[]})});
-    var d=await r.json();box.innerHTML='<div class="ec-skel" style="background:var(--ac-ecom-l);border-color:#BFE3DB;color:#0E6B5C">'+mdLite(d.reply||'暂无分析')+'</div>';
+    var ctx='平台：'+parts[0]+'，热度：'+x.h+'，参考价：'+x.price+'，销量：'+x.sales+'，标签：'+x.tag;
+    var sys='请作为电商运营专家分析。分点输出，用 1)2)3) 编号，关键结论用 **加粗**。包含：1)目标人群 2)核心卖点 3)内容/文案角度3条 4)定价与转化建议 5)一句话推荐结论（强烈推荐/可尝试/观望）';
+    var msg='分析这个热门商品：「'+x.n+'」（'+ctx+'）。'+(follow?('用户追问：'+follow):'')+(imageData?'（用户上传了商品参考图，请结合图片分析）':'');
+    var body={message:msg,system:sys,today:todayStr(),history:hotChats[key].filter(function(m){return !m.img;}).map(function(m){return {role:m.role,content:m.text};})};
+    if(imageData)body.image=imageData;
+    var r=await fetch(AI_URL,{method:'POST',headers:headers,body:JSON.stringify(body)});
+    var d=await r.json();if(!r.ok)throw new Error(d.error||'分析失败');
+    hotChats[key].push({role:'ai',text:d.reply||'暂无分析'});
+    renderHotChat(key);
   }catch(e){box.innerHTML='<div class="ec-skel" style="border-color:#E4C3BD;background:var(--rust-l);color:var(--rust)">分析失败：'+esc(e.message)+'</div>';}}
+function renderHotChat(key){var box=$('hotAi_'+key);if(!box)return;var ch=hotChats[key]||[];
+  var h=ch.map(function(m){if(m.role==='user'){return '<div style="text-align:right;margin:6px 0"><span style="display:inline-block;background:var(--sand2);border-radius:10px;padding:6px 10px;font-size:13px;max-width:85%;text-align:left;word-break:break-word">'+(m.img?'<img src="'+m.img+'" style="max-width:120px;border-radius:8px;display:block;margin-bottom:4px">':'')+esc(m.text)+'</span></div>';}
+    return '<div style="margin:6px 0"><div style="background:var(--ac-ecom-l);border:1px solid #BFE3DB;border-radius:10px;padding:8px 10px;font-size:13px;line-height:1.65">'+mdLite(m.text)+'</div></div>';}).join('');
+  h+='<div style="display:flex;gap:6px;margin-top:8px"><input class="fw" id="hotFollow_'+key+'" placeholder="继续追问这个商品…" style="flex:1;min-height:40px"><button class="btn xs" onclick="sendHotFollow(\''+key+'\')">发送</button></div>';
+  box.innerHTML=h;}
+async function sendHotFollow(key){var inp=$('hotFollow_'+key);if(!inp)return;var v=inp.value.trim();if(!v){toast('请输入追问内容');return;}inp.value='';await aiAnalyzeHot(key,v);}
+function hotPickImg(key){if(!hotImgInput){hotImgInput=document.createElement('input');hotImgInput.type='file';hotImgInput.accept='image/*';hotImgInput.onchange=function(){var f=hotImgInput.files&&hotImgInput.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){aiAnalyzeHot(key,'',rd.result);};rd.readAsDataURL(f);};}hotImgInput._key=key;hotImgInput.click();}
 
 // ===== 今日热度榜 =====
 var HOT_LIST=[['weibo','微博热搜'],['zhihu','知乎热榜'],['douyin','抖音热点'],['toutiao','头条热榜'],['bilibili','B站热榜'],['baidu','百度热搜']];
@@ -1386,7 +1417,7 @@ document.documentElement.style.setProperty('--ac', AC[t]||'var(--ac-top)');
   document.querySelectorAll('section.panel').forEach(function(p){p.classList.toggle('on',p.id==='p-'+t);});
   if(t==='ai')setTimeout(function(){$('ai_input').focus();},200);
   if(t==='hot'&&!hotLoaded)loadHot('weibo');
-  if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video')renderShotTimeline();if(t==='ecom'){renderEcomBoard();renderHotProducts();}}
+  if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video')renderShotTimeline();if(t==='ecom'){renderEcomBoard();renderHotTabs();renderHotProducts();}}
 
 // ===== RENDER ALL =====
 function renderAll(){switchCat();renderKanban();renderAssets();renderStats();renderShots();renderShotTimeline();renderPrompts();renderVideos();renderLedger();renderHabits();renderTodos();renderProducts();renderEcomBoard();renderHotProducts();renderDiary();renderToday();renderTop();initHot();checkTip();var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;renderChatHistory();/* agnes video panel init (D ready here) */try{vdirGallery();}catch(e){console.warn('vdir init',e);}if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb=$('vdirKeyBar');if(kb)kb.style.display='block';}});}}
