@@ -2393,7 +2393,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260813m';
+var APP_VER='20260813n';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -2501,9 +2501,10 @@ async function dbGenImg2ImgUI(){
   if(out)out.textContent='生成中…';
   try{
     var raws=await dbGenImg2Img(ref,prompt,$('db_i2i_size').value||'1024x1024',1);
-    for(var yi=0;yi<raws.length;yi++){var u=await fitImg(raws[yi]);storeDoubao(u,prompt);window.__dbLastImg=u;}
+    var outs=[];
+    for(var yi=0;yi<raws.length;yi++){var u=await fitImg(raws[yi]);storeDoubao(u,prompt);window.__dbLastImg=u;outs.push(u);}
     renderDoubaoGallery();
-    if(out)out.innerHTML='<span style="color:#3aa655">改图完成 ✓ 已存入豆包图库</span>'+dbThumbGrid(urls);
+    if(out)out.innerHTML='<span style="color:#3aa655">改图完成 ✓ 已存入豆包图库</span>'+dbThumbGrid(outs);
     toast('豆包图生图完成');
   }catch(e){if(out)out.innerHTML='<span style="color:#c0392b">失败：'+(e.message||e).toString().slice(0,120)+'</span>';}
 }
