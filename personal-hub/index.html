@@ -412,6 +412,8 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 .vdir-mode button{padding:6px 10px;border:1px solid var(--line);background:var(--card);border-radius:16px;font-size:12.5px;cursor:pointer;color:var(--ink)}
 .vdir-mode button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
 .vdir-mode button.mem{margin-left:auto;border-style:dashed}
+.vdir-bar{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center}
+.vdir-bar .mem{margin-left:auto;border-style:dashed}
 .vdir-sp{flex:1}
 .vdir-mem{margin-top:8px;border:1px solid var(--line);border-radius:10px;padding:8px;max-height:240px;overflow:auto;background:var(--sand2)}
 .vdir-mem .gl{font-size:12px;padding:6px 0;border-bottom:1px dashed var(--line);line-height:1.5}
@@ -422,26 +424,26 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 .hot-meta .tag{background:var(--sand2);border-radius:8px;padding:0 6px}
 </style>
 <div id="vdirKeyBar" class="mut2" style="display:none;margin:0 0 10px;font-size:12px;color:#c0392b">注意：尚未配置 Agnes API Key。可在设置中填入 sk-...（agnes-ai.cn 后台获取），或部署后端代理 agnes-media 后自动免 Key。</div>
-<div class="vdir-mode" id="vdirModeBar">
- <button class="on" data-m="chat" onclick="vdirSetMode('chat')">💬 对话</button>
- <button data-m="img" onclick="vdirSetMode('img')">🎨 文生图</button>
- <button data-m="video" onclick="vdirSetMode('video')">🎬 文生视频</button>
- <button data-m="i2v" onclick="vdirSetMode('i2v')">🖼️ 图生视频</button>
+<div class="vdir-bar">
+ <span class="mut2" style="font-size:12px">直接说需求，小林自动判断出图/出视频；也能正常聊天</span>
  <span class="vdir-sp"></span>
  <button class="mem" type="button" onclick="vdirToggleMem()" title="生成记忆（自动纠错记录）">📓 记忆</button>
 </div>
-<div id="vdirRefBox" style="display:none;margin:6px 0 2px"><label class="mut2">参考图（人物/场景统一用，图生视频必填）</label><input type="file" id="vdir_ref" accept="image/*" onchange="vdirRefPreview()"><img id="vdir_refprev" style="max-width:100%;border-radius:8px;margin-top:6px;display:none"></div>
-  <div class="mut2" style="margin-bottom:6px">小林：说需求，它联网搜索、拆解任务、整理视频/图文生成方案；需求模糊时会主动追问。切到「文生图/视频/图生视频」可直接生成，无需复制提示词。</div>
+<div id="vdirRefBox" style="margin:6px 0 2px;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--sand2)"><label class="mut2">参考图（人物/场景一致性用，做图生视频时上传；平时可留空）</label><br><input type="file" id="vdir_ref" accept="image/*" onchange="vdirRefPreview()"><img id="vdir_refprev" style="max-width:100%;border-radius:8px;margin-top:6px;display:none"></div>
+  <div class="mut2" style="margin-bottom:6px">小林：直接说「画一只国风猫」「做个30秒茶饮宣传视频」「让这张参考图动起来」即可内联出图/出视频，无需复制提示词；普通问题它会联网搜索解答。</div>
   <div class="ai-chat" id="vdir_chat" style="height:340px"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>我是小林，你的通用 AI 助手（基于 Agnes 免费模型），可以联网搜索、帮你规划视频、写提示词、直接生成图片/视频，有疑问会主动问你</div></div></div>
-  <div class="ai-input" style="margin-top:8px"><textarea id="vdir_input" placeholder="例如：做一个30秒的国风茶饮宣传视频…" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();vdirSubmit()}"></textarea><button class="btn ghost xs" id="vdirPlanBtn" onclick="vdirPlan()" title="用上方内容生成完整分镜方案">完整方案</button><button class="btn pri ai-send" id="vdirActBtn" onclick="vdirSubmit()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
+  <div class="ai-input" style="margin-top:8px"><textarea id="vdir_input" placeholder="例如：画一只国风猫 / 做个30秒茶饮宣传视频 / 让参考图动起来…" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();vdirSubmit()}"></textarea><button class="btn ghost xs" id="vdirPlanBtn" onclick="vdirPlan()" title="用上方内容生成完整分镜方案">完整方案</button><button class="btn pri ai-send" id="vdirActBtn" onclick="vdirSubmit()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
+<div id="vdirMem" class="vdir-mem" style="display:none"></div>
 <div class="mut2" style="margin:12px 0 2px">生成画廊（本地保存）</div>
 <div class="vdir-gallery" id="vdirGallery"></div>
 </div></div>
 </div></section>
 <section class="panel" id="p-life"><div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/><path d="M12 8v4M12 16h.1"/></svg><h3>生活</h3><div class="sp"><span class="mut2">记账·习惯·待办·日记</span></div></div><div class="bd"><div class="life-tabs" id="lifeTabs"><button class="on" data-lt="ledger" onclick="switchLifeTab('ledger')">记账</button><button data-lt="habit" onclick="switchLifeTab('habit')">习惯</button><button data-lt="todo" onclick="switchLifeTab('todo')">待办</button><button data-lt="diary" onclick="switchLifeTab('diary')">日记</button></div>
-<div id="life-ledger"><div class="form"><input class="w150 half" id="lg_d" type="date"><select class="w110 half" id="lg_t" onchange="switchCat()"><option value="out">支出</option><option value="in">收入</option></select><select class="w130 half" id="lg_c"></select><input class="half" id="lg_a" type="number" inputmode="decimal" step="0.01" placeholder="金额¥"><input class="f1" id="lg_n" placeholder="备注"><button class="btn pri" onclick="addLedger()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>记一笔</button></div><div class="stats" id="lgStats"></div><div style="display:flex;align-items:center;gap:9px;margin:2px 0 12px"><span class="mut" style="white-space:nowrap">月预算</span><input type="number" inputmode="numeric" id="lg_b" style="width:104px;min-height:38px;padding:5px 9px" onchange="setBudget(this.value)"><div class="bar" style="flex:1"><i id="lgBar"></i></div><span class="mut2" id="lgBarTx" style="white-space:nowrap"></span></div><div id="lgPie"></div><div id="lgList"></div></div>
+<div id="life-ledger"><div class="form"><input class="w150 half" id="lg_d" type="date"><select class="w110 half" id="lg_t" onchange="switchCat()"><option value="out">支出</option><option value="in">收入</option></select><select class="w130 half" id="lg_c"></select><input class="half" id="lg_a" type="number" inputmode="decimal" step="0.01" placeholder="金额¥"><input class="f1" id="lg_n" placeholder="备注"><button class="btn pri" onclick="addLedger()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>记一笔</button></div><div class="stats" id="lgStats"></div><div style="display:flex;align-items:center;gap:9px;margin:2px 0 12px"><span class="mut" style="white-space:nowrap">月预算</span><input type="number" inputmode="numeric" id="lg_b" style="width:104px;min-height:38px;padding:5px 9px" onchange="setBudget(this.value)"><div class="bar" style="flex:1"><i id="lgBar"></i></div><span class="mut2" id="lgBarTx" style="white-space:nowrap"></span></div><div id="lgPie"></div><div style="display:flex;justify-content:space-between;align-items:baseline;margin:4px 0 8px"><span class="mut2">明细</span><span class="mut2" id="lgCnt"></span></div>
+<div id="lgList"></div></div>
 <div id="life-habit" style="display:none"><div class="form"><input id="hb_n" placeholder="新习惯" style="min-height:38px;padding:5px 9px;font-size:15px;flex:1"><button class="btn pri" onclick="addHabit()"><svg class="ico s" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>添加习惯</button></div><div class="hm" id="habitBox"></div><div class="legend"><span><i style="background:var(--olive)"></i>已打卡</span><span><i style="background:var(--sand2)"></i>未打卡</span><span><i style="background:transparent;border:1.5px dashed var(--ink)"></i>今天</span></div></div>
-<div id="life-todo" style="display:none"><div class="form"><input class="f2" id="td_t" placeholder="要做的事"><select class="w110 half" id="td_p"><option value="P0">P0紧急</option><option value="P1" selected>P1重要</option><option value="P2">P2常规</option></select><input class="w150 half" id="td_d" type="date"><button class="btn pri" onclick="addTodo()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>添加</button></div><div class="stats" id="tdStats"></div><div id="tdList"></div></div>
+<div id="life-todo" style="display:none"><div class="form"><input class="f2" id="td_t" placeholder="要做的事"><select class="w110 half" id="td_p"><option value="P0">P0紧急</option><option value="P1" selected>P1重要</option><option value="P2">P2常规</option></select><input class="w150 half" id="td_d" type="date"><button class="btn pri" onclick="addTodo()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>添加</button></div><div class="stats" id="tdStats"></div><div style="display:flex;justify-content:space-between;align-items:baseline;margin:4px 0 8px"><span class="mut2">列表</span><span class="mut2" id="tdCnt"></span></div>
+<div id="tdList"></div></div>
 <div id="life-diary" style="display:none"><div class="form"><input class="w150 half" id="dr_d" type="date"><input class="f1" id="dr_m" placeholder="心情（如开心、疲惫、充实）"><textarea class="fw" id="dr_c" rows="3" placeholder="今天发生了什么？写下你的想法…"></textarea><button class="btn pri" onclick="addDiary()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>保存日记</button></div><div id="drList"></div></div>
 </div></div></section>
 <section class="panel" id="p-ecom"><div class="grid">
@@ -531,13 +533,16 @@ async function agnesEnsureReady(){
   if(agnesKey())return true;
   vdirWarnKey();return false;
 }
-var vdirMode='chat';
-function vdirSetMode(m){vdirMode=m;var btns=document.querySelectorAll('#vdirModeBar button[data-m]');for(var i=0;i<btns.length;i++){btns[i].classList.toggle('on',btns[i].getAttribute('data-m')===m);}
- var inp=$('vdir_input');var act=$('vdirActBtn');var plan=$('vdirPlanBtn');var ref=$('vdirRefBox');
- if(m==='chat'){if(inp)inp.placeholder='例如：做一个30秒的国风茶饮宣传视频…';if(plan)plan.style.display='';if(ref)ref.style.display='none';}
- else{var pn={img:'描述要生成的画面 / 风格 / 比例…',video:'描述视频画面、动作、时长、风格…',i2v:'描述基于参考图的动作 / 转场…'}[m]||'描述生成内容…';if(inp)inp.placeholder=pn;if(plan)plan.style.display='none';if(ref)ref.style.display=(m==='i2v')?'block':'none';}
- toast(({chat:'对话模式',img:'文生图模式：输入即直接出图',video:'文生视频模式：输入即直接出视频',i2v:'图生视频模式：先上传参考图'}[m]||'')+' · 无需复制提示词');}
-function vdirSubmit(){if(vdirMode==='chat'){vdirSend();}else{vdirGenerateInline();}}
+function vdirDetectIntent(t){var hasRef=!!window.__vdirRef;
+ if(hasRef&&/图生视频|图转动|让.*图.*动|参考图.*视频|图变视频/.test(t))return 'i2v';
+ if(/文生视频|生成视频|做个?视频|做条视频|视频生成|动画视频|短视频|宣传片/.test(t))return 'video';
+ if(/画|插画|海报|头像|配图|文生图|生成.*图片|logo|做张图|一张图|壁纸/.test(t))return 'img';
+ return 'chat';}
+function vdirSubmit(){
+ var inp=$('vdir_input');if(!inp)return;var t=inp.value.trim();if(!t)return;
+ var intent=vdirDetectIntent(t);
+ if(intent==='chat'){vdirSend();}else{vdirGenerateInline(intent,t);}
+}
 function vdirEsc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function vdirAddMsg(role,text,html){var box=$('vdir_chat');if(!box)return;var em=box.querySelector('.ai-empty');if(em)em.remove();
  var d=document.createElement('div');d.className='ai-msg '+(role==='bot'?'bot':'user');
@@ -574,7 +579,7 @@ async function vdirSend(){var inp=$('vdir_input');if(!inp)return;var m=inp.value
  msgs.push({role:'user',content:m});
  vdirChatSend(msgs,
   function(d){acc+=d;if(body)body.textContent=acc;var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;},
-  function(full){window.__vdirLast=full;if(!body)return;var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="vdirUseAsPrompt()">用这条生成视频</button> <button class="btn xs" onclick="vdirApplyPromptText()">存为提示词</button>';body.parentNode.appendChild(act);var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;}).catch(function(e){if(body)body.textContent='出错了：'+(e.message||e);});}
+  function(full){window.__vdirLast=full;if(!body)return;var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="vdirGenerateInline(\'img\',window.__vdirLast)">🖼️ 生成图片</button> <button class="btn xs" onclick="vdirUseAsPrompt()">🎬 生成视频</button> <button class="btn xs" onclick="vdirApplyPromptText()">存为提示词</button>';body.parentNode.appendChild(act);var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;}).catch(function(e){if(body)body.textContent='出错了：'+(e.message||e);});}
 async function vdirPlan(idea){if(idea===undefined){var inp=$('vdir_input');idea=inp?inp.value.trim():'';}if(!idea){toast('先在上方输入视频主题，或和导演聊完再生成');return;}
  if(!(await agnesEnsureReady()))return;
  vdirAddMsg('user','主题：'+idea);var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';var acc='';
@@ -588,19 +593,19 @@ function vdirApplyShots(){if(!window.__vdirPlan){toast('先生成方案');return
  picked.slice(0,20).forEach(function(ln){D.shots.push({id:uid(),pj:'',no:'',de:ln.replace(/^\d+[.、]\s*/,''),du:0,dd:'',st:'待拍摄',ct:todayStr()});n++;});
  saveLocal();scheduleCloudSync();renderShots();renderShotTimeline();renderToday();toast('已拆入 '+n+' 个分镜');}
 function vdirApplyPrompt(){if(!window.__vdirPlan){toast('先生成方案');return;}D.prompts.push({id:uid(),n:'视频方案 '+todayStr(),m:AGNES_MODEL.img,s:4,x:window.__vdirPlan,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
-function vdirUseAsPrompt(){if(!window.__vdirLast){toast('先和导演聊一下');return;}vdirSetMode('video');$('vdir_input').value=window.__vdirLast;vdirGenerateInline();}
+function vdirUseAsPrompt(){if(!window.__vdirLast){toast('先和导演聊一下');return;}vdirGenerateInline('video',window.__vdirLast);}
 function vdirApplyPromptText(){if(!window.__vdirLast){toast('先聊一下');return;}D.prompts.push({id:uid(),n:'视频方案 '+todayStr(),m:AGNES_MODEL.chat,s:4,x:window.__vdirLast,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
-function vdirUsePlanGen(){if(!window.__vdirPlan){toast('先生成方案');return;}vdirSetMode('video');$('vdir_input').value=window.__vdirPlan;vdirGenerateInline();}
+function vdirUsePlanGen(){if(!window.__vdirPlan){toast('先生成方案');return;}vdirGenerateInline('video',window.__vdirPlan);}
 function vdirRefPreview(){var f=$('vdir_ref')&&$('vdir_ref').files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var im=$('vdir_refprev');if(im){im.src=rd.result;im.style.display='block';}window.__vdirRef=rd.result;};rd.readAsDataURL(f);}
-async function vdirGenerateInline(){
- var inp=$('vdir_input');if(!inp)return;var p=inp.value.trim();if(!p){toast('先写生成内容');return;}
+async function vdirGenerateInline(mode,p){
+ if(!p){toast('先写生成内容');return;}
  if(!(await agnesEnsureReady()))return;
- vdirAddMsg('user',p);inp.value='';
+ vdirAddMsg('user',p);var inp=$('vdir_input');if(inp)inp.value='';
  var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';
- var ref=(vdirMode==='i2v')?(window.__vdirRef||null):null;
- if(vdirMode==='i2v'&&!ref){body.innerHTML='<div class="mut2" style="color:#c0392b">图生视频请先上传参考图</div>';return;}
- vdirLogGen(vdirMode,p,'生成中');
- if(vdirMode==='img')return vdirGenImage(p,body);
+ var ref=(mode==='i2v')?(window.__vdirRef||null):null;
+ if(mode==='i2v'&&!ref){body.innerHTML='<div class="mut2" style="color:#c0392b">图生视频请先在上方「参考图」处上传图片（用于人物/场景一致性），再发送</div>';return;}
+ vdirLogGen(mode,p,'生成中');
+ if(mode==='img')return vdirGenImage(p,body);
  return vdirGenVideo(p,body,ref,0);
 }
 function vdirToggleMem(){var m=$('vdirMem');if(!m)return;m.style.display=(m.style.display==='none'||!m.style.display)?'block':'none';if(m.style.display==='block')vdirRenderMem();}
@@ -614,7 +619,7 @@ function vdirLogGen(mode,prompt,status){
  saveLocal();if($('vdirMem')&&$('vdirMem').style.display!=='none')vdirRenderMem();}
 function nowStr(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
 // (removed: superseded by vdirRefPreview)
-async function vdirGenerate(){vdirGenerateInline();}
+async function vdirGenerate(){vdirSubmit();}
 function vdirGenImage(prompt,out){
   var url,hdr,body;
   if(agnesProxyOk){
@@ -712,7 +717,7 @@ function vdirGallery(){if(!D)D=defaultD();var box=$('vdirGallery');if(!box)retur
    return '<div class="vdir-g">'+media+'<div class="cap">'+vdirEsc(it.prompt||'')+'</div></div>';
  }).join('');}
 function vdirCopy(){var t=$('vdir_input').value.trim();if(!t){toast('先写提示词');return;}navigator.clipboard.writeText(t).then(function(){toast('已复制')},function(){toast('复制失败');});}
-function vdirSavePrompt(){var t=$('vdir_input').value.trim();if(!t){toast('先写提示词');return;}var m={img:AGNES_MODEL.img,video:AGNES_MODEL.video,i2v:AGNES_MODEL.video}[vdirMode]||vdirMode;D.prompts.push({id:uid(),n:'提示词 '+todayStr(),m:m,s:4,x:t,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
+function vdirSavePrompt(){var t=$('vdir_input').value.trim();if(!t){toast('先写提示词');return;}var m={img:AGNES_MODEL.img,video:AGNES_MODEL.video,i2v:AGNES_MODEL.video,chat:AGNES_MODEL.chat}[vdirDetectIntent(t)]||AGNES_MODEL.chat;D.prompts.push({id:uid(),n:'提示词 '+todayStr(),m:m,s:4,x:t,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
 /* video panel init moved to DOMContentLoaded + renderAll (D not yet ready here) */
 
 var SK='ph_session_v1',DK='ph_data_v1';
@@ -1738,7 +1743,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260812m';
+var APP_VER='20260812o';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
