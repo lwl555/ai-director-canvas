@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiB2aWV3Qm94PSIwIDAgMTkyIDE5MiI+PHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSI0MCIgZmlsbD0iI0MxNUEyQiIvPjx0ZXh0IHg9Ijk2IiB5PSIxMzQiIGZvbnQtc2l6ZT0iMTE2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjRkJGOEYxIiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiI+5belPC90ZXh0Pjwvc3ZnPg==">
 <style>
 :root{--paper:#FFFFFF;--card:#FFFFFF;--sand:#F6F3EE;--sand2:#EFE9E0;--ink:#241F1B;--ink2:#6E6357;--ink3:#9A8E7F;--line:#DFD5C2;--line2:#CDBFA6;--clay:#C15A2B;--clay-d:#9C4520;--clay-l:#F5E3D6;--olive:#5F7043;--olive-l:#E7EBDC;--mustard:#C0891F;--mustard-l:#F7EBD1;--rust:#B2382C;--rust-l:#F8E0DC;--r:14px;--sh:0 1px 2px rgba(60,45,25,.06),0 6px 18px rgba(60,45,25,.05);--field:#fff;--ac-top:#C15A2B;--ac-media:#D6457E;--ac-video:#7C5CC4;--ac-ecom:#1F9E8A;--ac-hot:#E0533D;--ac-life:#5F7043;--ac-ai:#3B6FD4;--ac-top-l:#F5E3D6;--ac-media-l:#FBE6EF;--ac-video-l:#ECE6F7;--ac-ecom-l:#DDF3EE;--ac-hot-l:#FBE3DD;--ac-life-l:#E7EBDC;--ac-ai-l:#E2EAF7;--ac:var(--ac-top)}
-[data-theme="dark"]{--paper:#17130F;--card:#221C16;--sand:#2C241B;--sand2:#332A1F;--ink:#F2E9DA;--ink2:#C2B39C;--ink3:#8C7E6A;--line:#3A3127;--line2:#4A3F32;--clay:#E27C4C;--clay-d:#C8652F;--clay-l:#3A2418;--olive:#93B067;--olive-l:#27311C;--mustard:#E3B24E;--mustard-l:#3A2E14;--rust:#E7735F;--rust-l:#3A201B;--field:#2C241B;--sh:0 1px 2px rgba(0,0,0,.5),0 8px 24px rgba(0,0,0,.45);--ac-top:#E27C4C;--ac-media:#E87AA8;--ac-video:#A98AE0;--ac-ecom:#4FC2AD;--ac-hot:#EE7C68;--ac-life:#93B067;--ac-ai:#7AA0E8;--ac-top-l:#3A2418;--ac-media-l:#3A2230;--ac-video-l:#2E2440;--ac-ecom-l:#16302B;--ac-hot-l:#3A221C;--ac-life-l:#27311C;--ac-ai-l:#1F2C45;--ac:var(--ac-top)}
+[data-theme="dark"]{--paper:#161310;--card:#211B15;--sand:#2A231B;--sand2:#322A20;--ink:#F5EEE0;--ink2:#CDC0A9;--ink3:#948672;--line:#3D342A;--line2:#4D4334;--clay:#E88A54;--clay-d:#C8652F;--clay-l:#3A2418;--olive:#A4C078;--olive-l:#27311C;--mustard:#E8BC5A;--mustard-l:#3A2E14;--rust:#EE836F;--rust-l:#3A201B;--field:#2A231B;--sh:0 1px 2px rgba(0,0,0,.55),0 8px 24px rgba(0,0,0,.5);--ac-top:#E88A54;--ac-media:#ED86B2;--ac-video:#B496EA;--ac-ecom:#5CCBB4;--ac-hot:#F28975;--ac-life:#A4C078;--ac-ai:#88ABEE;--ac-top-l:#3A2418;--ac-media-l:#3A2230;--ac-video-l:#2E2440;--ac-ecom-l:#16302B;--ac-hot-l:#3A221C;--ac-life-l:#27311C;--ac-ai-l:#1F2C45;--ac:var(--ac-top)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
 body{background:var(--paper);background-image:radial-gradient(circle at 1px 1px,rgba(120,100,70,.028) 1px,transparent 0);background-size:22px 22px;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.6;padding-bottom:calc(84px + env(safe-area-inset-bottom))}
@@ -197,9 +197,10 @@ label.lb{font-size:13px;color:var(--ink2);font-weight:600}
 .ai-typing span:nth-child(2){animation-delay:.2s}
 .ai-typing span:nth-child(3){animation-delay:.4s}
 @keyframes typ{0%,60%,100%{opacity:.3;transform:scale(.8)}30%{opacity:1;transform:scale(1.1)}}
-.ai-input{display:flex;gap:10px;align-items:flex-end}
-.ai-input textarea{flex:1;min-height:48px;max-height:140px;resize:none}
-.ai-send{min-height:48px;padding:0 18px}
+.ai-input{display:flex;gap:8px;align-items:flex-end;background:var(--field);border:1.5px solid var(--line2);border-radius:14px;padding:8px 8px 8px 10px}
+.ai-input textarea{flex:1;min-height:52px;max-height:160px;resize:none;border:none;background:transparent;outline:none;font-family:inherit;font-size:15px;line-height:1.5;padding:6px 2px}
+.ai-input textarea::placeholder{color:var(--ink3)}
+.ai-send{border-radius:11px}
 .ai-empty{text-align:center;padding:40px 20px;color:var(--ink3)}
 .ai-empty .ico{width:48px;height:48px;opacity:.3;margin-bottom:12px}
 .ai-atts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:9px}
@@ -240,6 +241,15 @@ mark{background:var(--mustard-l);color:var(--ink);padding:0 2px;border-radius:3p
 .mbar button{flex:1 0 auto;min-width:53px}
 .mask{display:none;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;background:rgba(20,16,12,.82);z-index:200;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
 .mask.on{display:flex}
+.set-card{background:var(--card);border:1px solid var(--line2);border-radius:16px;max-width:560px;width:100%;max-height:88vh;overflow:auto;box-shadow:var(--sh)}
+.set-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
+.set-hd b{font-size:16px}
+.set-hd .x{background:none;border:none;cursor:pointer;padding:6px;border-radius:8px;color:var(--ink2);display:inline-flex}
+.set-hd .x:hover{background:var(--sand2)}
+.set-bd{padding:16px}
+.set-sec{margin-bottom:18px}
+.set-sec:last-child{margin-bottom:0}
+.set-t{font-weight:700;margin-bottom:8px;font-size:14px;color:var(--clay)}
 .dlg{background:var(--card);border:2px solid var(--ink);border-radius:16px;max-width:420px;width:100%;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
 .dlg h3{margin:0 0 8px;font-size:18px;font-family:Georgia,"Songti SC",serif}
 .dlg p{margin:0 0 18px;color:var(--ink2);font-size:14.5px;line-height:1.65}
@@ -337,6 +347,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <button class="btn warn" onclick="askClear()"><svg class="ico" viewBox="0 0 24 24"><path d="M4 6.5h16M9.5 6.5V4.8a1.3 1.3 0 0 1 1.3-1.3h2.4a1.3 1.3 0 0 1 1.3 1.3v1.7M6.5 6.5l.9 13a1.3 1.3 0 0 0 1.3 1.2h6.6a1.3 1.3 0 0 0 1.3-1.2l.9-13"/></svg>清空</button>
 <button class="btn ghost" onclick="doLogout()"><svg class="ico" viewBox="0 0 24 24"><path d="M15 12H3M3 12l4-4M3 12l4 4M15 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/></svg>退出</button>
 <button class="btn" onclick="openAppDownload()"><svg class="ico" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.4"/><path d="M10.5 18.5h3"/></svg>下载APP</button>
+  <button class="btn ghost" onclick="openSettings()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 2h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 22h4l.5-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z"/></svg>设置</button>
 <input type="file" id="fileIn" accept=".json,application/json" style="display:none" onchange="doImport(this)">
 <button class="btn" id="themeBtn" onclick="toggleTheme()" title="切换深色 / 浅色"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.6 6.6 0 0 0 21 12.8z"/></svg><span id="themeTx">深色</span></button>
 <div class="sync-info" id="syncInfo"><span class="sync-dot off" id="syncDot"></span><span id="syncTx">未连接</span></div>
@@ -364,29 +375,41 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <button data-t="doubao"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 17l-5-5L5 21"/></svg>豆包生图</button>
 </nav>
 </header>
+<div class="mask" id="setModal" style="display:none;z-index:300">
+  <div class="set-card">
+    <div class="set-hd"><b>⚙ 设置</b><button class="x" onclick="closeSettings()" title="关闭"><svg class="ico s" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="set-bd">
+      <div class="set-sec"><div class="set-t">我的称呼</div>
+        <div class="form"><input id="hub_name" class="f1" placeholder="如 松屿" style="min-height:38px"><button class="btn pri sm" onclick="saveHubName()">保存</button><span class="mut2" style="font-size:12px">保存后问候立即更新</span></div>
+        <div class="mut2" style="font-size:12px">显示在「今日」问候里，如「晚上好，松屿」</div>
+      </div>
+      <div class="set-sec"><div class="set-t">AI 模型</div>
+        <div class="form"><select id="m_chat" class="f1" onchange="onModelSel('chat',this.value)"></select><select id="m_img" class="f1" onchange="onModelSel('img',this.value)"></select><select id="m_video" class="f1" onchange="onModelSel('video',this.value)"></select></div>
+        <div class="mut2" style="font-size:12px">分别选 对话 / 图像 / 视频 模型（可新增自定义模型）</div>
+        <button class="btn sm ghost" onclick="toggleModelMgr()">管理/新增模型</button>
+        <div id="modelMgr" style="display:none;margin-top:6px"><div id="modelList"></div>
+          <div class="form" style="margin-top:6px"><input id="nm_name" class="f1" placeholder="模型名(如 agnes-video-x)"><select id="nm_type" class="f1"><option value="chat">对话</option><option value="img">图像</option><option value="video">视频</option></select></div>
+          <div class="form" style="margin-top:4px"><input id="nm_fps" class="f1" placeholder="视频fps(默认24)" style="max-width:96px"><input id="nm_frames" class="f1" placeholder="单镜最大帧(默认121)" style="max-width:124px"><button class="btn pri sm" onclick="addModel()">添加</button></div>
+        </div>
+      </div>
+      <div class="set-sec"><div class="set-t">图像 / 视频生成参数</div>
+        <div class="form"><input id="p_seed" class="f1" placeholder="种子(留空随机)" style="max-width:104px"><input id="p_steps" class="f1" placeholder="步数" style="max-width:68px"><input id="p_cfg" class="f1" placeholder="引导值" style="max-width:68px"><input id="p_ratio" class="f1" placeholder="比例" style="max-width:68px"></div>
+        <div class="form" style="margin-top:4px"><input id="p_w" class="f1" placeholder="宽" style="max-width:68px"><input id="p_h" class="f1" placeholder="高" style="max-width:68px"><input id="p_neg" class="f1" placeholder="负面提示词(选填)"></div>
+        <button class="btn pri sm" style="margin-top:6px" onclick="saveParamsUI()">保存参数</button><span id="paramHint" class="mut2" style="font-size:12px"></span>
+      </div>
+      <div class="set-sec"><div class="set-t">对话参数（AI助手 / 小林）</div>
+        <div class="form" style="align-items:center"><span class="mut2" style="white-space:nowrap">温度</span><input id="c_temp" type="range" min="0" max="1.5" step="0.1" value="0.8" style="flex:1;min-height:38px" oninput="document.getElementById('c_temp_v').textContent=this.value"><span id="c_temp_v" style="min-width:30px;text-align:right">0.8</span></div>
+        <div class="form"><select id="c_maxtok" class="f1"><option value="512">512 tokens</option><option value="1024" selected>1024 tokens</option><option value="2048">2048 tokens</option><option value="4096">4096 tokens</option></select></div>
+        <button class="btn pri sm" onclick="saveChatParams()">保存对话参数</button><span id="chatParamHint" class="mut2" style="font-size:12px"></span>
+      </div>
+    </div>
+  </div>
+</div>
 <section class="panel on" id="p-top"><div class="grid">
 <div class="card greet"><div class="bd"><div class="greet-main"><div class="greet-tx" id="greetTx">你好 👋</div><div class="greet-sub" id="greetSub">今天也是充满可能的一天</div></div><div class="weather" id="weatherBox"><div class="w-loading">正在获取天气…</div></div></div></div>
 <div class="grid g2">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><h3>今日概览</h3></div><div class="bd"><div class="stats" id="topStats"></div><div id="topToday"></div></div></div>
-<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>未来天气</h3><div class="sp"><span class="mut2" id="weatherCity">定位中…</span></div></div><div class="bd"><div class="form" style="margin-bottom:10px"><input id="wcity" class="f1" list="cityList" autocomplete="off" placeholder="选择或输入城市，如 上海" style="min-height:38px"><button class="btn pri sm" onclick="setWeatherCity()">设置</button><button class="btn sm ghost" onclick="locateWeather()" title="使用浏览器GPS定位">📍 自动定位</button><button class="btn sm ghost" onclick="toggleWsrc()" title="天气数据源设置">⚙</button></div><div id="wsrcPanel" style="display:none;margin:8px 0;padding:10px;background:var(--sand2);border-radius:10px"><div class="form" style="margin-bottom:6px"><input id="qw_key" class="f1" placeholder="和风 Weather Key（选填）" style="min-height:36px"><input id="qw_host" class="f1" placeholder="专属 Host，如 xxx.qweatherapi.com" style="min-height:36px"></div><div class="form"><button class="btn pri sm" onclick="saveWeatherSrc()">保存</button><a class="mut2" href="https://console.qweather.com" target="_blank" rel="noopener" style="font-size:12px">免费申请 ↗</a><span id="wsrcHint" class="mut2" style="font-size:12px"></span></div><div class="mut2" style="font-size:12px;margin-top:4px">填了走和风（含空气质量/预警/生活指数/分钟降水）；留空自动用 Open-Meteo 兜底（免 Key）。</div><div class="form" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px"><input id="hub_name" class="f1" placeholder="我的称呼（选填，如 松屿）" style="min-height:36px"><button class="btn pri sm" onclick="saveHubName()">保存称呼</button></div>
-<div id="agnesKeyRow" class="form" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px"><input id="agnes_key" type="password" class="f1" placeholder="Agnes API Key（sk-...，agnes-ai.cn 后台获取）" style="min-height:36px"><button class="btn pri sm" onclick="saveAgnesKey()">保存Key</button><span id="agnesKeyHint" class="mut2" style="font-size:12px"></span></div><div id="vdirProxyNote" class="mut2" style="display:none;font-size:12px;color:#3aa655;margin-top:4px">AI 服务已由后端代理（agnes-media），无需填写 Key</div><div class="mut2" style="font-size:12px;margin-top:4px">Key 仅存本机浏览器，不上传；用于 AI 导演真实出图/出视频。</div>
-<div class="mut2" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px"><b>AI 模型与生成参数</b>
-  <div class="form" style="margin-top:6px">
-    <select id="m_chat" class="f1" onchange="onModelSel('chat',this.value)"></select>
-    <select id="m_img" class="f1" onchange="onModelSel('img',this.value)"></select>
-    <select id="m_video" class="f1" onchange="onModelSel('video',this.value)"></select>
-  </div>
-  <div class="mut2" style="font-size:12px">分别选 对话 / 图像 / 视频 模型（可新增自定义模型）</div>
-  <button class="btn sm ghost" onclick="toggleModelMgr()">管理/新增模型</button>
-  <div id="modelMgr" style="display:none;margin-top:6px"><div id="modelList"></div>
-    <div class="form" style="margin-top:6px"><input id="nm_name" class="f1" placeholder="模型名(如 agnes-video-x)"><select id="nm_type" class="f1"><option value="chat">对话</option><option value="img">图像</option><option value="video">视频</option></select></div>
-    <div class="form" style="margin-top:4px"><input id="nm_fps" class="f1" placeholder="视频fps(默认24)" style="max-width:96px"><input id="nm_frames" class="f1" placeholder="单镜最大帧(默认121)" style="max-width:124px"><button class="btn pri sm" onclick="addModel()">添加</button></div>
-  </div>
-  <div class="mut2" style="font-size:12px;margin-top:8px">生成参数（图像/视频通用）</div>
-  <div class="form" style="margin-top:4px"><input id="p_seed" class="f1" placeholder="种子(留空随机)" style="max-width:104px"><input id="p_steps" class="f1" placeholder="步数" style="max-width:68px"><input id="p_cfg" class="f1" placeholder="引导值" style="max-width:68px"><input id="p_ratio" class="f1" placeholder="比例" style="max-width:68px"></div>
-  <div class="form" style="margin-top:4px"><input id="p_w" class="f1" placeholder="宽" style="max-width:68px"><input id="p_h" class="f1" placeholder="高" style="max-width:68px"><input id="p_neg" class="f1" placeholder="负面提示词(选填)"></div>
-  <button class="btn pri sm" style="margin-top:6px" onclick="saveParamsUI()">保存参数</button><span id="paramHint" class="mut2" style="font-size:12px"></span>
-</div></div><div class="forecast" id="forecastBox"></div></div></div>
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>未来天气</h3><div class="sp"><span class="mut2" id="weatherCity">定位中…</span></div></div><div class="bd"><div class="form" style="margin-bottom:10px"><input id="wcity" class="f1" list="cityList" autocomplete="off" placeholder="选择或输入城市，如 上海" style="min-height:38px"><button class="btn pri sm" onclick="setWeatherCity()">设置</button><button class="btn sm ghost" onclick="locateWeather()" title="使用浏览器GPS定位">📍 自动定位</button><button class="btn sm ghost" onclick="toggleWsrc()" title="天气数据源设置">⚙</button></div><div id="wsrcPanel" style="display:none;margin:8px 0;padding:10px;background:var(--sand2);border-radius:10px"><div class="form" style="margin-bottom:6px"><input id="qw_key" class="f1" placeholder="和风 Weather Key（选填）" style="min-height:36px"><input id="qw_host" class="f1" placeholder="专属 Host，如 xxx.qweatherapi.com" style="min-height:36px"></div><div class="form"><button class="btn pri sm" onclick="saveWeatherSrc()">保存</button><a class="mut2" href="https://console.qweather.com" target="_blank" rel="noopener" style="font-size:12px">免费申请 ↗</a><span id="wsrcHint" class="mut2" style="font-size:12px"></span></div><div class="mut2" style="font-size:12px;margin-top:4px">填了走和风（含空气质量/预警/生活指数/分钟降水）；留空自动用 Open-Meteo 兜底（免 Key）。</div>  <div id="agnesKeyRow" class="form" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px"><input id="agnes_key" type="password" class="f1" placeholder="Agnes API Key（sk-...，agnes-ai.cn 后台获取）" style="min-height:36px"><button class="btn pri sm" onclick="saveAgnesKey()">保存Key</button><span id="agnesKeyHint" class="mut2" style="font-size:12px"></span></div><div id="vdirProxyNote" class="mut2" style="display:none;font-size:12px;color:#3aa655;margin-top:4px">AI 服务已由后端代理（agnes-media），无需填写 Key</div><div class="mut2" style="font-size:12px;margin-top:4px">Key 仅存本机浏览器，不上传；用于 AI 导演真实出图/出视频。<br>模型 / 生成参数 / 我的称呼，请点右上角 <b>⚙ 设置</b> 调整。</div></div><div class="forecast" id="forecastBox"></div></div></div>
 </div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>提醒中心</h3><div class="sp"><span class="mut2" id="notifState"></span></div></div><div class="bd">
 <div class="form"><input id="rem_min" type="number" inputmode="numeric" placeholder="分钟后" style="width:92px;min-height:40px"><input id="rem_txt" class="f1" placeholder="提醒内容（如：该起来走走了）"><button class="btn pri" onclick="scheduleCountdown()">倒计时提醒</button></div>
@@ -487,7 +510,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg><h3>商品库</h3><div class="sp"><span class="mut2" id="ecCnt"></span></div></div><div class="bd"><div class="form"><input class="f2" id="pd_n" placeholder="商品名"><input class="w110 half" id="pd_p" type="number" inputmode="decimal" step="0.01" placeholder="价格¥"><input class="w150 half" id="pd_c" placeholder="分类"><input class="fw" id="pd_f" placeholder="卖点"><button class="btn pri" onclick="addProduct()">加入</button></div><div id="ecProducts"></div></div></div>
 <div class="grid g2">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 14l3-4 3 3 4-6"/></svg><h3>电商运营看板</h3><div class="sp"><span class="mut2" id="ecBoardSub"></span></div></div><div class="bd ec-board"><div class="stats" id="ecStats"></div><div id="ecBoard"></div></div></div>
-<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>全平台热门商品</h3><div class="sp"><span class="mut2">AI 帮你盯热点 · 按平台切换</span></div></div><div class="bd"><div class="hot-src" id="hotTabs" style="margin-bottom:10px"></div><div id="hotProducts"></div></div></div>
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>热点灵感 · 示例</h3><div class="sp"><span class="mut2">示例数据 · 非实时抓取 · 仅供选题灵感</span></div></div><div class="bd"><div class="hot-src" id="hotTabs" style="margin-bottom:10px"></div><div id="hotProducts"></div></div></div>
 </div>
 </div></section>
 <section class="panel" id="p-hot"><div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>今日热度榜</h3><div class="sp"><span class="mut2" id="hotUpd"></span></div></div><div class="bd">
@@ -554,6 +577,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
   <input type="file" id="db_i2i_ref" accept="image/*" onchange="dbI2iRefPrev()" style="min-height:38px;width:100%">
   <div id="db_i2i_prev" style="margin:8px 0"></div>
   <textarea id="db_i2i_prompt" class="f1" rows="3" placeholder="写你要怎么改这张图，如：把背景换成海边、保留人物" style="min-height:64px;font-size:16px"></textarea>
+  <div class="form" style="margin:8px 0"><button class="btn ghost sm" onclick="dbOptimizePrompt('db_i2i_prompt')" id="dbI2iOptBtn">✨ 优化提示词</button><span id="dbI2iOptHint" class="mut2" style="font-size:12px"></span></div>
   <div class="form" style="margin:8px 0">
     <select id="db_i2i_size" class="f1" style="min-height:38px"><option value="1024x1024">1024×1024</option><option value="1024x768">1024×768</option><option value="768x1024">768×1024</option><option value="1280x720">1280×720</option><option value="720x1280">720×1280</option></select>
     <select id="db_i2i_n" class="f1" style="min-height:38px"><option value="1">1 张</option><option value="2">2 张</option><option value="3">3 张</option><option value="4">4 张</option></select>
@@ -604,6 +628,7 @@ var DEFAULT_MODELS=[
 ];
 var SEL={chat:'agnes-2.5-flash',img:'agnes-image-2.1-flash',video:'agnes-video-v2.0'};
 var GEN_PARAMS={seed:'',steps:30,cfg:7.5,width:1152,height:768,fps:24,ratio:'16:9',negative:''};
+var CHAT_PARAMS={temperature:0.8,max_tokens:1024};try{var __cp=JSON.parse(localStorage.getItem('ph_chat_params'));if(__cp)CHAT_PARAMS=Object.assign(CHAT_PARAMS,__cp);}catch(e){}
 function loadModels(){try{var m=JSON.parse(localStorage.getItem(MODEL_STORE_KEY));window.__MODELS=Array.isArray(m)&&m.length?m:DEFAULT_MODELS.slice();}catch(e){window.__MODELS=DEFAULT_MODELS.slice();}
  try{var s=JSON.parse(localStorage.getItem('wb_personal_hub_sel'));if(s)SEL=Object.assign(SEL,s);}catch(e){}
  try{var p=JSON.parse(localStorage.getItem(PARAM_STORE_KEY));if(p)GEN_PARAMS=Object.assign(GEN_PARAMS,p);}catch(e){}
@@ -664,10 +689,10 @@ function vdirChatSend(messages,onDelta,onDone){
   var url,hdr,body;
   if(agnesProxyOk){
     url=AGNES_PROXY;hdr={'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'};
-    body=JSON.stringify({route:'chat',model:AGNES_MODEL.chat,messages:messages,stream:true,max_tokens:4000});
+    body=JSON.stringify({route:'chat',model:AGNES_MODEL.chat,messages:messages,stream:true,temperature:(CHAT_PARAMS.temperature||0.8),max_tokens:(CHAT_PARAMS.max_tokens||1024)});
   }else{
     url=AGNES_BASE+'/chat/completions';hdr={'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()};
-    body=JSON.stringify({model:AGNES_MODEL.chat,messages:messages,stream:true,max_tokens:4000});
+    body=JSON.stringify({model:AGNES_MODEL.chat,messages:messages,stream:true,temperature:(CHAT_PARAMS.temperature||0.8),max_tokens:(CHAT_PARAMS.max_tokens||1024)});
   }
   return fetch(url,{method:'POST',headers:hdr,body:body})
     .then(function(r){if(!r.ok)return r.json().then(function(j){throw new Error((j.error&&(j.error.message||j.error.msg))||('HTTP '+r.status));});
@@ -1518,6 +1543,7 @@ function renderShotTimeline(){var box=$('shotTimeline');if(!box)return;if(!D.sho
   h+='</div>';box.innerHTML=h;}
 function cycleShot(id){var x=D.shots.find(function(s){return s.id===id});if(!x)return;var order=['待拍摄','拍摄中','已交付'];var i=order.indexOf(x.st||'待拍摄');x.st=order[(i+1)%order.length];saveLocal();scheduleCloudSync();renderShots();renderShotTimeline();renderToday();}
 
+function deAiify(t){if(!t)return '';return t.replace(/[—–]/g,'，').replace(/在这个(快节奏|信息爆炸|内卷|焦虑|注意力稀缺).*?的时代[，,]?/g,'').replace(/(不得不说|众所周知|总的来说|总而言之|需要注意的是|值得一提的是|首先[，,]?|其次[，,]?|最后[，,]?|此外[，,]?|另外[，,]?|其实[，,]?|说实话|说真的|家人们|绝绝子|yyds|无独有偶|毋庸置疑)/g,'').replace(/([。！？]){2,}/g,'$1').replace(/\n{3,}/g,'\n\n').replace(/[ \t]{2,}/g,' ').replace(/\s+([，。！？、])/g,'$1').trim();}
 // ===== 电商文案仿写 =====
 var ecLast={variants:[]},ecLastImg='';
 async function genCopy(){
@@ -1538,7 +1564,7 @@ async function genCopy(){
 function renderEcomResult(d){ecLast.variants=d.variants||[];
   var h='';if(d.skeleton)h+='<div class="ec-skel" style="background:var(--olive-l);border-color:#D3DCC0;color:var(--olive)">结构套路：'+esc(d.skeleton)+'</div>';
   (d.variants||[]).forEach(function(v,i){h+='<div class="ec-var"><div class="hd2"><span class="tag clay">'+esc(v.angle||('版本'+(i+1)))+'</span>'+(v.title?'<span class="t" style="font-weight:700">'+esc(v.title)+'</span>':'')+'<span style="margin-left:auto;display:flex;gap:6px"><button class="btn xs" onclick="ecCopyText('+i+')">复制</button><button class="btn xs" onclick="ecSaveProduct('+i+')">存商品</button></span></div>';
-    h+='<div class="bodytx">'+esc(v.body||'')+'</div>';
+    h+='<div class="bodytx">'+esc(deAiify(v.body||''))+'</div>';
     if(v.tags&&v.tags.length)h+='<div class="tgs">'+v.tags.map(function(t){return '<span class="tag">'+esc(t)+'</span>'}).join('')+'</div>';
     h+='</div>';});
   $('ec_result').innerHTML=h;
@@ -1701,6 +1727,7 @@ function publishToMedia(id){
   saveLocal();scheduleCloudSync();renderVideos();renderKanban();renderToday();
   toast('已推送到自媒体看板 ✅');
 }
+var toolsClosed=false;
 function switchTab(t){curTab=t;
 var AC={'top':'var(--ac-top)','media':'var(--ac-media)','video':'var(--ac-video)','ecom':'var(--ac-ecom)','hot':'var(--ac-hot)','life':'var(--ac-life)','ai':'var(--ac-ai)','doubao':'#7c4dff'};
 document.documentElement.style.setProperty('--ac', AC[t]||'var(--ac-top)');
@@ -1709,14 +1736,15 @@ document.documentElement.style.setProperty('--ac', AC[t]||'var(--ac-top)');
   document.querySelectorAll('section.panel').forEach(function(p){p.classList.toggle('on',p.id==='p-'+t);});
   if(t==='ai')setTimeout(function(){$('ai_input').focus();},200);
   if(t==='hot'&&!hotLoaded)loadHot('weibo');
-  if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video'){renderShotTimeline();loadActiveChat('vdir');}if(t==='ai')loadActiveChat('ai');if(t==='ecom'){renderEcomBoard();renderHotTabs();renderHotProducts();}if(t==='doubao')renderDoubaoGallery();}
+  if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video'){renderShotTimeline();loadActiveChat('vdir');}if(t==='ai')loadActiveChat('ai');if(t==='ecom'){renderEcomBoard();renderHotTabs();renderHotProducts();}if(t==='doubao')renderDoubaoGallery();var tb=document.querySelector('.tools');if(tb){if(t==='top'){toolsClosed=false;tb.style.display='';}else{tb.style.display=toolsClosed?'none':'';}}}
+function closeTools(){toolsClosed=true;var tb=document.querySelector('.tools');if(tb)tb.style.display='none';}
 
 // ===== RENDER ALL =====
 function renderAll(){switchCat();renderKanban();renderAssets();renderStats();renderShots();renderShotTimeline();renderPrompts();renderVideos();renderLedger();renderHabits();renderTodos();renderProducts();renderEcomBoard();renderHotProducts();renderDiary();renderToday();renderTop();initHot();checkTip();var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;renderChatHistory();renderDoubaoGallery();/* agnes video panel init (D ready here) */try{vdirGallery();renderVdirChatHistory();}catch(e){console.warn('vdir init',e);}if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb=$('vdirKeyBar');if(kb)kb.style.display='block';}});}}
 
 // ===== TODAY HOME =====
 function hubName(){try{var n=localStorage.getItem('wb_personal_hub_name');if(n&&n.trim())return n.trim();}catch(e){}if(session&&session.user&&session.user.email)return session.user.email.split('@')[0];return '';}
-function getGreeting(){var h=new Date().getHours();var n=hubName();return (h<11?'早上好':h<14?'中午好':h<18?'下午好':'晚上好')+(n?'，'+n:'')+' 👋';}
+function getGreeting(){var h=new Date().getHours();var n=hubName();var g=h>=23||h<5?'夜深了':h<11?'早上好':h<14?'中午好':h<18?'下午好':'晚上好';return g+(n?'，'+n:'')+' 👋';}
 function getEncourage(){var arr=['今天的努力，是明天惊喜的铺垫。','保持节奏，你已经比昨天更好了。','小步前进，也是前进。','把一件小事做好，就是今天的胜利。'];return arr[Math.floor(Math.random()*arr.length)];}
 var weatherCache=null;
 function renderTop(){
@@ -2224,10 +2252,10 @@ function dbChatText(j){if(!j)return '';if(j.choices&&j.choices[0]){var c=j.choic
 async function dbCallChat(messages){
   if(typeof agnesCheckProxy==='function'){try{await agnesCheckProxy();}catch(e){}}
   if(agnesProxyOk){
-    var r=await fetch(AGNES_PROXY,{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({route:'chat',model:AGNES_MODEL.chat,messages:messages,stream:false,max_tokens:600})});
+    var r=await fetch(AGNES_PROXY,{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({route:'chat',model:AGNES_MODEL.chat,messages:messages,stream:false,temperature:(CHAT_PARAMS.temperature||0.8),max_tokens:(CHAT_PARAMS.max_tokens||1024)})});
     return dbChatText(await r.json());
   }else if(agnesKey()){
-    var r2=await fetch(AGNES_BASE+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()},body:JSON.stringify({model:AGNES_MODEL.chat,messages:messages,stream:false,max_tokens:600})});
+    var r2=await fetch(AGNES_BASE+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()},body:JSON.stringify({model:AGNES_MODEL.chat,messages:messages,stream:false,temperature:(CHAT_PARAMS.temperature||0.8),max_tokens:(CHAT_PARAMS.max_tokens||1024)})});
     return dbChatText(await r2.json());
   }
   throw new Error('no-ai');
@@ -2238,10 +2266,10 @@ function dbLocalEnhance(raw,ta,hint){
   if(hint){hint.style.color='#b8860b';hint.textContent='已本地增强（未联网 AI）';}
   toast('已本地增强提示词');
 }
-async function dbOptimizePrompt(){
-  var ta=$('db_prompt');if(!ta)return;var raw=ta.value.trim();
+async function dbOptimizePrompt(targetId){
+  var ta=$(targetId||'db_prompt');if(!ta)return;var raw=ta.value.trim();
   if(!raw){toast('先写点画面描述再优化');return;}
-  var btn=$('dbOptBtn'),hint=$('dbOptHint');
+  var isI2i=(targetId==='db_i2i_prompt');var btn=$(isI2i?'dbI2iOptBtn':'dbOptBtn'),hint=$(isI2i?'dbI2iOptHint':'dbOptHint');
   if(btn)btn.disabled=true;if(hint){hint.style.color='';hint.textContent='优化中…';}
   var sys={role:'system',content:'你是顶尖的中英文 AI 绘画提示词架构师，擅长把一句话画面描述扩写成专业级文生图提示词。用户给出简短描述，请输出【一段】高质量提示词（不要解释、不要序号、不要代码块），要求：\n1) 主体与特征具体化（外貌、服饰、姿态、表情、动作、材质）；\n2) 环境场景细节化（地点、季节、天气、时间、背景元素、氛围物）；\n3) 光影与情绪（主光方向、光质、色彩情绪、空气感、体积光）；\n4) 构图与镜头（景别、视角、景深、运镜感、留白）；\n5) 风格流派明确（如电影感/动漫/写实/水彩/赛博朋克/国风，并指明画风参考）；\n6) 画质词（8K、超清、极致细节、电影级质感、锐利、大师作品）。\n中文为主，可穿插英文画质/风格标签（如 cinematic, ultra-detailed, masterpiece, volumetric lighting）。若用户描述已含风格或主体，则保留并强化，不得篡改主体意图。'};
   try{
@@ -2262,6 +2290,10 @@ function addModel(){var n=$('nm_name').value.trim();var t=$('nm_type').value;if(
 function delModel(i){if(!window.__MODELS)return;window.__MODELS.splice(i,1);saveModels();renderModelSelects();}
 function fillParamsUI(){try{$('p_seed').value=GEN_PARAMS.seed||'';$('p_steps').value=GEN_PARAMS.steps||30;$('p_cfg').value=GEN_PARAMS.cfg||7.5;$('p_ratio').value=GEN_PARAMS.ratio||'16:9';$('p_w').value=GEN_PARAMS.width||1152;$('p_h').value=GEN_PARAMS.height||768;$('p_neg').value=GEN_PARAMS.negative||'';}catch(e){}}
 function saveParamsUI(){GEN_PARAMS={seed:$('p_seed').value.trim(),steps:parseInt($('p_steps').value)||30,cfg:parseFloat($('p_cfg').value)||7.5,width:parseInt($('p_w').value)||1152,height:parseInt($('p_h').value)||768,fps:videoFps(),ratio:$('p_ratio').value.trim()||'16:9',negative:$('p_neg').value.trim()};saveModels();var h=$('paramHint');if(h){h.style.color='#3aa655';h.textContent='已保存';}toast('参数已保存');}
+function openSettings(){try{fillParamsUI();}catch(e){}fillChatParamsUI();renderModelSelects();var m=$('setModal');if(m)m.style.display='flex';}
+function closeSettings(){var m=$('setModal');if(m)m.style.display='none';}
+function fillChatParamsUI(){try{var cp=CHAT_PARAMS||{temperature:0.8,max_tokens:1024};var t=$('c_temp');if(t)t.value=cp.temperature;var tv=$('c_temp_v');if(tv)tv.textContent=cp.temperature;$('c_maxtok').value=cp.max_tokens;}catch(e){}}
+function saveChatParams(){CHAT_PARAMS={temperature:parseFloat($('c_temp').value)||0.8,max_tokens:parseInt($('c_maxtok').value)||1024};try{localStorage.setItem('ph_chat_params',JSON.stringify(CHAT_PARAMS));}catch(e){}var h=$('chatParamHint');if(h){h.style.color='#3aa655';h.textContent='已保存';}toast('对话参数已保存');}
 
 async function fetchWeather(loc, isCoord){
   var lat,lon,city='';
@@ -2394,7 +2426,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260813o';
+var APP_VER='20260814a';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
