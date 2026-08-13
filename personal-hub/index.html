@@ -407,7 +407,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <section class="panel" id="p-video"><div class="grid">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M3 9.2h18M3 14.8h18M8 4.5v15M16 4.5v15"/></svg><h3>分镜脚本</h3><div class="sp"><span class="mut2" id="shotCnt"></span></div></div><div class="bd"><div class="form"><input class="w150 half" id="sh_pj" placeholder="项目名"><input class="w110 half" id="sh_no" placeholder="镜号S03"><input class="f2" id="sh_de" placeholder="画面描述"><input class="w110 half" id="sh_du" type="number" inputmode="numeric" placeholder="秒"><input class="w150 half" id="sh_dd" type="date" title="交付日"><button class="btn pri" onclick="addShot()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>加分镜</button><button class="btn" onclick="vdirBatchFilm()" style="margin-left:8px">🎬 分镜成片（自动切段）</button></div><div id="shotList"></div></div></div>
 <div class="grid g2">
-<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M7.5 4.5h11a1.5 1.5 0 0 1 1.5 1.5v13.5l-4-2.6-4 2.6-4-2.6V6a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M10 9h6M10 12.5h4"/></svg><h3>提示词库</h3><div class="sp"><span class="mut2" id="prCnt"></span></div></div><div class="bd"><div class="form"><input class="f1" id="pr_n" placeholder="名称"><select class="w130 half" id="pr_m"><option>agnes-image-2.1-flash（文生图）</option><option>agnes-video-v2.0（文生视频）</option><option>agnes-video-v2.0（图生视频）</option><option>agnes-2.0-flash（对话）</option><option>其他</option></select><select class="w110 half" id="pr_s"><option value="5">★★★★★</option><option value="4" selected>★★★★</option><option value="3">★★★</option><option value="2">★★</option><option value="1">★</option></select><textarea class="fw" id="pr_x" placeholder="提示词正文"></textarea><button class="btn pri" onclick="addPrompt()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>存入词库</button></div><div id="prList"></div></div></div>
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M7.5 4.5h11a1.5 1.5 0 0 1 1.5 1.5v13.5l-4-2.6-4 2.6-4-2.6V6a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M10 9h6M10 12.5h4"/></svg><h3>提示词库</h3><div class="sp"><span class="mut2" id="prCnt"></span></div></div><div class="bd"><div class="form"><input class="f1" id="pr_n" placeholder="名称"><select class="w130 half" id="pr_m"><option>agnes-image-2.1-flash（文生图）</option><option>agnes-video-v2.0（文生视频）</option><option>agnes-video-v2.0（图生视频）</option><option>agnes-2.5-flash（对话）</option><option>其他</option></select><select class="w110 half" id="pr_s"><option value="5">★★★★★</option><option value="4" selected>★★★★</option><option value="3">★★★</option><option value="2">★★</option><option value="1">★</option></select><textarea class="fw" id="pr_x" placeholder="提示词正文"></textarea><button class="btn pri" onclick="addPrompt()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>存入词库</button></div><div id="prList"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M4.5 6.5h11a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 16V8a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M17 11l4-2.6v7.2L17 13z"/></svg><h3>成片产出</h3><div class="sp"><span class="mut2" id="vdCnt"></span></div></div><div class="bd"><div class="form"><input class="fw" id="vd_t" placeholder="成片标题"><input class="w110 half" id="vd_d" type="number" inputmode="numeric" placeholder="时长秒"><select class="w130 half" id="vd_s"><option>生成中</option><option>待剪辑</option><option>待审</option><option>已发布</option></select><input class="fw" id="vd_p" placeholder="发布平台/备注"><button class="btn pri" onclick="addVideo()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>登记</button></div><div class="stats" id="vdStats"></div><div id="vdList"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9v6M12 9v6M17 9v6"/></svg><h3>分镜时间轴</h3><div class="sp"><span class="mut2">点击镜头块切换 待拍摄→拍摄中→已交付</span></div></div><div class="bd"><div id="shotTimeline"></div></div></div>
 </div>
@@ -571,18 +571,18 @@ var STUDIO_URL='https://wcnssyiqitugqfmcbdhe.functions.supabase.co/ai-studio';
 var AGNES_BASE='https://api.agnes-ai.cn/v1';
 var AGNES_POLL='https://api.agnes-ai.cn/agnesapi';
 var AGNES_PROXY=SB_URL+'/functions/v1/agnes-media';
-var AGNES_MODEL={chat:'agnes-2.0-flash',img:'agnes-image-2.1-flash',video:'agnes-video-v2.0'};
+var AGNES_MODEL={chat:'agnes-2.5-flash',img:'agnes-image-2.1-flash',video:'agnes-video-v2.0'};
 var agnesProxyOk=null;
 function agnesKey(){try{return localStorage.getItem('wb_personal_hub_agnes_key')||'';}catch(e){return '';}}
 function agnesSetKey(v){try{localStorage.setItem('wb_personal_hub_agnes_key',v.trim());}catch(e){}}
 // ===== 可编辑模型注册表 + 生成参数（设置里可改）=====
 var MODEL_STORE_KEY='wb_personal_hub_models', PARAM_STORE_KEY='wb_personal_hub_params';
 var DEFAULT_MODELS=[
-  {name:'agnes-2.0-flash',label:'Agnes 对话',type:'chat',maxFrames:0,fps:0},
+  {name:'agnes-2.5-flash',label:'Agnes 2.5 对话',type:'chat',maxFrames:0,fps:0},
   {name:'agnes-image-2.1-flash',label:'Agnes 图像',type:'img',maxFrames:0,fps:0},
   {name:'agnes-video-v2.0',label:'Agnes 视频',type:'video',maxFrames:121,fps:24}
 ];
-var SEL={chat:'agnes-2.0-flash',img:'agnes-image-2.1-flash',video:'agnes-video-v2.0'};
+var SEL={chat:'agnes-2.5-flash',img:'agnes-image-2.1-flash',video:'agnes-video-v2.0'};
 var GEN_PARAMS={seed:'',steps:30,cfg:7.5,width:1152,height:768,fps:24,ratio:'16:9',negative:''};
 function loadModels(){try{var m=JSON.parse(localStorage.getItem(MODEL_STORE_KEY));window.__MODELS=Array.isArray(m)&&m.length?m:DEFAULT_MODELS.slice();}catch(e){window.__MODELS=DEFAULT_MODELS.slice();}
  try{var s=JSON.parse(localStorage.getItem('wb_personal_hub_sel'));if(s)SEL=Object.assign(SEL,s);}catch(e){}
@@ -607,9 +607,10 @@ async function agnesEnsureReady(){
   vdirWarnKey();return false;
 }
 function vdirDetectIntent(t){var hasRef=!!window.__vdirRef;
- if(hasRef&&/图生视频|图转动|让.*图.*动|参考图.*视频|图变视频/.test(t))return 'i2v';
- if(/文生视频|生成视频|做个?视频|做条视频|视频生成|动画视频|短视频|宣传片/.test(t))return 'video';
- if(/画|插画|海报|头像|配图|文生图|生成.*图片|logo|做张图|一张图|壁纸/.test(t))return 'img';
+ if(hasRef&&/(图|参考图|这张|上传的图).*(动|视频|生成视频|变成视频)/.test(t))return 'i2v';
+ if(/(图生视频|图转动|让.*图.*动|参考图.*视频|图变视频|把图.*视频)/.test(t))return 'i2v';
+ if(/(视频|片子?|动画|动起来|运镜|分镜|成片|mv|混剪|短片|预告|片头|片尾|生成一段视频|做个视频|来个视频|视频生成|宣传片|广告片)/.test(t))return 'video';
+ if(/(画|插画|海报|头像|logo|配图|文生图|生成.*图|做张图|一张图|壁纸|封面|表情|漫画|图标|草图|示意图|概念图|三视图|角色图|设计图|出图|来张图|给我图|图)/.test(t))return 'img';
  return 'chat';}
 function vdirSubmit(){
  window.__vdirMode=window.__vdirMode||'auto';
@@ -652,7 +653,7 @@ async function vdirSend(){var inp=$('vdir_input');if(!inp)return;var m=inp.value
  if(!(await agnesEnsureReady()))return;
  vdirAddMsg('user',m);var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';var acc='';
  var ctx='';try{ctx=await agnesSearch(m);}catch(e){ctx='';}
- var msgs=[{role:'system',content:'你是小林的通用 AI 助手（不限视频领域）。你的定位：像一个靠谱的人类助手——理解用户需求、按需联网搜索资料、把复杂任务拆成可执行步骤、整理视频/图文生成方案，并在需求模糊时主动追问 1-2 个关键问题。\n你具备联网搜索能力：平台会把搜索到的网页摘要作为「联网搜索结果」上下文发给你，请基于它们作答，并尽量标注来源（URL）。若没有搜索结果，就基于自身知识回答并说明。\n回答要简洁、条理清晰、用中文。涉及视频/图片生成时，给出可直接用的提示词（agnes 模型：agnes-image-2.1-flash 文生图 / agnes-video-v2.0 文生视频·图生视频），并说明生成步骤。'}];
+ var msgs=[{role:'system',content:'你是小林，用户随身的 AI 专家 Agent，不是普通聊天机器人。你的核心能力：\n1. 深度理解：先准确抓住用户真实意图（哪怕表达模糊、口语化、有错字），再行动；信息不足时主动追问 1-2 个最关键的问题，不要瞎猜、不要啰嗦。\n2. 专家级视频创作：精通脚本/分镜/运镜/节奏/提示词工程。涉及生图给出可直接用的提示词（agnes-image-2.1-flash 文生图），涉及生视频给提示词加参数（agnes-video-v2.0 文生/图生视频，约 121 帧/24fps），并说明生成步骤。\n3. 桌面 EXE 应用专家：精通把网页/前端项目打包成 Windows 桌面 .exe 的各类方案与取舍——WebView2（WinForms/WPF 内嵌 Edge）、Tauri（Rust加WebView，体积小）、Electron（生态全但重）、以及纯原生（C#/C++/Win32）。能为用户选型、给打包命令与配置、解决常见坑（CORS、本地存储、离线运行、代码签名与 SmartScreen、自动更新、体积优化、中文乱码、高 DPI 缩放、托盘与开机自启）。也懂 Android APK（WebView 壳）与 PWA。\n4. 联网搜索：平台会把搜索到的网页摘要作为「联网搜索结果」发给你，请基于它们作答并尽量标注来源（URL）；无结果则用自身知识并说明。\n5. 可执行输出：复杂任务拆成步骤清单；给代码/配置直接给可复制块；用中文、条理清晰、不废话。\n你同时是视频导演与桌面应用架构师，用户问哪块就切换到哪块的专业模式。'}];
  if(ctx)msgs.push({role:'system',content:ctx});
  msgs.push({role:'user',content:m});
  vdirChatSend(msgs,
@@ -2144,7 +2145,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260813b';
+var APP_VER='20260813c';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
