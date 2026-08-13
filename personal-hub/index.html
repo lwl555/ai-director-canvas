@@ -411,7 +411,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M4.5 6.5h11a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 16V8a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M17 11l4-2.6v7.2L17 13z"/></svg><h3>成片产出</h3><div class="sp"><span class="mut2" id="vdCnt"></span></div></div><div class="bd"><div class="form"><input class="fw" id="vd_t" placeholder="成片标题"><input class="w110 half" id="vd_d" type="number" inputmode="numeric" placeholder="时长秒"><select class="w130 half" id="vd_s"><option>生成中</option><option>待剪辑</option><option>待审</option><option>已发布</option></select><input class="fw" id="vd_p" placeholder="发布平台/备注"><button class="btn pri" onclick="addVideo()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>登记</button></div><div class="stats" id="vdStats"></div><div id="vdList"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9v6M12 9v6M17 9v6"/></svg><h3>分镜时间轴</h3><div class="sp"><span class="mut2">点击镜头块切换 待拍摄→拍摄中→已交付</span></div></div><div class="bd"><div id="shotTimeline"></div></div></div>
 </div>
-<div class="card vdir"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI 助手 · 小林</h3><div class="sp"><span class="mut2">聊需求 · 出图 · 出视频 · 导演成片</span></div></div><div class="bd">
+<div class="card vdir"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI 助手 · 小林</h3><div class="sp"><span class="mut2">通用创作助手 · 聊需求·出图·出视频·导演成片</span></div></div><div class="bd">
 <style>
 .vdir-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:768px){.vdir-cols{grid-template-columns:1fr}}
@@ -500,7 +500,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="stats" id="hotStats" style="display:none"></div>
 <div id="hotList"><div class="empty">选择上方平台查看实时热榜</div></div>
 </div></div></section>
-<section class="panel" id="p-ai"><div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI助手</h3><div class="sp"><span class="mut2">能查看你平台上的所有数据</span></div></div><div class="bd"><div class="ai-wrap">
+<section class="panel" id="p-ai"><div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI助手</h3><div class="sp"><span class="mut2">数据参谋 · 读懂你的待办/记账/选题，给针对性建议（也能出图出视频）</span></div></div><div class="bd"><div class="ai-wrap">
 <div class="ai-bar">
   <button class="btn xs ghost" type="button" onclick="toggleChatHist()">🗂 历史对话</button>
   <button class="btn xs ghost" type="button" onclick="newChat()">＋ 新对话</button>
@@ -525,7 +525,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <input type="file" id="ai_file" accept="image/*" multiple style="display:none" onchange="aiOnImage(event)">
 </div></div></div></section>
 <section class="panel" id="p-doubao"><div class="grid">
-<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 17l-5-5L5 21"/></svg><h3>豆包文生图</h3><div class="sp"><span class="mut2">火山引擎豆包（Doubao）独立生图</span></div></div><div class="bd">
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 17l-5-5L5 21"/></svg><h3>豆包文生图</h3><div class="sp"><span class="mut2">火山引擎豆包（Doubao）独立生图</span></div></div><div class="bd"><div class="mut2" style="font-size:13px;background:var(--sand2);border:1px dashed var(--ac);border-radius:10px;padding:8px 10px;margin-bottom:12px;color:var(--ink)">💡 不想配 Key？用「AI视频制作-小林」或「AI助手」也能<b>免 Key 直接出图/出视频</b>。豆包通道适合需要火山引擎 Seedream 专属模型的场景。</div>
   <div class="form" style="margin-bottom:8px"><input id="db_key" type="password" class="f1" placeholder="豆包 API Key（ark-...，仅存本机浏览器）" style="min-height:38px"><button class="btn pri sm" onclick="saveDoubaoKey()">保存Key</button><span id="dbKeyHint" class="mut2" style="font-size:12px"></span></div>
   <div class="mut2" style="font-size:12px;margin-bottom:8px">Key 只存你自己的浏览器（localStorage），不进源码/不进 git。部署后是公开页面，明文写进去会被人偷走。</div>
   <textarea id="db_prompt" class="f1" rows="3" placeholder="描述你想生成的画面，如：赛博朋克风格的城市夜景，霓虹灯，雨夜" style="min-height:64px;font-size:16px"></textarea>
@@ -620,7 +620,7 @@ async function agnesEnsureReady(){
   if(agnesKey())return true;
   vdirWarnKey();return false;
 }
-function vdirDetectIntent(t){var hasRef=!!_scGet('Ref');
+function vdirDetectIntent(t){var hasRef=!!getSharedRef();
  if(hasRef&&/(图|参考图|这张|上传的图).*(动|视频|生成视频|变成视频)/.test(t))return 'i2v';
  if(/(图生视频|图转动|让.*图.*动|参考图.*视频|图变视频|把图.*视频)/.test(t))return 'i2v';
  if(/(视频|片子?|动画|动起来|运镜|分镜|成片|mv|混剪|短片|预告|片头|片尾|生成一段视频|做个视频|来个视频|视频生成|宣传片|广告片)/.test(t))return 'video';
@@ -726,7 +726,7 @@ function vdirRenderDirPlanChat(full,node){
   if(hasChar){
     window.__dirPlanChar=char;
     h+='<div class="mut2" style="margin-bottom:4px"><b>🧍 角色：</b>'+esc(char)+'</div>';
-    if(window.__vdirRef)h+='<div class="mut2" style="color:#3aa655">已使用参考图，将用于视频一致性</div>';
+    if(getSharedRef())h+='<div class="mut2" style="color:#3aa655">已使用参考图，将用于视频一致性</div>';
     else h+='<div class="ai-actions"><button class="btn pri xs" onclick="vdirGenCharSheet()">🎨 生成人物三视图</button><span class="mut2" style="font-size:12px">AI 当顾问，先出三视图你确认</span></div>';
   }else{h+='<div class="mut2">本方案无需固定角色，可直接生成</div>';}
   if(shots.length)h+='<div class="mut2" style="margin-top:6px"><b>🎞 分镜（'+shots.length+'）：</b></div><div class="mut2">'+shots.map(function(s,i){return (i+1)+'. '+esc(s.de)+' ('+s.du+'s)';}).join('<br>')+'</div>';
@@ -747,7 +747,7 @@ async function vdirGenCharSheet(){AGNES_SCOPE='vdir';
   h+='</div><div class="ai-actions" style="margin-top:10px"><button class="btn pri xs" onclick="vdirDirectorApprove()">✅ 同意，开始生成视频</button><button class="btn ghost xs" onclick="vdirDirectorSkipChar()">不用三视图，直接生成</button></div>';
   if(body)body.innerHTML=h;var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;
   window.__vdirDirUrls=ok;
-  if(ok.length)window.__vdirRef=ok[0];
+  if(ok.length)setSharedRef(ok[0]);
 }
 function vdirDirectorAdopt(){AGNES_SCOPE='vdir';
   if(!window.__dirPlan||!window.__dirPlan.shots.length){toast('先构思方案');return;}
@@ -756,13 +756,20 @@ function vdirDirectorAdopt(){AGNES_SCOPE='vdir';
 }
 function vdirDirectorApprove(){AGNES_SCOPE='vdir';vdirDirectorAdopt();setTimeout(function(){vdirBatchFilm();},300);}
 function vdirDirectorSkipChar(){AGNES_SCOPE='vdir';window.__vdirDirUrls=[];vdirDirectorApprove();}
-function vdirRefPreview(){AGNES_SCOPE='vdir';var f=$('vdir_ref')&&$('vdir_ref').files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var im=$('vdir_refprev');if(im){im.src=rd.result;im.style.display='block';}window.__vdirRef=rd.result;};rd.readAsDataURL(f);}
+function getSharedRef(){if(window.__sharedRef)return window.__sharedRef;try{var s=localStorage.getItem('wb_refimg');if(s){window.__sharedRef=s;return s;}}catch(e){}return null;}
+function setSharedRef(d){
+  window.__sharedRef=d; window.__vdirRef=d; window.vdirRef=d; window.__aiRef=d;
+  try{ if(d)localStorage.setItem('wb_refimg',d); else localStorage.removeItem('wb_refimg'); }catch(e){}
+  var ia=$('ai_refprev'); if(ia&&d){ia.src=d;ia.style.display='block';}
+  var iv=$('vdir_refprev'); if(iv&&d){iv.src=d;iv.style.display='block';}
+}
+function vdirRefPreview(){AGNES_SCOPE='vdir';var f=$('vdir_ref')&&$('vdir_ref').files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var im=$('vdir_refprev');if(im){im.src=rd.result;im.style.display='block';}setSharedRef(rd.result);};rd.readAsDataURL(f);}
 async function vdirGenerateInline(mode,p){AGNES_SCOPE='vdir';
  if(!p){toast('先写生成内容');return;}
  if(!(await agnesEnsureReady()))return;
  vdirAddMsg('user',p);var inp=$('vdir_input');if(inp)inp.value='';
  var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';
- var ref=(mode==='i2v')?(window.__vdirRef||null):null;
+ var ref=(mode==='i2v')?(getSharedRef()||null):null;
  if(mode==='i2v'&&!ref){body.innerHTML='<div class="mut2" style="color:#c0392b">图生视频请先在上方「参考图」处上传图片（用于人物/场景一致性），再发送</div>';return;}
  vdirLogGen(mode,p,'生成中');
  if(mode==='img')return vdirGenImage(p,body);
@@ -913,7 +920,7 @@ async function vdirBatchFilm(){AGNES_SCOPE='vdir';
   if(!(await agnesEnsureReady()))return;
   var segs=vdirBuildSegs();
   if(!segs.length){toast('没有可生成的分镜');return;}
-  var sharedRef=_scGet('Ref')||null;
+  var sharedRef=getSharedRef()||null;
   if(!sharedRef){
     vdirFilm={segs:segs,ref:null,results:new Array(segs.length).fill(null),done:0,urls:[]};
     vdirFilmOpen();vdirFilmProg(0,'⏳ 生成共享角色参考图（保证多镜一致）');
@@ -1327,17 +1334,17 @@ function aiMDirectorAdopt(){if(!window.__aiDirPlan||!window.__aiDirPlan.shots.le
  var n=0;window.__aiDirPlan.shots.forEach(function(s){D.shots.push({id:uid(),pj:'',no:'',de:s.de,du:s.du||0,dd:'',st:'待拍摄',ct:todayStr()});n++;});
  saveLocal();scheduleCloudSync();renderShots();renderShotTimeline();renderToday();toast('已采纳 '+n+' 个分镜');}
 async function aiMDirectorApprove(){AGNES_SCOPE='ai';if(!(await agnesEnsureReady()))return;if(!window.__aiDirPlan||!window.__aiDirPlan.shots.length){toast('先构思方案');return;}
- var shots=window.__aiDirPlan.shots;var ref=window.__aiRef||null;var char=window.__aiDirPlan.char||'';
+ var shots=window.__aiDirPlan.shots;var ref=getSharedRef()||null;var char=window.__aiDirPlan.char||'';
  aiMAddMsg('bot','🎬 开始按分镜生成视频（共 '+shots.length+' 段，保持角色/风格一致）…');
  shots.forEach(function(s){AGNES_SCOPE='ai';vdirGenVideo((s.de||'')+'。'+(char?('角色设定：'+char+'。'):'')+'电影级质感，风格统一，色调一致',null,ref,0);});
  toast('已提交 '+shots.length+' 段视频生成');}
 function aiMDirectorSkipChar(){window.__aiDirUrls=[];aiMDirectorApprove();}
-function aiMRefPreview(){AGNES_SCOPE='ai';var f=$('ai_ref')&&$('ai_ref').files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var im=$('ai_refprev');if(im){im.src=rd.result;im.style.display='block';}window.__aiRef=rd.result;};rd.readAsDataURL(f);}
+function aiMRefPreview(){AGNES_SCOPE='ai';var f=$('ai_ref')&&$('ai_ref').files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var im=$('ai_refprev');if(im){im.src=rd.result;im.style.display='block';}setSharedRef(rd.result);};rd.readAsDataURL(f);}
 async function aiMGenerateInline(mode,p){AGNES_SCOPE='ai';if(!p){toast('先写生成内容');return;}
  if(!(await agnesEnsureReady()))return;
  aiMAddMsg('user',p);var inp=$('ai_input');if(inp)inp.value='';
  var node=aiMAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';
- var ref=(mode==='i2v')?(window.__aiRef||null):null;
+ var ref=(mode==='i2v')?(getSharedRef()||null):null;
  if(mode==='i2v'&&!ref){body.innerHTML='<div class="mut2" style="color:#c0392b">图生视频请先在上方「参考图」处上传图片（用于人物/场景一致性），再发送</div>';return;}
  vdirLogGen(mode,p,'生成中');
  if(mode==='img')return vdirGenImage(p,body);
@@ -2307,7 +2314,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260813f';
+var APP_VER='20260813g';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -2383,6 +2390,7 @@ window.addEventListener('DOMContentLoaded',function(){
   var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;
   if(restoreSession()){if(!isTokenExpired()){enterApp();}else{refreshToken().then(function(ok){if(ok)enterApp();else showAuth();});}}
   else{showAuth();loadLocal();try{vdirGallery();}catch(e){console.warn('vdir init2',e);}}loadModels();try{var dbk=$('db_key');if(dbk)dbk.value=doubaoKey();var dbm=$('db_model');if(dbm)dbm.value=doubaoGet('ep');var dbp=$('db_prompt');if(dbp)dbp.value=doubaoGet('prompt');var dbs=$('db_size');if(dbs)dbs.value=doubaoGet('size')||'1024x1024';var dbn=$('db_n');if(dbn)dbn.value=doubaoGet('n')||'1';renderDoubaoGallery();}catch(e){console.warn('doubao init',e);}/* one-time proxy detection for the video panel */if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb2=$('vdirKeyBar');if(kb2)kb2.style.display='block';}});}
+  try{var __sr=getSharedRef();if(__sr){var __ip1=$('vdir_refprev'),__ip2=$('ai_refprev');if(__ip1){__ip1.src=__sr;__ip1.style.display='block';}if(__ip2){__ip2.src=__sr;__ip2.style.display='block';}}}catch(e){}
   // 注册 Service Worker（仅 https 环境；让手机端可"安装到主屏幕"）
   // 关键：新版本自动激活 + 刷新一次，确保用户不会一直看到旧的缓存页面
   if(location.protocol==='https:' && 'serviceWorker' in navigator){
