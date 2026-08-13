@@ -360,7 +360,6 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <button data-t="ecom"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9H7.5z"/><path d="M6 6L5 3H2.5M9 20.5a1 1 0 1 0 0-.1M18 20.5a1 1 0 1 0 0-.1"/></svg>电商运营</button>
 <button data-t="hot"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg>今日热度</button>
 <button data-t="life"><svg class="ico" viewBox="0 0 24 24"><path d="M3.5 10.6L12 3.6l8.5 7v9a1.4 1.4 0 0 1-1.4 1.4H4.9a1.4 1.4 0 0 1-1.4-1.4z"/><path d="M9.3 21V13.4h5.4V21"/></svg>生活全能</button>
-<button data-t="ai"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>AI助手</button>
 <button data-t="doubao"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 17l-5-5L5 21"/></svg>豆包生图</button>
 </nav>
 </header>
@@ -411,7 +410,9 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M4.5 6.5h11a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 16V8a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M17 11l4-2.6v7.2L17 13z"/></svg><h3>成片产出</h3><div class="sp"><span class="mut2" id="vdCnt"></span></div></div><div class="bd"><div class="form"><input class="fw" id="vd_t" placeholder="成片标题"><input class="w110 half" id="vd_d" type="number" inputmode="numeric" placeholder="时长秒"><select class="w130 half" id="vd_s"><option>生成中</option><option>待剪辑</option><option>待审</option><option>已发布</option></select><input class="fw" id="vd_p" placeholder="发布平台/备注"><button class="btn pri" onclick="addVideo()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>登记</button></div><div class="stats" id="vdStats"></div><div id="vdList"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9v6M12 9v6M17 9v6"/></svg><h3>分镜时间轴</h3><div class="sp"><span class="mut2">点击镜头块切换 待拍摄→拍摄中→已交付</span></div></div><div class="bd"><div id="shotTimeline"></div></div></div>
 </div>
-<div class="card vdir"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI 助手 · 小林</h3><div class="sp"><span class="mut2">通用创作助手 · 聊需求·出图·出视频·导演成片</span></div></div><div class="bd">
+<div class="card vdir"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI 助手</h3><div class="sp"><span class="mut2" id="vdirRoleLabel">通用创作助手 · 小林（聊需求·出图·出视频·导演成片）</span></div></div><div class="bd">
+<div class="vdir-mode" id="vdirRoleSeg" style="margin-bottom:10px"><button class="on" data-role="create" onclick="setVdirRole('create')">🎨 通用创作助手</button><button data-role="data" onclick="setVdirRole('data')">📊 数据参谋</button></div>
+<div id="vdirCreatePane">
 <style>
 .vdir-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:768px){.vdir-cols{grid-template-columns:1fr}}
@@ -453,13 +454,38 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
  <button data-mode="video" onclick="vdirSetMode('video')">出视频</button>
  <button data-mode="director" onclick="vdirSetMode('director')">🎬 导演</button>
 </div>
-<div id="vdirRefBox" style="margin:6px 0 2px;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--sand2)"><label class="mut2">参考图（人物/场景一致性、图生视频、导演分镜成片共用；平时可留空）</label><br><input type="file" id="vdir_ref" accept="image/*" onchange="vdirRefPreview()"><img id="vdir_refprev" style="max-width:100%;border-radius:8px;margin-top:6px;display:none"></div>
+<div id="vdirRefBox" style="margin:6px 0 2px;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--sand2)"><label class="mut2">角色三视图（前/侧/后，用于导演成片锁死人物造型·服装·道具一致性；可单独替换；平时可留空）</label><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px"><div style="text-align:center"><div class="mut2" style="font-size:12px;margin-bottom:3px">正面</div><input type="file" accept="image/*" onchange="refViewUpload('front',this)"><img id="ref_front" style="width:100%;border-radius:8px;margin-top:4px;display:none"></div><div style="text-align:center"><div class="mut2" style="font-size:12px;margin-bottom:3px">侧面</div><input type="file" accept="image/*" onchange="refViewUpload('side',this)"><img id="ref_side" style="width:100%;border-radius:8px;margin-top:4px;display:none"></div><div style="text-align:center"><div class="mut2" style="font-size:12px;margin-bottom:3px">背面</div><input type="file" accept="image/*" onchange="refViewUpload('back',this)"><img id="ref_back" style="width:100%;border-radius:8px;margin-top:4px;display:none"></div></div><div style="margin-top:6px"><button class="btn xs ghost" type="button" onclick="clearRefViews()">清空三视图</button><span class="mut2" id="refViewsHint" style="font-size:12px"></span></div></div>
   <div class="mut2" style="margin-bottom:6px">小林：直接说「画一只国风猫」「做个30秒茶饮宣传视频」「让这张参考图动起来」即可内联出图/出视频；切到「🎬 导演」并描述想法，它会自动构思分镜、可选生成人物三视图、一键成片。参考图上传框同时供所有模式使用。</div>
   <div class="ai-chat" id="vdir_chat" style="height:340px"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>我是小林，你的通用 AI 助手（基于 Agnes 免费模型），可以联网搜索、帮你规划视频、写提示词、直接生成图片/视频，有疑问会主动问你</div></div></div>
   <div class="ai-input" style="margin-top:8px"><textarea id="vdir_input" placeholder="例如：画一只国风猫 / 做个30秒茶饮宣传视频 / 让参考图动起来…" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();vdirSubmit()}"></textarea><button class="btn pri ai-send" id="vdirActBtn" onclick="vdirSubmit()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
 <div id="vdirMem" class="vdir-mem" style="display:none"></div>
 <div class="mut2" style="margin:12px 0 2px">生成画廊（本地保存）</div>
 <div class="vdir-gallery" id="vdirGallery"></div>
+</div>
+<div id="vdirDataPane" style="display:none"><div class="ai-wrap">
+<div class="ai-bar">
+  <button class="btn xs ghost" type="button" onclick="toggleChatHist()">🗂 历史对话</button>
+  <button class="btn xs ghost" type="button" onclick="newChat()">＋ 新对话</button>
+  <button class="btn xs ghost" type="button" onclick="clearChat()">清空</button>
+  <span class="ai-cur" id="curSessTx"></span>
+</div>
+<div class="ai-hist" id="aiHist" style="display:none"></div>
+<div class="ai-chips"><button class="ai-chip" onclick="aiQuick('总结一下今天要处理的事')">总结今天</button><button class="ai-chip" onclick="aiQuick('分析我这个月的支出情况，哪些可以省')">分析支出</button><button class="ai-chip" onclick="aiQuick('看看我的选题库，给我几个新选题建议')">选题建议</button><button class="ai-chip" onclick="aiQuick('帮我回顾一下最近的自媒体数据趋势')">数据复盘</button><button class="ai-chip" onclick="aiQuick('我有哪些逾期的任务？帮我排个优先级')">逾期处理</button></div>
+<div class="ai-ctx" id="ai_ctx"><div class="vdir-mode" id="ai_mode">
+ <button class="on" data-mode="auto" onclick="aiMSetMode('auto')">自动</button>
+ <button data-mode="chat" onclick="aiMSetMode('chat')">闲聊</button>
+ <button data-mode="img" onclick="aiMSetMode('img')">出图</button>
+ <button data-mode="video" onclick="aiMSetMode('video')">出视频</button>
+ <button data-mode="director" onclick="aiMSetMode('director')">🎬导演</button>
+</div>
+<div id="aiRefBox" style="margin:6px 0 2px;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--sand2)"><label class="mut2">参考图（人物/场景一致性、图生视频、导演成片共用；平时可留空）</label><br><input type="file" id="ai_ref" accept="image/*" onchange="aiMRefPreview()"><img id="ai_refprev" style="max-width:100%;border-radius:8px;margin-top:6px;display:none"></div>
+<svg class="ico s" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.1"/></svg><span>AI助手可以查看你的待办、记账、选题、分镜和习惯数据，给出针对性建议</span></div>
+<div class="ai-chat" id="ai_chat"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>和你的AI助手聊聊吧<br>它了解你工作台上的所有数据</div></div></div>
+<div class="ai-atts" id="ai_atts" style="display:none"></div>
+<div class="ai-input"><button class="ai-attbtn" type="button" onclick="aiPickImage()" title="发送图片（小票可自动记账）"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="2"/><path d="M21 15l-5-5L5 21"/></svg></button><textarea id="ai_input" placeholder="输入消息…（Shift+Enter换行，可附图片让 AI 看图）" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiMSubmit()}" oninput="aiAutoResize(this)"></textarea><button class="btn pri ai-send" onclick="aiMSubmit()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
+<div class="vdir-gallery" id="aiGallery" style="margin-top:10px"></div>
+<input type="file" id="ai_file" accept="image/*" multiple style="display:none" onchange="aiOnImage(event)">
+</div></div>
 </div></div>
 </div></section>
 <section class="panel" id="p-life"><div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/><path d="M12 8v4M12 16h.1"/></svg><h3>生活</h3><div class="sp"><span class="mut2">记账·习惯·待办·日记</span></div></div><div class="bd"><div class="life-tabs" id="lifeTabs"><button class="on" data-lt="ledger" onclick="switchLifeTab('ledger')">记账</button><button data-lt="habit" onclick="switchLifeTab('habit')">习惯</button><button data-lt="todo" onclick="switchLifeTab('todo')">待办</button><button data-lt="diary" onclick="switchLifeTab('diary')">日记</button></div>
@@ -500,30 +526,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="stats" id="hotStats" style="display:none"></div>
 <div id="hotList"><div class="empty">选择上方平台查看实时热榜</div></div>
 </div></div></section>
-<section class="panel" id="p-ai"><div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI助手</h3><div class="sp"><span class="mut2">数据参谋 · 读懂你的待办/记账/选题，给针对性建议（也能出图出视频）</span></div></div><div class="bd"><div class="ai-wrap">
-<div class="ai-bar">
-  <button class="btn xs ghost" type="button" onclick="toggleChatHist()">🗂 历史对话</button>
-  <button class="btn xs ghost" type="button" onclick="newChat()">＋ 新对话</button>
-  <button class="btn xs ghost" type="button" onclick="clearChat()">清空</button>
-  <span class="ai-cur" id="curSessTx"></span>
-</div>
-<div class="ai-hist" id="aiHist" style="display:none"></div>
-<div class="ai-chips"><button class="ai-chip" onclick="aiQuick('总结一下今天要处理的事')">总结今天</button><button class="ai-chip" onclick="aiQuick('分析我这个月的支出情况，哪些可以省')">分析支出</button><button class="ai-chip" onclick="aiQuick('看看我的选题库，给我几个新选题建议')">选题建议</button><button class="ai-chip" onclick="aiQuick('帮我回顾一下最近的自媒体数据趋势')">数据复盘</button><button class="ai-chip" onclick="aiQuick('我有哪些逾期的任务？帮我排个优先级')">逾期处理</button></div>
-<div class="ai-ctx" id="ai_ctx"><div class="vdir-mode" id="ai_mode">
- <button class="on" data-mode="auto" onclick="aiMSetMode('auto')">自动</button>
- <button data-mode="chat" onclick="aiMSetMode('chat')">闲聊</button>
- <button data-mode="img" onclick="aiMSetMode('img')">出图</button>
- <button data-mode="video" onclick="aiMSetMode('video')">出视频</button>
- <button data-mode="director" onclick="aiMSetMode('director')">🎬导演</button>
-</div>
-<div id="aiRefBox" style="margin:6px 0 2px;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--sand2)"><label class="mut2">参考图（人物/场景一致性、图生视频、导演成片共用；平时可留空）</label><br><input type="file" id="ai_ref" accept="image/*" onchange="aiMRefPreview()"><img id="ai_refprev" style="max-width:100%;border-radius:8px;margin-top:6px;display:none"></div>
-<svg class="ico s" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.1"/></svg><span>AI助手可以查看你的待办、记账、选题、分镜和习惯数据，给出针对性建议</span></div>
-<div class="ai-chat" id="ai_chat"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>和你的AI助手聊聊吧<br>它了解你工作台上的所有数据</div></div></div>
-<div class="ai-atts" id="ai_atts" style="display:none"></div>
-<div class="ai-input"><button class="ai-attbtn" type="button" onclick="aiPickImage()" title="发送图片（小票可自动记账）"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="2"/><path d="M21 15l-5-5L5 21"/></svg></button><textarea id="ai_input" placeholder="输入消息…（Shift+Enter换行，可附图片让 AI 看图）" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiMSubmit()}" oninput="aiAutoResize(this)"></textarea><button class="btn pri ai-send" onclick="aiMSubmit()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
-<div class="vdir-gallery" id="aiGallery" style="margin-top:10px"></div>
-<input type="file" id="ai_file" accept="image/*" multiple style="display:none" onchange="aiOnImage(event)">
-</div></div></div></section>
+<!-- 数据参谋面板已合并进「AI视频制作」标签页的「数据参谋」模式 -->
 <section class="panel" id="p-doubao"><div class="grid">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 17l-5-5L5 21"/></svg><h3>豆包文生图</h3><div class="sp"><span class="mut2">火山引擎豆包（Doubao）独立生图</span></div></div><div class="bd"><div class="mut2" style="font-size:13px;background:var(--sand2);border:1px dashed var(--ac);border-radius:10px;padding:8px 10px;margin-bottom:12px;color:var(--ink)">💡 不想配 Key？用「AI视频制作-小林」或「AI助手」也能<b>免 Key 直接出图/出视频</b>。豆包通道适合需要火山引擎 Seedream 专属模型的场景。</div>
   <div class="form" style="margin-bottom:8px"><input id="db_key" type="password" class="f1" placeholder="豆包 API Key（ark-...，仅存本机浏览器）" style="min-height:38px"><button class="btn pri sm" onclick="saveDoubaoKey()">保存Key</button><span id="dbKeyHint" class="mut2" style="font-size:12px"></span></div>
@@ -562,7 +565,6 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <button data-t="ecom"><svg class="ico b" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9H7.5z"/><path d="M6 6L5 3H2.5M9 20.5a1 1 0 1 0 0-.1M18 20.5a1 1 0 1 0 0-.1"/></svg>电商运营</button>
 <button data-t="hot"><svg class="ico b" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg>热度</button>
 <button data-t="life"><svg class="ico b" viewBox="0 0 24 24"><path d="M3.5 10.6L12 3.6l8.5 7v9a1.4 1.4 0 0 1-1.4 1.4H4.9a1.4 1.4 0 0 1-1.4-1.4z"/><path d="M9.3 21V13.4h5.4V21"/></svg>生活</button>
-<button data-t="ai"><svg class="ico b" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>AI</button>
 <button data-t="doubao"><svg class="ico b" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 17l-5-5L5 21"/></svg>豆包</button>
 </div></div>
 <div class="mask" id="mask"><div class="dlg"><h3 id="dlgT">确认</h3><p id="dlgP"></p><div class="row"><button class="btn ghost" onclick="closeDlg()">取消</button><button class="btn pri" id="dlgOk">确定</button></div></div></div>
@@ -756,7 +758,9 @@ function vdirDirectorAdopt(){AGNES_SCOPE='vdir';
 }
 function vdirDirectorApprove(){AGNES_SCOPE='vdir';vdirDirectorAdopt();setTimeout(function(){vdirBatchFilm();},300);}
 function vdirDirectorSkipChar(){AGNES_SCOPE='vdir';window.__vdirDirUrls=[];vdirDirectorApprove();}
-function getSharedRef(){if(window.__sharedRef)return window.__sharedRef;try{var s=localStorage.getItem('wb_refimg');if(s){window.__sharedRef=s;return s;}}catch(e){}return null;}
+function getRefViews(){try{var s=localStorage.getItem('wb_refviews');if(s){var o=JSON.parse(s);if(o&&(o.front||o.side||o.back))return o;}}catch(e){}return null;}
+function setRefViews(o){try{if(o)localStorage.setItem('wb_refviews',JSON.stringify(o));else localStorage.removeItem('wb_refviews');}catch(e){}}
+function getSharedRef(){var v=getRefViews();if(v&&(v.front||v.side||v.back))return v.front||v.side||v.back;if(window.__sharedRef)return window.__sharedRef;try{var s=localStorage.getItem('wb_refimg');if(s){window.__sharedRef=s;return s;}}catch(e){}return null;}
 function setSharedRef(d){
   window.__sharedRef=d; window.__vdirRef=d; window.vdirRef=d; window.__aiRef=d;
   try{ if(d)localStorage.setItem('wb_refimg',d); else localStorage.removeItem('wb_refimg'); }catch(e){}
@@ -940,7 +944,9 @@ async function vdirFilmRun(i){
     vdirFilmProg(i,'⏳ 出图→视频');
     try{ ref=await vdirFilmGenImage(seg.prompt); }catch(e){}
   }
-  vdirGenVideo(seg.prompt, null, ref||null, 0, function(url){
+  var views=getRefViews();
+  var cons=(views&&(views.side||views.back))?('（角色参考：已设定人物正面/侧面/背面三视图，请严格保持发型、服装、体型、道具跨镜头一致）'):'';
+  vdirGenVideo(seg.prompt+cons, null, ref||null, 0, function(url){
     if(url){vdirFilm.results[i]=url; vdirFilm.done++;}
     vdirFilmProg(i, url?'✅':'❌');
     vdirFilmRun(i+1);
@@ -1037,7 +1043,8 @@ function vdirGallery(){if(!D)D=defaultD();var box=_scEl('Gallery');if(!box)retur
    }else{
      media='<img src="'+it.src+'" alt="">';
    }
-   return '<div class="vdir-g">'+media+'<div class="cap">'+vdirEsc(it.prompt||'')+'</div></div>';
+   var act = it.t==='video'&&it.src?'<div style="padding:0 6px 6px"><button class="btn xs" type="button" onclick="publishToMedia(\''+it.id+'\')">📤 发布到自媒体</button></div>':'';
+   return '<div class="vdir-g">'+media+'<div class="cap">'+esc(it.prompt||'')+'</div>'+act+'</div>';
  }).join('');}
 function vdirCopy(){var t=$('vdir_input').value.trim();if(!t){toast('先写提示词');return;}navigator.clipboard.writeText(t).then(function(){toast('已复制')},function(){toast('复制失败');});}
 function vdirSavePrompt(){var t=$('vdir_input').value.trim();if(!t){toast('先写提示词');return;}var m={img:AGNES_MODEL.img,video:AGNES_MODEL.video,i2v:AGNES_MODEL.video,chat:AGNES_MODEL.chat}[vdirDetectIntent(t)]||AGNES_MODEL.chat;D.prompts.push({id:uid(),n:'提示词 '+todayStr(),m:m,s:4,x:t,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
@@ -1669,6 +1676,27 @@ function renderHotList(q){if(!hotCache){$('hotList').innerHTML='<div class="empt
 function searchHot(){renderHotList($('hotSearch').value);}
 
 // ===== TAB NAV =====
+function setVdirRole(r){
+  document.querySelectorAll('#vdirRoleSeg button').forEach(function(b){b.classList.toggle('on',b.dataset.role===r);});
+  var cp=$('vdirCreatePane'),dp=$('vdirDataPane');
+  if(cp)cp.style.display=r==='create'?'':'none';
+  if(dp)dp.style.display=r==='data'?'':'none';
+  var lab=$('vdirRoleLabel');
+  if(lab)lab.textContent=r==='create'?'通用创作助手 · 小林（聊需求·出图·出视频·导演成片）':'数据参谋 · 读懂你的待办/记账/选题，给针对性建议（也能出图出视频）';
+  if(r==='data'){try{renderChatHistory();}catch(e){}}
+}
+function refViewUpload(slot,input){var f=input.files&&input.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var o=getRefViews()||{};o[slot]=rd.result;setRefViews(o);var im=$('ref_'+slot);if(im){im.src=rd.result;im.style.display='block';}var h=$('refViewsHint');if(h){var n=['front','side','back'].filter(function(s){return o[s];}).length;h.textContent='已上传 '+n+'/3 视图';}};rd.readAsDataURL(f);}
+function clearRefViews(){setRefViews(null);['front','side','back'].forEach(function(s){var im=$('ref_'+s);if(im){im.style.display='none';im.src='';}});var h=$('refViewsHint');if(h)h.textContent='';toast('已清空三视图');}
+function publishToMedia(id){
+  if(!D.vmedia)D.vmedia=[];
+  var it=D.vmedia.find(function(x){return x.id===id;});if(!it){toast('找不到该成片');return;}
+  if(D.videos.some(function(v){return v.genId===id;})){toast('该成片已在自媒体看板');return;}
+  var title=(it.prompt||'AI成片').slice(0,40);
+  D.videos.push({id:uid(),t:title+'（AI生成）',d:0,s:'待审',p:'',ct:todayStr(),genId:id});
+  D.posts.push({id:uid(),t:title,p:'视频号',st:'idea',d:'',ct:todayStr(),note:'AI成片待发布'});
+  saveLocal();scheduleCloudSync();renderVideos();renderKanban();renderToday();
+  toast('已推送到自媒体看板 ✅');
+}
 function switchTab(t){curTab=t;
 var AC={'top':'var(--ac-top)','media':'var(--ac-media)','video':'var(--ac-video)','ecom':'var(--ac-ecom)','hot':'var(--ac-hot)','life':'var(--ac-life)','ai':'var(--ac-ai)','doubao':'#7c4dff'};
 document.documentElement.style.setProperty('--ac', AC[t]||'var(--ac-top)');
@@ -1680,7 +1708,7 @@ document.documentElement.style.setProperty('--ac', AC[t]||'var(--ac-top)');
   if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video')renderShotTimeline();if(t==='ecom'){renderEcomBoard();renderHotTabs();renderHotProducts();}}
 
 // ===== RENDER ALL =====
-function renderAll(){switchCat();renderKanban();renderAssets();renderStats();renderShots();renderShotTimeline();renderPrompts();renderVideos();renderLedger();renderHabits();renderTodos();renderProducts();renderEcomBoard();renderHotProducts();renderDiary();renderToday();renderTop();initHot();checkTip();var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;renderChatHistory();/* agnes video panel init (D ready here) */try{vdirGallery();}catch(e){console.warn('vdir init',e);}if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb=$('vdirKeyBar');if(kb)kb.style.display='block';}});}}
+function renderAll(){switchCat();renderKanban();renderAssets();renderStats();renderShots();renderShotTimeline();renderPrompts();renderVideos();renderLedger();renderHabits();renderTodos();renderProducts();renderEcomBoard();renderHotProducts();renderDiary();renderToday();renderTop();initHot();checkTip();var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;renderChatHistory();/* agnes video panel init (D ready here) */try{vdirGallery();setVdirRole('create');}catch(e){console.warn('vdir init',e);}if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb=$('vdirKeyBar');if(kb)kb.style.display='block';}});}}
 
 // ===== TODAY HOME =====
 function hubName(){try{var n=localStorage.getItem('wb_personal_hub_name');if(n&&n.trim())return n.trim();}catch(e){}if(session&&session.user&&session.user.email)return session.user.email.split('@')[0];return '';}
@@ -2314,7 +2342,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260813g';
+var APP_VER='20260813h';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -2390,7 +2418,7 @@ window.addEventListener('DOMContentLoaded',function(){
   var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;
   if(restoreSession()){if(!isTokenExpired()){enterApp();}else{refreshToken().then(function(ok){if(ok)enterApp();else showAuth();});}}
   else{showAuth();loadLocal();try{vdirGallery();}catch(e){console.warn('vdir init2',e);}}loadModels();try{var dbk=$('db_key');if(dbk)dbk.value=doubaoKey();var dbm=$('db_model');if(dbm)dbm.value=doubaoGet('ep');var dbp=$('db_prompt');if(dbp)dbp.value=doubaoGet('prompt');var dbs=$('db_size');if(dbs)dbs.value=doubaoGet('size')||'1024x1024';var dbn=$('db_n');if(dbn)dbn.value=doubaoGet('n')||'1';renderDoubaoGallery();}catch(e){console.warn('doubao init',e);}/* one-time proxy detection for the video panel */if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb2=$('vdirKeyBar');if(kb2)kb2.style.display='block';}});}
-  try{var __sr=getSharedRef();if(__sr){var __ip1=$('vdir_refprev'),__ip2=$('ai_refprev');if(__ip1){__ip1.src=__sr;__ip1.style.display='block';}if(__ip2){__ip2.src=__sr;__ip2.style.display='block';}}}catch(e){}
+  try{var __sr=getSharedRef();if(__sr){var __ip2=$('ai_refprev');if(__ip2){__ip2.src=__sr;__ip2.style.display='block';}}var __rv=getRefViews();if(__rv){['front','side','back'].forEach(function(s){if(__rv[s]){var im=$('ref_'+s);if(im){im.src=__rv[s];im.style.display='block';}}});var __h=$('refViewsHint');if(__h){var __n=['front','side','back'].filter(function(s){return __rv[s];}).length;__h.textContent='已上传 '+__n+'/3 视图';}}}catch(e){}
   // 注册 Service Worker（仅 https 环境；让手机端可"安装到主屏幕"）
   // 关键：新版本自动激活 + 刷新一次，确保用户不会一直看到旧的缓存页面
   if(location.protocol==='https:' && 'serviceWorker' in navigator){
