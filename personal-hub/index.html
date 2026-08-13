@@ -361,6 +361,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <button data-t="hot"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg>今日热度</button>
 <button data-t="life"><svg class="ico" viewBox="0 0 24 24"><path d="M3.5 10.6L12 3.6l8.5 7v9a1.4 1.4 0 0 1-1.4 1.4H4.9a1.4 1.4 0 0 1-1.4-1.4z"/><path d="M9.3 21V13.4h5.4V21"/></svg>生活全能</button>
 <button data-t="ai"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>AI助手</button>
+<button data-t="doubao"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 17l-5-5L5 21"/></svg>豆包生图</button>
 </nav>
 </header>
 <section class="panel on" id="p-top"><div class="grid">
@@ -508,6 +509,34 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="ai-input"><button class="ai-attbtn" type="button" onclick="aiPickImage()" title="发送图片（小票可自动记账）"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="2"/><path d="M21 15l-5-5L5 21"/></svg></button><textarea id="ai_input" placeholder="输入消息…（Shift+Enter换行，可附图片让 AI 看图）" rows="1" onkeydown="aiKey(event)" oninput="aiAutoResize(this)"></textarea><button class="btn pri ai-send" onclick="aiSendFromInput()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
 <input type="file" id="ai_file" accept="image/*" multiple style="display:none" onchange="aiOnImage(event)">
 </div></div></div></section>
+<section class="panel" id="p-doubao"><div class="grid">
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 17l-5-5L5 21"/></svg><h3>豆包文生图</h3><div class="sp"><span class="mut2">火山引擎豆包（Doubao）独立生图</span></div></div><div class="bd">
+  <div class="form" style="margin-bottom:8px"><input id="db_key" type="password" class="f1" placeholder="豆包 API Key（ark-...，仅存本机浏览器）" style="min-height:38px"><button class="btn pri sm" onclick="saveDoubaoKey()">保存Key</button><span id="dbKeyHint" class="mut2" style="font-size:12px"></span></div>
+  <div class="mut2" style="font-size:12px;margin-bottom:8px">Key 只存你自己的浏览器（localStorage），不进源码/不进 git。部署后是公开页面，明文写进去会被人偷走。</div>
+  <textarea id="db_prompt" class="f1" rows="3" placeholder="描述你想生成的画面，如：赛博朋克风格的城市夜景，霓虹灯，雨夜" style="min-height:64px;font-size:16px"></textarea>
+  <div class="form" style="margin:8px 0">
+    <select id="db_size" class="f1" style="min-height:38px">
+      <option value="1024x1024">1024×1024（方）</option>
+      <option value="1024x768">1024×768（横）</option>
+      <option value="768x1024">768×1024（竖）</option>
+      <option value="1280x720">1280×720（横）</option>
+      <option value="720x1280">720×1280（竖）</option>
+      <option value="1536x1024">1536×1024（横大）</option>
+      <option value="1024x1536">1024×1536（竖大）</option>
+    </select>
+    <select id="db_n" class="f1" style="min-height:38px">
+      <option value="1">1 张</option><option value="2">2 张</option><option value="3">3 张</option><option value="4">4 张</option>
+    </select>
+  </div>
+  <div class="form" style="margin-bottom:4px">
+    <input id="db_model" class="f1" placeholder="推理接入点 ID（ep-xxxx），在火山引擎控制台创建" style="min-height:38px">
+    <button class="btn pri" onclick="dbGen()">🎨 生成图片</button>
+  </div>
+  <div class="mut2" style="font-size:12px;margin-bottom:8px">模型填「推理接入点 ID」（形如 <code>ep-20250xxxx</code>，<b>不是</b>模型名）。创建路径：火山引擎控制台 → 方舟 Ark → 推理接入点 → 从 Seedream 图像模型新建，把得到的 ID 粘到这里。</div>
+  <div id="db_out" class="db-out"><div class="mut2">填好 Key、接入点 ID 和提示词，点生成。</div></div>
+</div></div>
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M3 5h18v14H3z"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg><h3>我的豆包图库</h3><div class="sp"><span class="mut2" id="dbCnt"></span></div></div><div class="bd"><div id="dbGallery" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px"></div></div></div>
+</div></section>
 <footer>数据云端自动备份+本地存储双保险<br>换设备登录即可同步，导出JSON可离线备份</footer>
 </div>
 <div class="mbar"><div class="in">
@@ -518,6 +547,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <button data-t="hot"><svg class="ico b" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg>热度</button>
 <button data-t="life"><svg class="ico b" viewBox="0 0 24 24"><path d="M3.5 10.6L12 3.6l8.5 7v9a1.4 1.4 0 0 1-1.4 1.4H4.9a1.4 1.4 0 0 1-1.4-1.4z"/><path d="M9.3 21V13.4h5.4V21"/></svg>生活</button>
 <button data-t="ai"><svg class="ico b" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>AI</button>
+<button data-t="doubao"><svg class="ico b" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 17l-5-5L5 21"/></svg>豆包</button>
 </div></div>
 <div class="mask" id="mask"><div class="dlg"><h3 id="dlgT">确认</h3><p id="dlgP"></p><div class="row"><button class="btn ghost" onclick="closeDlg()">取消</button><button class="btn pri" id="dlgOk">确定</button></div></div></div>
 <div class="mask" id="installMask"><div class="inst-card"><h3>安装到手机</h3><div id="instBody"></div><button class="btn ghost" onclick="closeInstall()">关闭</button></div></div>
@@ -885,7 +915,7 @@ function vdirSavePrompt(){var t=$('vdir_input').value.trim();if(!t){toast('先�
 var SK='ph_session_v1',DK='ph_data_v1';
 var session=null,isOffline=false,curTab='top',syncTimer=null;
 var D=defaultD();
-function defaultD(){return {posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],vmedia:[],genLog:[],ledger:[],habits:[],hLogs:{},todos:[],products:[],diary:[],budget:0,chats:[],sessions:[],curSid:null,reminders:[],wcity:'',del:{posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],vmedia:[],ledger:[],todos:[],habits:[],habitLogs:[],products:[],diary:[]}};}
+function defaultD(){return {posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],vmedia:[],genLog:[],ledger:[],habits:[],hLogs:{},todos:[],products:[],doubao:[],diary:[],budget:0,chats:[],sessions:[],curSid:null,reminders:[],wcity:'',del:{posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],vmedia:[],ledger:[],todos:[],habits:[],habitLogs:[],products:[],diary:[]}};}
 function defaultDel(){return {posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],vmedia:[],ledger:[],todos:[],habits:[],habitLogs:[],products:[],diary:[]};}
 var CATS={out:['餐饮','交通','购物','住房','娱乐','医疗','教育','其他'],in:['工资','副业','理财','红包','其他']};
 
@@ -1410,7 +1440,7 @@ function searchHot(){renderHotList($('hotSearch').value);}
 
 // ===== TAB NAV =====
 function switchTab(t){curTab=t;
-var AC={'top':'var(--ac-top)','media':'var(--ac-media)','video':'var(--ac-video)','ecom':'var(--ac-ecom)','hot':'var(--ac-hot)','life':'var(--ac-life)','ai':'var(--ac-ai)'};
+var AC={'top':'var(--ac-top)','media':'var(--ac-media)','video':'var(--ac-video)','ecom':'var(--ac-ecom)','hot':'var(--ac-hot)','life':'var(--ac-life)','ai':'var(--ac-ai)','doubao':'#7c4dff'};
 document.documentElement.style.setProperty('--ac', AC[t]||'var(--ac-top)');
   document.querySelectorAll('nav.tabs button').forEach(function(b){b.classList.toggle('on',b.dataset.t===t);});
   document.querySelectorAll('.mbar button').forEach(function(b){b.classList.toggle('on',b.dataset.t===t);});
@@ -1806,6 +1836,53 @@ function aqiCat(a){a=parseInt(a)||0;if(a<=50)return '优';if(a<=100)return '良'
 function degToCompass(d){d=parseInt(d)||0;var dirs=['北','东北','东','东南','南','西南','西','西北'];return dirs[Math.round(d/45)%8]+'风';}
 function saveWeatherSrc(){var k=$('qw_key').value.trim();var h=$('qw_host').value.trim().replace(/^https?:\/\//,'');var hint=$('wsrcHint');try{localStorage.setItem('wb_personal_hub_qwkey',k);localStorage.setItem('wb_personal_hub_qwhost',h);}catch(e){}if(k&&h){hint.textContent='已保存，刷新中…';hint.style.color='#3aa655';toggleWsrc(false);weatherCache=null;fetchWeather(D.wcity||'',typeof D.wcity==='string'&&D.wcity.indexOf(',')>-1);}else if(!k&&!h){hint.textContent='已清除，改用 Open-Meteo';hint.style.color='#3aa655';toggleWsrc(false);weatherCache=null;fetchWeather(D.wcity||'',typeof D.wcity==='string'&&D.wcity.indexOf(',')>-1);}else{hint.textContent='Key 和 Host 都要填，或都留空';hint.style.color='#e8784f';}}
 function toggleWsrc(force){var p=$('wsrcPanel');if(!p)return;var show=(typeof force==='boolean')?force:(p.style.display==='none');p.style.display=show?'block':'none';if(show){$('qw_key').value=qwKey();$('qw_host').value=qwHost();var nm=$('hub_name');if(nm){try{nm.value=localStorage.getItem('wb_personal_hub_name')||'';}catch(e){}}var ak=$('agnes_key');if(ak){try{ak.value=localStorage.getItem('wb_personal_hub_agnes_key')||'';}catch(e){}}var hint=$('wsrcHint');if(hint)hint.textContent=qwReady()?'当前：和风天气(详细)':'当前：Open-Meteo(兜底)';}renderModelSelects();fillParamsUI();}
+/* ===== 豆包独立生图（火山引擎 Ark 图像 API）===== */
+function doubaoKey(){try{return localStorage.getItem('wb_personal_hub_doubao_key')||'';}catch(e){return '';}}
+function doubaoSetKey(v){try{localStorage.setItem('wb_personal_hub_doubao_key',(v||'').trim());}catch(e){}}
+function saveDoubaoKey(){var el=$('db_key');if(!el)return;var v=el.value.trim();doubaoSetKey(v);var h=$('dbKeyHint');if(h){h.style.color='#3aa655';h.textContent=v?'已保存':'已清除';}toast(v?'豆包 Key 已保存':'已清除');}
+function dbGen(){
+  var key=doubaoKey();var out=$('db_out');
+  if(!key){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请先在上方填写并保存豆包 Key</div>';return;}
+  var prompt=$('db_prompt')?$('db_prompt').value.trim():'';
+  if(!prompt){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请先写画面描述</div>';return;}
+  var size=$('db_size')?$('db_size').value:'1024x1024';
+  var n=$('db_n')?Math.max(1,Math.min(4,parseInt($('db_n').value||'1',10)||1)):1;
+  var model=$('db_model')?$('db_model').value.trim():'';
+  if(!model){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请先填写推理接入点 ID（ep-xxxx），在火山引擎 Ark 控制台从 Seedream 图像模型新建接入点获得</div>';return;}
+  if(out)out.innerHTML='<div class="mut2">生成中…（豆包云端出图通常 10–40 秒）</div>';
+  var body=JSON.stringify({model:model,prompt:prompt,size:size,n:n});
+  fetch('https://ark.cn-beijing.volces.com/api/v3/images/generations',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body:body
+  }).then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+  .then(function(res){
+    if(!res.ok){var msg=(res.j&&res.j.error&&res.j.error.message)||JSON.stringify(res.j);if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">生成失败：'+esc(msg)+'</div>';return;}
+    var arr=(res.j&&res.j.data)||(res.j&&res.j.choices)||[];
+    var urls=arr.map(function(it){return it.url||(it.b64_json?'data:image/png;base64,'+it.b64_json:null);}).filter(Boolean);
+    if(!urls.length){if(out)out.innerHTML='<div class="mut2">未返回图片，原始：'+esc(JSON.stringify(res.j).slice(0,200))+'</div>';return;}
+    D.doubao=D.doubao||[];
+    urls.forEach(function(u){D.doubao.unshift({id:'d'+Date.now()+Math.random().toString(36).slice(2,5),url:u,prompt:prompt,t:Date.now()});});
+    saveLocal();renderDoubaoGallery();
+    if(out)out.innerHTML='<div class="mut2" style="color:#3aa655">生成完成 ✓ 共 '+urls.length+' 张</div>';
+    toast('豆包图片生成完成');
+  }).catch(function(e){
+    var m=e.message||'';
+    if(m.indexOf('Failed to fetch')>=0||m.indexOf('NetworkError')>=0||m.indexOf('CORS')>=0){
+      if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">浏览器跨域(CORS)被拦截：火山引擎通常不允许浏览器直连。可行方案：用 Supabase Edge Function 做代理转发（我可帮你加，需你授权 Supabase 或在控制台配置密钥）。需要代理版告诉我。</div>';
+    }else if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请求出错：'+esc(m)+'</div>';
+  });
+}
+function renderDoubaoGallery(){
+  var g=$('dbGallery');if(!g)return;
+  D.doubao=D.doubao||[];
+  var c=$('dbCnt');if(c)c.textContent=D.doubao.length+' 张';
+  if(!D.doubao.length){g.innerHTML='<div class="mut2">还没有生成的图片</div>';return;}
+  g.innerHTML=D.doubao.slice(0,60).map(function(x){
+    return '<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff"><img src="'+esc(x.url)+'" alt="" loading="lazy" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block"><div style="padding:6px;font-size:12px;color:#555">'+esc((x.prompt||'').slice(0,40))+'</div><button class="btn xs ghost" style="width:100%" onclick="dbDel(\''+x.id+'\')">删除</button></div>';
+  }).join('');
+}
+function dbDel(id){D.doubao=(D.doubao||[]).filter(function(x){return x.id!==id;});saveLocal();renderDoubaoGallery();}
 function saveHubName(){var nm=$('hub_name');if(!nm)return;var v=nm.value.trim();try{localStorage.setItem('wb_personal_hub_name',v);}catch(e){}var hint=$('wsrcHint');if(hint){hint.style.color='#3aa655';hint.textContent=v?('已保存称呼「'+v+'」，问候已更新'):'已清除称呼';}$('greetTx').textContent=getGreeting();}
 function saveAgnesKey(){var ak=$('agnes_key');if(!ak)return;var v=ak.value.trim();agnesSetKey(v);var hint=$('agnesKeyHint');if(hint){hint.style.color='#3aa655';hint.textContent=v?'已保存 Key，AI 导演可真实生成':'已清除';}var kb=$('vdirKeyBar');if(kb&&v)kb.style.display='none';vdirGallery();}
 // ===== 模型/参数 UI =====
@@ -2024,7 +2101,7 @@ window.addEventListener('DOMContentLoaded',function(){
   initStatPlat();switchCat();
   var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;
   if(restoreSession()){if(!isTokenExpired()){enterApp();}else{refreshToken().then(function(ok){if(ok)enterApp();else showAuth();});}}
-  else{showAuth();loadLocal();try{vdirGallery();}catch(e){console.warn('vdir init2',e);}}loadModels();/* one-time proxy detection for the video panel */if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb2=$('vdirKeyBar');if(kb2)kb2.style.display='block';}});}
+  else{showAuth();loadLocal();try{vdirGallery();}catch(e){console.warn('vdir init2',e);}}loadModels();try{var dbk=$('db_key');if(dbk)dbk.value=doubaoKey();renderDoubaoGallery();}catch(e){console.warn('doubao init',e);}/* one-time proxy detection for the video panel */if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb2=$('vdirKeyBar');if(kb2)kb2.style.display='block';}});}
   // 注册 Service Worker（仅 https 环境；让手机端可"安装到主屏幕"）
   // 关键：新版本自动激活 + 刷新一次，确保用户不会一直看到旧的缓存页面
   if(location.protocol==='https:' && 'serviceWorker' in navigator){
