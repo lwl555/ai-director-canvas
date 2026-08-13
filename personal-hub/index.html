@@ -1370,7 +1370,7 @@ function aiAutoResize(el){el.style.height='auto';el.style.height=Math.min(140,el
 function aiAddMsg(role,content,ts,images){var chat=$('ai_chat');var empty=chat.querySelector('.ai-empty');if(empty)empty.remove();
   var div=document.createElement('div');div.className='ai-msg '+role;
   var av=role==='user'?'<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>':'<svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>';
-  var imgHtml='';if(images&&images.length)imgHtml=images.map(function(s){return '<img class="shot" src="'+s+'" alt="图片">'}).join('');
+  var imgHtml='';if(images&&images.length)imgHtml=images.map(function(s){var a=esc(s);return '<img class="shot" src="'+a+'" alt="图片" data-u="'+a+'" onclick="showLightbox(this.getAttribute(\'data-u\'))">'}).join('');
   var tag=role==='bot'?'<div class="ai-tag"># 小林</div>':'';
   div.innerHTML='<div class="av">'+av+'</div><div class="bubble">'+tag+imgHtml+esc(content).replace(/\n/g,'<br>')+'<div class="ts">'+(ts||'')+'</div></div>';
   chat.appendChild(div);chat.scrollTop=chat.scrollHeight;}
@@ -2146,8 +2146,8 @@ function dbThumbGrid(urls){
   if(!urls||!urls.length)return '';
   return '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:10px">'+
     urls.map(function(u){
-      var q=JSON.stringify(u);
-      return '<div style="position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff"><img src="'+esc(u)+'" alt="" loading="lazy" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;cursor:zoom-in" onclick="showLightbox('+q+')" onerror="this.style.display=\'none\'"><button class="btn xs ghost" style="position:absolute;right:4px;bottom:4px;opacity:.92" onclick="downloadImg('+q+')">⤓ 下载</button></div>';
+      var a=esc(u);
+      return '<div style="position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff"><img src="'+a+'" alt="" loading="lazy" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;cursor:zoom-in" data-u="'+a+'" onclick="showLightbox(this.getAttribute(\'data-u\'))" onerror="this.style.display=\'none\'"><button class="btn xs ghost" style="position:absolute;right:4px;bottom:4px;opacity:.92" data-u="'+a+'" onclick="downloadImg(this.getAttribute(\'data-u\'))">⤓ 下载</button></div>';
     }).join('')+'</div>';
 }
 function renderDoubaoGallery(){
@@ -2156,8 +2156,8 @@ function renderDoubaoGallery(){
   var c=$('dbCnt');if(c)c.textContent=D.doubao.length+' 张';
   if(!D.doubao.length){g.innerHTML='<div class="mut2">还没有生成的图片</div>';return;}
   g.innerHTML=D.doubao.slice(0,60).map(function(x){
-    var u=JSON.stringify(x.url);
-    return '<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff"><img src="'+esc(x.url)+'" alt="" loading="lazy" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;cursor:zoom-in" onclick="showLightbox('+u+')"><div style="padding:6px;font-size:12px;color:#555">'+esc((x.prompt||'').slice(0,40))+'</div><div style="display:flex;gap:6px;padding:0 6px 6px"><button class="btn xs ghost" style="flex:1" onclick="downloadImg('+u+')">⤓ 下载</button><button class="btn xs ghost" style="flex:1" onclick="dbDel(\''+x.id+'\')">删除</button></div></div>';
+    var a=esc(x.url);
+    return '<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff"><img src="'+a+'" alt="" loading="lazy" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;cursor:zoom-in" data-u="'+a+'" onclick="showLightbox(this.getAttribute(\'data-u\'))"><div style="padding:6px;font-size:12px;color:#555">'+esc((x.prompt||'').slice(0,40))+'</div><div style="display:flex;gap:6px;padding:0 6px 6px"><button class="btn xs ghost" style="flex:1" data-u="'+a+'" onclick="downloadImg(this.getAttribute(\'data-u\'))">⤓ 下载</button><button class="btn xs ghost" style="flex:1" onclick="dbDel(\''+x.id+'\')">删除</button></div></div>';
   }).join('');
 }
 function dbDel(id){D.doubao=(D.doubao||[]).filter(function(x){return x.id!==id;});saveLocal();renderDoubaoGallery();}
@@ -2393,7 +2393,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260813l';
+var APP_VER='20260813m';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
