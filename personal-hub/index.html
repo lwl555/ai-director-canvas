@@ -411,6 +411,12 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M4.5 6.5h11a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 16V8a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M17 11l4-2.6v7.2L17 13z"/></svg><h3>成片产出</h3><div class="sp"><span class="mut2" id="vdCnt"></span></div></div><div class="bd"><div class="form"><input class="fw" id="vd_t" placeholder="成片标题"><input class="w110 half" id="vd_d" type="number" inputmode="numeric" placeholder="时长秒"><select class="w130 half" id="vd_s"><option>生成中</option><option>待剪辑</option><option>待审</option><option>已发布</option></select><input class="fw" id="vd_p" placeholder="发布平台/备注"><button class="btn pri" onclick="addVideo()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>登记</button></div><div class="stats" id="vdStats"></div><div id="vdList"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9v6M12 9v6M17 9v6"/></svg><h3>分镜时间轴</h3><div class="sp"><span class="mut2">点击镜头块切换 待拍摄→拍摄中→已交付</span></div></div><div class="bd"><div id="shotTimeline"></div></div></div>
 </div>
+<div class="card" id="dirCard"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v5h5"/></svg><h3>AI 导演</h3><div class="sp"><span class="mut2">自动构思·人物设定·成片</span></div></div><div class="bd">
+<textarea id="dir_idea" class="f1" rows="3" placeholder="说一个视频想法，如：做一个动漫风角色宣传片，主角是银发少女星，在霓虹都市奔跑" style="min-height:64px;font-size:16px"></textarea>
+<div class="form" style="margin-top:8px"><button class="btn pri" onclick="vdirDirector()">🧠 AI 自动构思</button><span class="mut2" style="font-size:12px;margin-left:6px">参考图（可选）：</span><input type="file" id="dir_ref" accept="image/*" onchange="vdirDirectorRef(this)" style="font-size:13px;max-width:200px"></div>
+<div id="dirPlan" style="margin-top:10px"></div>
+<div id="dirChar" style="margin-top:10px"></div>
+</div></div>
 <div class="card vdir"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI 助手 · 小林</h3><div class="sp"><span class="mut2">联网搜索 · 通用助手</span></div></div><div class="bd">
 <style>
 .vdir-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -663,6 +669,74 @@ function vdirApplyPrompt(){if(!window.__vdirPlan){toast('先生成方案');retur
 function vdirUseAsPrompt(){if(!window.__vdirLast){toast('先和导演聊一下');return;}vdirGenerateInline('video',window.__vdirLast);}
 function vdirApplyPromptText(){if(!window.__vdirLast){toast('先聊一下');return;}D.prompts.push({id:uid(),n:'视频方案 '+todayStr(),m:AGNES_MODEL.chat,s:4,x:window.__vdirLast,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
 function vdirUsePlanGen(){if(!window.__vdirPlan){toast('先生成方案');return;}vdirGenerateInline('video',window.__vdirPlan);}
+// ===== AI 导演（自动思考 · 人物设定 · 成片）=====
+function vdirGenImgURL(prompt){
+  return new Promise(function(res,rej){
+    var url,hdr,body;
+    var imgExtra={response_format:'url'};
+    if(agnesProxyOk){url=AGNES_PROXY;hdr={'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'};body=JSON.stringify({route:'image',model:AGNES_MODEL.img,prompt:prompt,size:'1K',ratio:'1:1',extra_body:imgExtra});}
+    else{url=AGNES_BASE+'/images/generations';hdr={'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()};body=JSON.stringify({model:AGNES_MODEL.img,prompt:prompt,size:'1K',ratio:'1:1',extra_body:imgExtra});}
+    fetch(url,{method:'POST',headers:hdr,body:body}).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error((j.error&&(j.error.message||j.error.msg))||('HTTP '+r.status));return j;});}).then(function(j){var u=(j.data&&j.data[0]&&j.data[0].url)||'';if(!u)throw new Error('未返回图片');res(u);}).catch(rej);
+  });
+}
+function vdirDirectorRef(input){var f=input&&input.files&&input.files[0];if(!f){return;}var rd=new FileReader();rd.onload=function(){window.__vdirRef=rd.result;toast('参考图已就绪（用于视频一致性）');var p=$('dirPlan');};rd.readAsDataURL(f);}
+async function vdirDirector(){
+  var ta=$('dir_idea');var idea=ta?ta.value.trim():'';
+  if(!idea){toast('先说一个视频想法');return;}
+  if(!(await agnesEnsureReady()))return;
+  var box=$('dirPlan');if(box)box.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';
+  if($('dirChar'))$('dirChar').innerHTML='';
+  var sys={role:'system',content:'你是专业 AI 视频导演。请基于用户的一个视频想法，输出结构化创作方案。严格按以下格式（不要多余解释）：\n【创意】一句话核心创意\n【角色】是否需要固定角色。若需要，用一段文字描述角色（外貌、服饰、性格、典型场景），用于生成人物三视图；若不需要，只写“无”。\n【分镜】\n1. 画面描述 | 秒数\n2. 画面描述 | 秒数\n（每条一行，镜号+描述+竖线+秒数）'};
+  vdirChatSend([sys,{role:'user',content:idea}],null,function(full){vdirRenderDirPlan(full||'');});
+}
+function vdirRenderDirPlan(full){
+  var concept='',char='',shots=[],mode=null;
+  full.split(/\n+/).forEach(function(l){l=l.trim();
+    if(l.indexOf('【创意】')>=0)concept=l.replace('【创意】','').replace(/^创意】/,'').trim();
+    else if(l.indexOf('【角色】')>=0){char=l.replace('【角色】','').replace(/^角色】/,'').trim();mode=null;}
+    else if(l.indexOf('【分镜】')>=0){mode='shot';}
+    else if(mode==='shot'){
+      var mm=l.match(/^(\d+)[.、)]\s*(.+?)(?:\s*\|\s*(\d+)\s*秒?)?$/);
+      if(mm)shots.push({de:mm[2].trim(),du:parseInt(mm[3]||'5',10)});
+      else if(/^\d+/.test(l))shots.push({de:l.replace(/^\d+[.、)]\s*/,'').trim(),du:5});
+    }
+  });
+  var hasChar=char&&!/无|不需要|否|none|no/i.test(char);
+  var box=$('dirPlan');if(!box)return;
+  var h='<div class="mut2" style="margin-bottom:4px"><b>💡 创意：</b>'+esc(concept||'(未识别)')+'</div>';
+  if(hasChar){
+    window.__dirPlanChar=char;
+    h+='<div class="mut2" style="margin-bottom:4px"><b>🧍 角色：</b>'+esc(char)+'</div>';
+    if(window.__vdirRef)h+='<div class="mut2" style="color:#3aa655">已使用参考图，将用于视频一致性</div>';
+    else h+='<div class="form"><button class="btn pri sm" onclick="vdirGenCharSheet()">🎨 生成人物三视图</button><span class="mut2" style="font-size:12px">AI 当顾问，先出三视图你确认</span></div>';
+  }else{h+='<div class="mut2">本方案无需固定角色，可直接生成</div>';}
+  if(shots.length)h+='<div class="mut2" style="margin-top:6px"><b>🎞 分镜（'+shots.length+'）：</b></div><div class="mut2">'+shots.map(function(s,i){return (i+1)+'. '+esc(s.de)+' ('+s.du+'s)';}).join('<br>')+'</div>';
+  h+='<div class="form" style="margin-top:8px"><button class="btn pri" onclick="vdirDirectorApprove()">✅ 采纳分镜并生成视频</button></div>';
+  box.innerHTML=h;
+  window.__dirPlan={concept:concept,char:hasChar?char:'',shots:shots};
+}
+async function vdirGenCharSheet(){
+  var char=window.__dirPlanChar||'';if(!char){toast('先构思方案');return;}
+  if(!(await agnesEnsureReady()))return;
+  var box=$('dirChar');if(!box)return;box.innerHTML='<div class="mut2">正在生成人物三视图（正面/侧面/背面）…</div>';
+  var views=[['正面','front full body facing camera'],['侧面','side profile'],['背面','back view']];
+  var urls=[];
+  for(var i=0;i<views.length;i++){try{var u=await vdirGenImgURL(char+'，'+views[i][1]+'，角色设计三视图，纯白背景，全身清晰，动漫风格，无文字');urls.push(u);}catch(e){urls.push('');}}
+  var ok=urls.filter(Boolean);
+  var h='<div class="mut2" style="margin-bottom:6px">🎨 人物三视图（AI 建议，确认后用于视频一致性）</div><div style="display:flex;gap:8px;flex-wrap:wrap">';
+  ok.forEach(function(u){h+='<img src="'+esc(u)+'" style="width:90px;height:120px;object-fit:cover;border-radius:8px;border:1px solid var(--line)">';});
+  h+='</div><div class="form" style="margin-top:10px"><button class="btn pri" onclick="vdirDirectorApprove()">✅ 同意，开始生成视频</button><button class="btn ghost" onclick="vdirDirectorSkipChar()">不用三视图，直接生成</button></div>';
+  box.innerHTML=h;
+  window.__vdirDirUrls=ok;
+  if(ok.length)window.__vdirRef=ok[0];
+}
+function vdirDirectorAdopt(){
+  if(!window.__dirPlan||!window.__dirPlan.shots.length){toast('先构思方案');return;}
+  var n=0;window.__dirPlan.shots.forEach(function(s){D.shots.push({id:uid(),pj:'',no:'',de:s.de,du:s.du||0,dd:'',st:'待拍摄',ct:todayStr()});n++;});
+  saveLocal();scheduleCloudSync();renderShots();renderShotTimeline();renderToday();toast('已采纳 '+n+' 个分镜');
+}
+function vdirDirectorApprove(){vdirDirectorAdopt();setTimeout(function(){vdirBatchFilm();},300);}
+function vdirDirectorSkipChar(){window.__vdirDirUrls=[];vdirDirectorApprove();}
 function vdirRefPreview(){var f=$('vdir_ref')&&$('vdir_ref').files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var im=$('vdir_refprev');if(im){im.src=rd.result;im.style.display='block';}window.__vdirRef=rd.result;};rd.readAsDataURL(f);}
 async function vdirGenerateInline(mode,p){
  if(!p){toast('先写生成内容');return;}
@@ -810,7 +884,7 @@ function vdirFilmRun(i){
   if(i>=vdirFilm.segs.length){vdirFilmFinish();return;}
   var seg=vdirFilm.segs[i];
   vdirFilmProg(i, '⏳ 生成 '+(seg.no?seg.no+' ':'')+'第 '+seg.part+'/'+seg.total+' 段');
-  vdirGenVideo(seg.prompt, null, null, 0, function(url){
+  vdirGenVideo(seg.prompt, null, window.__vdirRef||null, 0, function(url){
     if(url){vdirFilm.results[i]=url; vdirFilm.done++;}
     vdirFilmProg(i, url?'✅':'❌');
     vdirFilmRun(i+1);
