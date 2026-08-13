@@ -238,7 +238,7 @@ mark{background:var(--mustard-l);color:var(--ink);padding:0 2px;border-radius:3p
 .mbar .in{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .mbar .in::-webkit-scrollbar{display:none}
 .mbar button{flex:1 0 auto;min-width:53px}
-.mask{display:none;position:fixed;inset:0;background:rgba(36,31,27,.5);z-index:200;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+.mask{display:none;position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;background:rgba(20,16,12,.82);z-index:200;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
 .mask.on{display:flex}
 .dlg{background:var(--card);border:2px solid var(--ink);border-radius:16px;max-width:420px;width:100%;padding:20px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
 .dlg h3{margin:0 0 8px;font-size:18px;font-family:Georgia,"Songti SC",serif}
@@ -2122,7 +2122,7 @@ async function dbGen(){
   var ok=0,fail=0,allUrls=[];
   for(var i=0;i<n;i++){
     try{
-      var body=JSON.stringify({model:model,prompt:prompt,width:w,height:h,n:1});
+      var body=JSON.stringify({model:model,prompt:prompt,width:w,height:h,n:1,response_format:'b64_json'});
       var res=await fetch('https://ark.cn-beijing.volces.com/api/v3/images/generations',{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
@@ -2131,15 +2131,14 @@ async function dbGen(){
       if(!res.ok){var m2=(res.j&&res.j.error&&res.j.error.message)||JSON.stringify(res.j);fail++;if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">第'+(i+1)+'张失败：'+esc(m2).slice(0,120)+'</div>';}
       else{
         var arr=(res.j&&res.j.data)||(res.j&&res.j.choices)||[];
-        var urls=arr.map(function(it){return it.url||(it.b64_json?'data:image/png;base64,'+it.b64_json:null);}).filter(Boolean);
-        urls.forEach(function(u){D.doubao.unshift({id:'d'+Date.now()+Math.random().toString(36).slice(2,5),url:u,prompt:prompt,t:Date.now()});allUrls.push(u);});
-        ok+=urls.length;
+        var raws=arr.map(function(it){return (it.b64_json?'data:image/png;base64,'+it.b64_json:null)||(it.url||null);}).filter(Boolean);
+        for(var k=0;k<raws.length;k++){var f=await fitImg(raws[k]);storeDoubao(f,prompt);allUrls.push(f);ok++;}
       }
     }catch(e){fail++;var m=e.message||'';if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">第'+(i+1)+'张出错：'+(m.indexOf('Failed to fetch')>=0||m.indexOf('CORS')>=0?'网络/CORS 被拦截，请检查网络或 Key/接入点':esc(m).slice(0,120))+'</div>';}
-    saveLocal();renderDoubaoGallery();
+    renderDoubaoGallery();
     if(out)out.innerHTML='<div class="mut2">已生成 '+ok+'/'+n+' 张…</div>';
   }
-  saveLocal();renderDoubaoGallery();
+  renderDoubaoGallery();
   if(out)out.innerHTML='<div class="mut2" style="color:#3aa655">生成完成 ✓ 共 '+ok+' 张'+(fail?'（'+fail+' 张失败）':'')+'</div>'+dbThumbGrid(allUrls);
   toast('豆包图片生成完成'+(ok?'':'：全部失败'));
 }
@@ -2162,6 +2161,39 @@ function renderDoubaoGallery(){
   }).join('');
 }
 function dbDel(id){D.doubao=(D.doubao||[]).filter(function(x){return x.id!==id;});saveLocal();renderDoubaoGallery();}
+async function fitImg(src){
+  return await new Promise(function(res){
+    try{
+      var im=new Image();
+      im.onload=function(){
+        try{
+          var max=1280, w=im.naturalWidth||1024, h=im.naturalHeight||1024;
+          var s=Math.min(1,max/Math.max(w,h));
+          var cw=Math.max(1,Math.round(w*s)), ch=Math.max(1,Math.round(h*s));
+          var c=document.createElement('canvas');c.width=cw;c.height=ch;
+          c.getContext('2d').drawImage(im,0,0,cw,ch);
+          res(c.toDataURL('image/jpeg',0.82));
+        }catch(e){res(src);}
+      };
+      im.onerror=function(){res(src);};
+      im.src=src;
+    }catch(e){res(src);}
+  });
+}
+function storeDoubao(dataUrl,prompt){
+  D.doubao=D.doubao||[];
+  D.doubao.unshift({id:'d'+Date.now()+Math.random().toString(36).slice(2,5),url:dataUrl,prompt:prompt||'',t:Date.now()});
+  if(D.doubao.length>40)D.doubao=D.doubao.slice(0,40);
+  saveLocalSafe();
+}
+function saveLocalSafe(){
+  try{saveLocal();return;}catch(e){}
+  for(var i=0;i<20 && D.doubao && D.doubao.length>0;i++){
+    D.doubao=D.doubao.slice(1);
+    try{saveLocal();toast('图库已满，已自动清理最早图片');return;}catch(e){}
+  }
+  try{saveLocal();}catch(e2){}
+}
 function showLightbox(url){
   if(!$('imgLightbox')){
     var d=document.createElement('div');d.id='imgLightbox';d.className='mask';
@@ -2173,10 +2205,18 @@ function showLightbox(url){
 }
 function hideLightbox(){$('imgLightbox').style.display='none';}
 async function downloadImg(url){
+  if(!url)return;
   try{
-    if(url.indexOf('data:')===0){var a=document.createElement('a');a.href=url;a.download='personal_hub_'+Date.now()+'.png';a.click();return;}
-    var r=await fetch(url);var b=await r.blob();var a2=document.createElement('a');a2.href=URL.createObjectURL(b);a2.download='personal_hub_'+Date.now()+'.png';a2.click();setTimeout(function(){URL.revokeObjectURL(a2.href);},2000);
-  }catch(e){window.open(url,'_blank');}
+    if(url.indexOf('data:')===0){
+      var a=document.createElement('a');a.href=url;a.download='personal_hub_'+Date.now()+'.png';document.body.appendChild(a);a.click();a.remove();return;
+    }
+    var r=await fetch(url,{mode:'cors'});if(!r.ok)throw new Error('http'+r.status);
+    var b=await r.blob();var a2=document.createElement('a');a2.href=URL.createObjectURL(b);a2.download='personal_hub_'+Date.now()+'.png';document.body.appendChild(a2);a2.click();a2.remove();
+    setTimeout(function(){URL.revokeObjectURL(a2.href);},3000);
+  }catch(e){
+    try{var a3=document.createElement('a');a3.href=url;a3.target='_blank';a3.rel='noopener';a3.click();toast('已打开图片，长按可保存到相册');}
+    catch(e2){toast('下载失败：请长按图片保存');}
+  }
 }
 // 提示词优化：优先用 agnes 模型，失败回退本地增强
 function dbChatText(j){if(!j)return '';if(j.choices&&j.choices[0]){var c=j.choices[0];if(c.message&&c.message.content)return c.message.content;if(c.content)return c.content;if(c.text)return c.text;}if(j.content)return j.content;if(j.output)return typeof j.output==='string'?j.output:JSON.stringify(j.output);return '';}
@@ -2353,7 +2393,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260813k';
+var APP_VER='20260813l';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -2433,9 +2473,9 @@ async function aiImg2Img(){
   $('ai_input').value='';$('ai_input').style.height='auto';var atts=aiImages.slice(0,4);aiImages=[];renderAiAtts();
   aiAddMsg('user',instr,ts,atts);recordChat('user',instr,ts,atts,'ai');aiShowTyping();
   try{
-    var urls=await dbGenImg2Img(ref,instr,'1024x1024',1);aiHideTyping();
-    urls.forEach(function(u){D.doubao=D.doubao||[];D.doubao.unshift({id:'d'+Date.now()+Math.random().toString(36).slice(2,5),url:u,prompt:instr,t:Date.now()});aiAddMsg('bot','已按你的要求改图（豆包 Seedream）',new Date().toTimeString().slice(0,5),[u]);recordChat('assistant','已按你的要求改图：'+instr,new Date().toTimeString().slice(0,5),[u],'ai');});
-    saveLocal();renderDoubaoGallery();toast('图生图完成，已存入豆包图库');
+    var raws=await dbGenImg2Img(ref,instr,'1024x1024',1);aiHideTyping();
+    for(var zi=0;zi<raws.length;zi++){var u=await fitImg(raws[zi]);storeDoubao(u,instr);aiAddMsg('bot','已按你的要求改图（豆包 Seedream）',new Date().toTimeString().slice(0,5),[u]);recordChat('assistant','已按你的要求改图：'+instr,new Date().toTimeString().slice(0,5),[u],'ai');}
+    renderDoubaoGallery();toast('图生图完成，已存入豆包图库');
   }catch(e){aiHideTyping();aiAddMsg('bot','图生图失败：'+(e.message||e),new Date().toTimeString().slice(0,5));}
 }
 // ===== 豆包 图生图底层（Ark images/generations + image 参考） =====
@@ -2443,11 +2483,11 @@ async function dbGenImg2Img(ref,prompt,size,n){
   var key=doubaoKey(),ep=doubaoGet('ep');
   if(!key||!ep)throw new Error('请先在「豆包生图」填 Key 和接入点 ID');
   var wh=size.split('x');var w=parseInt(wh[0],10)||1024;var h=parseInt(wh[1],10)||1024;
-  var body=JSON.stringify({model:ep,prompt:prompt,image:[ref],width:w,height:h,n:1});
+  var body=JSON.stringify({model:ep,prompt:prompt,image:[ref],width:w,height:h,n:1,response_format:'b64_json'});
   var res=await fetch('https://ark.cn-beijing.volces.com/api/v3/images/generations',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:body}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j};});});
   if(!res.ok){var m=(res.j&&res.j.error&&res.j.error.message)||JSON.stringify(res.j);throw new Error(m);}
   var arr=(res.j&&res.j.data)||(res.j&&res.j.choices)||[];
-  return arr.map(function(it){return it.url||(it.b64_json?'data:image/png;base64,'+it.b64_json:null);}).filter(Boolean);
+  return arr.map(function(it){return (it.b64_json?'data:image/png;base64,'+it.b64_json:null)||(it.url||null);}).filter(Boolean);
 }
 async function fileToDataURL(f){return new Promise(function(res,rej){var rd=new FileReader();rd.onload=function(){res(rd.result);};rd.onerror=rej;rd.readAsDataURL(f);});}
 async function dbGenImg2ImgUI(){
@@ -2460,9 +2500,9 @@ async function dbGenImg2ImgUI(){
   if(!ref){if(out)out.textContent='先上传参考图，或勾选「以最近生成的图为底图」';return;}
   if(out)out.textContent='生成中…';
   try{
-    var urls=await dbGenImg2Img(ref,prompt,$('db_i2i_size').value||'1024x1024',1);
-    urls.forEach(function(u){D.doubao=D.doubao||[];D.doubao.unshift({id:'d'+Date.now()+Math.random().toString(36).slice(2,5),url:u,prompt:prompt,t:Date.now()});window.__dbLastImg=u;});
-    saveLocal();renderDoubaoGallery();
+    var raws=await dbGenImg2Img(ref,prompt,$('db_i2i_size').value||'1024x1024',1);
+    for(var yi=0;yi<raws.length;yi++){var u=await fitImg(raws[yi]);storeDoubao(u,prompt);window.__dbLastImg=u;}
+    renderDoubaoGallery();
     if(out)out.innerHTML='<span style="color:#3aa655">改图完成 ✓ 已存入豆包图库</span>'+dbThumbGrid(urls);
     toast('豆包图生图完成');
   }catch(e){if(out)out.innerHTML='<span style="color:#c0392b">失败：'+(e.message||e).toString().slice(0,120)+'</span>';}
