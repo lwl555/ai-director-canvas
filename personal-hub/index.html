@@ -913,7 +913,13 @@ async function vdirBatchFilm(){AGNES_SCOPE='vdir';
   if(!(await agnesEnsureReady()))return;
   var segs=vdirBuildSegs();
   if(!segs.length){toast('没有可生成的分镜');return;}
-  vdirFilm={segs:segs, results:new Array(segs.length).fill(null), done:0, urls:[]};
+  var sharedRef=_scGet('Ref')||null;
+  if(!sharedRef){
+    vdirFilm={segs:segs,ref:null,results:new Array(segs.length).fill(null),done:0,urls:[]};
+    vdirFilmOpen();vdirFilmProg(0,'⏳ 生成共享角色参考图（保证多镜一致）');
+    try{sharedRef=await vdirFilmGenImage((D.shots[0]&&D.shots[0].de)||segs[0].prompt);}catch(e){}
+  }
+  vdirFilm={segs:segs,ref:sharedRef,results:new Array(segs.length).fill(null),done:0,urls:[]};
   vdirFilmOpen();
   vdirFilmRun(0);
 }
@@ -921,13 +927,13 @@ async function vdirBatchFilm(){AGNES_SCOPE='vdir';
 async function vdirFilmRun(i){
   if(i>=vdirFilm.segs.length){vdirFilmFinish();return;}
   var seg=vdirFilm.segs[i];
-  vdirFilmProg(i, '⏳ 文字→图片 '+(seg.no?seg.no+' ':'')+'第 '+seg.part+'/'+seg.total+' 段');
-  var imgData=null;
-  try{ imgData=await vdirFilmGenImage(seg.prompt); }catch(e){}
-  if(!imgData){vdirFilmProg(i,'⚠️ 出图失败→纯文字生成');}
-  vdirFilmProg(i, '⏳ 图片→视频');
-  var ref=imgData||(_scGet('Ref')||null);
-  vdirGenVideo(seg.prompt, null, ref, 0, function(url){
+  var ref=vdirFilm.ref;
+  vdirFilmProg(i, ref?('⏳ 图生视频（共享参考）'+(seg.no?(' '+seg.no):'')+' 第 '+seg.part+'/'+seg.total):('⏳ 文字→视频 '+(seg.no?seg.no+' ':'')+'第 '+seg.part+'/'+seg.total+' 段'));
+  if(!ref){
+    vdirFilmProg(i,'⏳ 出图→视频');
+    try{ ref=await vdirFilmGenImage(seg.prompt); }catch(e){}
+  }
+  vdirGenVideo(seg.prompt, null, ref||null, 0, function(url){
     if(url){vdirFilm.results[i]=url; vdirFilm.done++;}
     vdirFilmProg(i, url?'✅':'❌');
     vdirFilmRun(i+1);
@@ -2301,7 +2307,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260813e';
+var APP_VER='20260813f';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
