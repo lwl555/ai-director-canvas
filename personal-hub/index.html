@@ -368,7 +368,24 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="grid g2">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><h3>今日概览</h3></div><div class="bd"><div class="stats" id="topStats"></div><div id="topToday"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>未来天气</h3><div class="sp"><span class="mut2" id="weatherCity">定位中…</span></div></div><div class="bd"><div class="form" style="margin-bottom:10px"><input id="wcity" class="f1" list="cityList" autocomplete="off" placeholder="选择或输入城市，如 上海" style="min-height:38px"><button class="btn pri sm" onclick="setWeatherCity()">设置</button><button class="btn sm ghost" onclick="locateWeather()" title="使用浏览器GPS定位">📍 自动定位</button><button class="btn sm ghost" onclick="toggleWsrc()" title="天气数据源设置">⚙</button></div><div id="wsrcPanel" style="display:none;margin:8px 0;padding:10px;background:var(--sand2);border-radius:10px"><div class="form" style="margin-bottom:6px"><input id="qw_key" class="f1" placeholder="和风 Weather Key（选填）" style="min-height:36px"><input id="qw_host" class="f1" placeholder="专属 Host，如 xxx.qweatherapi.com" style="min-height:36px"></div><div class="form"><button class="btn pri sm" onclick="saveWeatherSrc()">保存</button><a class="mut2" href="https://console.qweather.com" target="_blank" rel="noopener" style="font-size:12px">免费申请 ↗</a><span id="wsrcHint" class="mut2" style="font-size:12px"></span></div><div class="mut2" style="font-size:12px;margin-top:4px">填了走和风（含空气质量/预警/生活指数/分钟降水）；留空自动用 Open-Meteo 兜底（免 Key）。</div><div class="form" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px"><input id="hub_name" class="f1" placeholder="我的称呼（选填，如 松屿）" style="min-height:36px"><button class="btn pri sm" onclick="saveHubName()">保存称呼</button></div>
-<div id="agnesKeyRow" class="form" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px"><input id="agnes_key" type="password" class="f1" placeholder="Agnes API Key（sk-...，agnes-ai.cn 后台获取）" style="min-height:36px"><button class="btn pri sm" onclick="saveAgnesKey()">保存Key</button><span id="agnesKeyHint" class="mut2" style="font-size:12px"></span></div><div id="vdirProxyNote" class="mut2" style="display:none;font-size:12px;color:#3aa655;margin-top:4px">AI 服务已由后端代理（agnes-media），无需填写 Key</div><div class="mut2" style="font-size:12px;margin-top:4px">Key 仅存本机浏览器，不上传；用于 AI 导演真实出图/出视频。</div></div><div class="forecast" id="forecastBox"></div></div></div>
+<div id="agnesKeyRow" class="form" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px"><input id="agnes_key" type="password" class="f1" placeholder="Agnes API Key（sk-...，agnes-ai.cn 后台获取）" style="min-height:36px"><button class="btn pri sm" onclick="saveAgnesKey()">保存Key</button><span id="agnesKeyHint" class="mut2" style="font-size:12px"></span></div><div id="vdirProxyNote" class="mut2" style="display:none;font-size:12px;color:#3aa655;margin-top:4px">AI 服务已由后端代理（agnes-media），无需填写 Key</div><div class="mut2" style="font-size:12px;margin-top:4px">Key 仅存本机浏览器，不上传；用于 AI 导演真实出图/出视频。</div>
+<div class="mut2" style="margin-top:8px;border-top:1px dashed var(--line);padding-top:8px"><b>AI 模型与生成参数</b>
+  <div class="form" style="margin-top:6px">
+    <select id="m_chat" class="f1" onchange="onModelSel('chat',this.value)"></select>
+    <select id="m_img" class="f1" onchange="onModelSel('img',this.value)"></select>
+    <select id="m_video" class="f1" onchange="onModelSel('video',this.value)"></select>
+  </div>
+  <div class="mut2" style="font-size:12px">分别选 对话 / 图像 / 视频 模型（可新增自定义模型）</div>
+  <button class="btn sm ghost" onclick="toggleModelMgr()">管理/新增模型</button>
+  <div id="modelMgr" style="display:none;margin-top:6px"><div id="modelList"></div>
+    <div class="form" style="margin-top:6px"><input id="nm_name" class="f1" placeholder="模型名(如 agnes-video-x)"><select id="nm_type" class="f1"><option value="chat">对话</option><option value="img">图像</option><option value="video">视频</option></select></div>
+    <div class="form" style="margin-top:4px"><input id="nm_fps" class="f1" placeholder="视频fps(默认24)" style="max-width:96px"><input id="nm_frames" class="f1" placeholder="单镜最大帧(默认121)" style="max-width:124px"><button class="btn pri sm" onclick="addModel()">添加</button></div>
+  </div>
+  <div class="mut2" style="font-size:12px;margin-top:8px">生成参数（图像/视频通用）</div>
+  <div class="form" style="margin-top:4px"><input id="p_seed" class="f1" placeholder="种子(留空随机)" style="max-width:104px"><input id="p_steps" class="f1" placeholder="步数" style="max-width:68px"><input id="p_cfg" class="f1" placeholder="引导值" style="max-width:68px"><input id="p_ratio" class="f1" placeholder="比例" style="max-width:68px"></div>
+  <div class="form" style="margin-top:4px"><input id="p_w" class="f1" placeholder="宽" style="max-width:68px"><input id="p_h" class="f1" placeholder="高" style="max-width:68px"><input id="p_neg" class="f1" placeholder="负面提示词(选填)"></div>
+  <button class="btn pri sm" style="margin-top:6px" onclick="saveParamsUI()">保存参数</button><span id="paramHint" class="mut2" style="font-size:12px"></span>
+</div></div><div class="forecast" id="forecastBox"></div></div></div>
 </div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>提醒中心</h3><div class="sp"><span class="mut2" id="notifState"></span></div></div><div class="bd">
 <div class="form"><input id="rem_min" type="number" inputmode="numeric" placeholder="分钟后" style="width:92px;min-height:40px"><input id="rem_txt" class="f1" placeholder="提醒内容（如：该起来走走了）"><button class="btn pri" onclick="scheduleCountdown()">倒计时提醒</button></div>
@@ -521,6 +538,25 @@ var AGNES_MODEL={chat:'agnes-2.0-flash',img:'agnes-image-2.1-flash',video:'agnes
 var agnesProxyOk=null;
 function agnesKey(){try{return localStorage.getItem('wb_personal_hub_agnes_key')||'';}catch(e){return '';}}
 function agnesSetKey(v){try{localStorage.setItem('wb_personal_hub_agnes_key',v.trim());}catch(e){}}
+// ===== 可编辑模型注册表 + 生成参数（设置里可改）=====
+var MODEL_STORE_KEY='wb_personal_hub_models', PARAM_STORE_KEY='wb_personal_hub_params';
+var DEFAULT_MODELS=[
+  {name:'agnes-2.0-flash',label:'Agnes 对话',type:'chat',maxFrames:0,fps:0},
+  {name:'agnes-image-2.1-flash',label:'Agnes 图像',type:'img',maxFrames:0,fps:0},
+  {name:'agnes-video-v2.0',label:'Agnes 视频',type:'video',maxFrames:121,fps:24}
+];
+var SEL={chat:'agnes-2.0-flash',img:'agnes-image-2.1-flash',video:'agnes-video-v2.0'};
+var GEN_PARAMS={seed:'',steps:30,cfg:7.5,width:1152,height:768,fps:24,ratio:'16:9',negative:''};
+function loadModels(){try{var m=JSON.parse(localStorage.getItem(MODEL_STORE_KEY));window.__MODELS=Array.isArray(m)&&m.length?m:DEFAULT_MODELS.slice();}catch(e){window.__MODELS=DEFAULT_MODELS.slice();}
+ try{var s=JSON.parse(localStorage.getItem('wb_personal_hub_sel'));if(s)SEL=Object.assign(SEL,s);}catch(e){}
+ try{var p=JSON.parse(localStorage.getItem(PARAM_STORE_KEY));if(p)GEN_PARAMS=Object.assign(GEN_PARAMS,p);}catch(e){}
+ applyModels();}
+function saveModels(){try{localStorage.setItem(MODEL_STORE_KEY,JSON.stringify(window.__MODELS||DEFAULT_MODELS));localStorage.setItem('wb_personal_hub_sel',JSON.stringify(SEL));localStorage.setItem(PARAM_STORE_KEY,JSON.stringify(GEN_PARAMS));}catch(e){}}
+function applyModels(){var ms=window.__MODELS||DEFAULT_MODELS;function f(t){var x=ms.find(function(y){return y.type===t&&y.name===SEL[t];})||ms.find(function(y){return y.type===t;});return x?x.name:'';}AGNES_MODEL={chat:f('chat'),img:f('img'),video:f('video')};}
+function getModel(type){var ms=window.__MODELS||DEFAULT_MODELS;return ms.find(function(x){return x.type===type&&x.name===SEL[type];})||ms.find(function(x){return x.type===type;});}
+function videoMaxFrames(){var m=getModel('video');return (m&&m.maxFrames)||121;}
+function videoFps(){var m=getModel('video');return (m&&m.fps)||24;}
+
 function agnesCheckProxy(){
   if(agnesProxyOk!==null)return Promise.resolve(agnesProxyOk);
   return fetch(AGNES_PROXY,{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({route:'chat',model:AGNES_MODEL.chat,messages:[{role:'user',content:'hi'}],stream:false,max_tokens:5})})
@@ -622,12 +658,13 @@ function nowStr(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth(
 async function vdirGenerate(){vdirSubmit();}
 function vdirGenImage(prompt,out){
   var url,hdr,body;
+  var imgExtra={response_format:'url'};if(GEN_PARAMS.seed)imgExtra.seed=Number(GEN_PARAMS.seed);if(GEN_PARAMS.cfg)imgExtra.guidance_scale=Number(GEN_PARAMS.cfg);if(GEN_PARAMS.negative)imgExtra.negative_prompt=GEN_PARAMS.negative;
   if(agnesProxyOk){
     url=AGNES_PROXY;hdr={'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'};
-    body=JSON.stringify({route:'image',model:AGNES_MODEL.img,prompt:prompt,size:'1K',ratio:'16:9',extra_body:{response_format:'url'}});
+    body=JSON.stringify({route:'image',model:AGNES_MODEL.img,prompt:prompt,size:'1K',ratio:GEN_PARAMS.ratio||'16:9',extra_body:imgExtra});
   }else{
     url=AGNES_BASE+'/images/generations';hdr={'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()};
-    body=JSON.stringify({model:AGNES_MODEL.img,prompt:prompt,size:'1K',ratio:'16:9',extra_body:{response_format:'url'}});
+    body=JSON.stringify({model:AGNES_MODEL.img,prompt:prompt,size:'1K',ratio:GEN_PARAMS.ratio||'16:9',extra_body:imgExtra});
   }
   fetch(url,{method:'POST',headers:hdr,body:body})
  .then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error((j.error&&(j.error.message||j.error.msg))||('HTTP '+r.status));return j;});})
@@ -635,12 +672,17 @@ function vdirGenImage(prompt,out){
  .catch(function(e){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">生成失败：'+(e.message||e)+'</div>';vdirLogGen('img',prompt,'失败:'+(e.message||e));});}
 function vdirGenVideo(prompt,out,imageData,attempt,cb,framesIn){
   if(attempt===undefined)attempt=0;
-  var frames=framesIn||(attempt>0?97:121);
-  var vbody={model:AGNES_MODEL.video,prompt:prompt,width:1152,height:768,num_frames:frames,frame_rate:24};if(imageData)vbody.image=imageData;
+  var frames=framesIn||videoMaxFrames();
+  var fps=videoFps();
+  var vbody={model:AGNES_MODEL.video,prompt:prompt,width:GEN_PARAMS.width||1152,height:GEN_PARAMS.height||768,num_frames:frames,frame_rate:fps};if(imageData)vbody.image=imageData;
+  if(GEN_PARAMS.seed)vbody.seed=Number(GEN_PARAMS.seed);
+  if(GEN_PARAMS.cfg)vbody.cfg_scale=Number(GEN_PARAMS.cfg);
+  if(GEN_PARAMS.steps)vbody.steps=Number(GEN_PARAMS.steps);
+  if(GEN_PARAMS.negative)vbody.negative_prompt=GEN_PARAMS.negative;
   var url,hdr,body;
   if(agnesProxyOk){
     url=AGNES_PROXY;hdr={'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'};
-    body=JSON.stringify({route:'video',model:vbody.model,prompt:vbody.prompt,width:vbody.width,height:vbody.height,num_frames:vbody.num_frames,frame_rate:vbody.frame_rate,image:imageData||undefined});
+    body=JSON.stringify(Object.assign({route:'video',image:imageData||undefined},vbody));
   }else{
     url=AGNES_BASE+'/videos';hdr={'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()};
     body=JSON.stringify(vbody);
@@ -703,20 +745,20 @@ function vdirPoll(vid,out,prompt,cb){var tries=0,retries=0,startTime=Date.now();
   poll();}
 
 // ===== 长视频：按模型上限自动切段 + 顺序生成 + 连播成片 =====
-// 模型单次上限：agnes-video-v2.0 约 121 帧 @24fps ≈ 5 秒
-var VIDEO_MAX_FRAMES=121, VIDEO_FPS=24, VIDEO_MAX_SEC=Math.floor(VIDEO_MAX_FRAMES/VIDEO_FPS);
+// 模型单次上限改为「按所选视频模型动态读取」(videoMaxFrames / videoFps)，不再写死 5 秒
 var vdirFilm=null;
 
-// 把分镜列表按"每段≤模型上限(5秒)"切成片段队列
+// 把分镜列表按"每段≤所选视频模型上限"切成片段队列（AI 规划的秒数决定总时长，模型上限决定单段上限）
 function vdirBuildSegs(){
   var segs=[];
+  var MAXF=videoMaxFrames(), FPS=videoFps(), MAXSEC=Math.max(1,Math.floor(MAXF/FPS));
   (D.shots||[]).forEach(function(s){
     if(!s.de)return;
-    var dur=Math.max(1, Number(s.du)||VIDEO_MAX_SEC); // 没填秒数默认 5 秒/镜
-    var parts=Math.max(1, Math.ceil(dur/VIDEO_MAX_SEC));
+    var dur=Math.max(1, Number(s.du)||MAXSEC); // 没填秒数默认按模型单段上限
+    var parts=Math.max(1, Math.ceil(dur/MAXSEC));
     for(var p=0;p<parts;p++){
       var last=(p===parts-1);
-      var f= last ? Math.max(8, Math.round((dur-(parts-1)*VIDEO_MAX_SEC)*VIDEO_FPS)) : VIDEO_MAX_FRAMES;
+      var f= last ? Math.max(8, Math.round((dur-(parts-1)*MAXSEC)*FPS)) : MAXF;
       segs.push({shotId:s.id, no:s.no||'', prompt:s.de, part:p+1, total:parts, frames:f});
     }
   });
@@ -1732,9 +1774,18 @@ function aqiColor(a){a=parseInt(a)||0;if(a<=50)return '#3aa655';if(a<=100)return
 function aqiCat(a){a=parseInt(a)||0;if(a<=50)return '优';if(a<=100)return '良';if(a<=150)return '轻度';if(a<=200)return '中度';if(a<=300)return '重度';return '严重';}
 function degToCompass(d){d=parseInt(d)||0;var dirs=['北','东北','东','东南','南','西南','西','西北'];return dirs[Math.round(d/45)%8]+'风';}
 function saveWeatherSrc(){var k=$('qw_key').value.trim();var h=$('qw_host').value.trim().replace(/^https?:\/\//,'');var hint=$('wsrcHint');try{localStorage.setItem('wb_personal_hub_qwkey',k);localStorage.setItem('wb_personal_hub_qwhost',h);}catch(e){}if(k&&h){hint.textContent='已保存，刷新中…';hint.style.color='#3aa655';toggleWsrc(false);weatherCache=null;fetchWeather(D.wcity||'',typeof D.wcity==='string'&&D.wcity.indexOf(',')>-1);}else if(!k&&!h){hint.textContent='已清除，改用 Open-Meteo';hint.style.color='#3aa655';toggleWsrc(false);weatherCache=null;fetchWeather(D.wcity||'',typeof D.wcity==='string'&&D.wcity.indexOf(',')>-1);}else{hint.textContent='Key 和 Host 都要填，或都留空';hint.style.color='#e8784f';}}
-function toggleWsrc(force){var p=$('wsrcPanel');if(!p)return;var show=(typeof force==='boolean')?force:(p.style.display==='none');p.style.display=show?'block':'none';if(show){$('qw_key').value=qwKey();$('qw_host').value=qwHost();var nm=$('hub_name');if(nm){try{nm.value=localStorage.getItem('wb_personal_hub_name')||'';}catch(e){}}var ak=$('agnes_key');if(ak){try{ak.value=localStorage.getItem('wb_personal_hub_agnes_key')||'';}catch(e){}}var hint=$('wsrcHint');if(hint)hint.textContent=qwReady()?'当前：和风天气(详细)':'当前：Open-Meteo(兜底)';}}
+function toggleWsrc(force){var p=$('wsrcPanel');if(!p)return;var show=(typeof force==='boolean')?force:(p.style.display==='none');p.style.display=show?'block':'none';if(show){$('qw_key').value=qwKey();$('qw_host').value=qwHost();var nm=$('hub_name');if(nm){try{nm.value=localStorage.getItem('wb_personal_hub_name')||'';}catch(e){}}var ak=$('agnes_key');if(ak){try{ak.value=localStorage.getItem('wb_personal_hub_agnes_key')||'';}catch(e){}}var hint=$('wsrcHint');if(hint)hint.textContent=qwReady()?'当前：和风天气(详细)':'当前：Open-Meteo(兜底)';}renderModelSelects();fillParamsUI();}
 function saveHubName(){var nm=$('hub_name');if(!nm)return;var v=nm.value.trim();try{localStorage.setItem('wb_personal_hub_name',v);}catch(e){}var hint=$('wsrcHint');if(hint){hint.style.color='#3aa655';hint.textContent=v?('已保存称呼「'+v+'」，问候已更新'):'已清除称呼';}$('greetTx').textContent=getGreeting();}
 function saveAgnesKey(){var ak=$('agnes_key');if(!ak)return;var v=ak.value.trim();agnesSetKey(v);var hint=$('agnesKeyHint');if(hint){hint.style.color='#3aa655';hint.textContent=v?'已保存 Key，AI 导演可真实生成':'已清除';}var kb=$('vdirKeyBar');if(kb&&v)kb.style.display='none';vdirGallery();}
+// ===== 模型/参数 UI =====
+function renderModelSelects(){['chat','img','video'].forEach(function(t){var sel=$('m_'+t);if(!sel)return;sel.innerHTML=(window.__MODELS||DEFAULT_MODELS).filter(function(x){return x.type===t;}).map(function(x){return '<option value="'+esc(x.name)+'"'+(SEL[t]===x.name?' selected':'')+'>'+esc(x.label||x.name)+'</option>';}).join('');});renderModelList();}
+function onModelSel(t,v){SEL[t]=v;saveModels();applyModels();if(t==='video')toast('视频模型：'+v+'（单镜上限 '+videoMaxFrames()+' 帧 / '+videoFps()+'fps）');}
+function toggleModelMgr(){var p=$('modelMgr');if(p)p.style.display=(p.style.display==='none'?'block':'none');renderModelList();}
+function renderModelList(){var box=$('modelList');if(!box)return;box.innerHTML=(window.__MODELS||DEFAULT_MODELS).map(function(x,i){return '<div class="hot-meta" style="margin:2px 0"><span class="tag">'+esc(x.type)+'</span><b style="font-size:12px">'+esc(x.name)+'</b>'+(x.maxFrames?' <span class="mut2">'+x.maxFrames+'帧/'+x.fps+'fps</span>':'')+' <button class="btn xs ghost" onclick="delModel('+i+')">删</button></div>';}).join('');}
+function addModel(){var n=$('nm_name').value.trim();var t=$('nm_type').value;if(!n){toast('填模型名');return;}var fps=parseInt($('nm_fps').value)||24;var mf=parseInt($('nm_frames').value)||0;window.__MODELS=(window.__MODELS||DEFAULT_MODELS.slice());window.__MODELS.push({name:n,label:n,type:t,maxFrames:mf,fps:fps});saveModels();renderModelSelects();$('nm_name').value='';toast('已添加 '+n);}
+function delModel(i){if(!window.__MODELS)return;window.__MODELS.splice(i,1);saveModels();renderModelSelects();}
+function fillParamsUI(){try{$('p_seed').value=GEN_PARAMS.seed||'';$('p_steps').value=GEN_PARAMS.steps||30;$('p_cfg').value=GEN_PARAMS.cfg||7.5;$('p_ratio').value=GEN_PARAMS.ratio||'16:9';$('p_w').value=GEN_PARAMS.width||1152;$('p_h').value=GEN_PARAMS.height||768;$('p_neg').value=GEN_PARAMS.negative||'';}catch(e){}}
+function saveParamsUI(){GEN_PARAMS={seed:$('p_seed').value.trim(),steps:parseInt($('p_steps').value)||30,cfg:parseFloat($('p_cfg').value)||7.5,width:parseInt($('p_w').value)||1152,height:parseInt($('p_h').value)||768,fps:videoFps(),ratio:$('p_ratio').value.trim()||'16:9',negative:$('p_neg').value.trim()};saveModels();var h=$('paramHint');if(h){h.style.color='#3aa655';h.textContent='已保存';}toast('参数已保存');}
 
 async function fetchWeather(loc, isCoord){
   var lat,lon,city='';
@@ -1942,7 +1993,7 @@ window.addEventListener('DOMContentLoaded',function(){
   initStatPlat();switchCat();
   var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;
   if(restoreSession()){if(!isTokenExpired()){enterApp();}else{refreshToken().then(function(ok){if(ok)enterApp();else showAuth();});}}
-  else{showAuth();loadLocal();try{vdirGallery();}catch(e){console.warn('vdir init2',e);}}/* one-time proxy detection for the video panel */if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb2=$('vdirKeyBar');if(kb2)kb2.style.display='block';}});}
+  else{showAuth();loadLocal();try{vdirGallery();}catch(e){console.warn('vdir init2',e);}}loadModels();/* one-time proxy detection for the video panel */if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb2=$('vdirKeyBar');if(kb2)kb2.style.display='block';}});}
   // 注册 Service Worker（仅 https 环境；让手机端可"安装到主屏幕"）
   // 关键：新版本自动激活 + 刷新一次，确保用户不会一直看到旧的缓存页面
   if(location.protocol==='https:' && 'serviceWorker' in navigator){
