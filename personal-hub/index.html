@@ -1227,7 +1227,7 @@ function aiMAddMsg(role,text,html){var box=$('ai_chat');if(!box)return;var em=bo
  if(html)body.innerHTML=html;else body.textContent=text;
  bub.appendChild(body);d.appendChild(av);d.appendChild(bub);box.appendChild(d);box.scrollTop=box.scrollHeight;return d;}
 function aiMSubmit(){AGNES_SCOPE='ai';var m=window.__aiMode||'auto';var inp=$('ai_input');var t=inp?inp.value.trim():'';
- if(m==='chat'){aiSendFromInput();return;}
+ if(m==='chat'){aiMSend();return;}
  if(m==='director'){aiMDirectorChat(t);return;}
  if(m==='img'||m==='video'){if(!t){toast('先写内容');return;}aiMGenerateInline(m,t);return;}
  if(!t)return;var it=vdirDetectIntent(t);
@@ -1237,6 +1237,8 @@ async function aiMSend(){AGNES_SCOPE='ai';var inp=$('ai_input');if(!inp)return;v
  aiMAddMsg('user',m);var node=aiMAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';var acc='';
  var ctx='';try{ctx=await agnesSearch(m);}catch(e){ctx='';}
  var msgs=[{role:'system',content:'你是小林，用户随身的 AI 专家 Agent，不是普通聊天机器人。核心能力：1)深度理解用户真实意图（模糊/口语/错字也能抓，信息不足主动追问）；2)专家级视频创作：脚本/分镜/运镜/提示词工程，生图给 agnes-image-2.1-flash 提示词，生视频给 agnes-video-v2.0 参数（约121帧/24fps）；3)桌面 EXE 应用专家：WebView2/Tauri/Electron/原生C#C++ 选型与打包、CORS/离线/签名/SmartScreen/高DPI/托盘自启等坑，也懂 Android APK 与 PWA；4)联网搜索：基于平台给的网页摘要作答并标注来源；5)可执行输出：步骤清单、可复制代码块。你同时是视频导演与桌面应用架构师。'}];
+ var dc=[];try{var dnow=new Date();var y=dnow.getFullYear(),mo=dnow.getMonth()+1;var ym=y+'-'+(mo<10?'0'+mo:mo);var exp=0,inc=0;(D.ledger||[]).forEach(function(l){if(l.date&&String(l.date).indexOf(ym)===0){if(l.kind==='in')inc+=Number(l.amount||0);else exp+=Number(l.amount||0);}});if(D.todos&&D.todos.length)dc.push('待办 '+D.todos.length+' 条');if(D.topics&&D.topics.length)dc.push('选题 '+D.topics.length+' 条');if(D.shots&&D.shots.length)dc.push('分镜 '+D.shots.length+' 条');if(exp)dc.push('本月支出 ¥'+exp.toFixed(2));if(inc)dc.push('本月收入 ¥'+inc.toFixed(2));}catch(e){}
+ if(dc.length)msgs.push({role:'system',content:'当前工作台数据概览（仅供参考，回答时无需复述原样）：'+dc.join('；')+'。用户提及这些数据时可结合作答。'});
  if(ctx)msgs.push({role:'system',content:ctx});
  msgs.push({role:'user',content:m});
  vdirChatSend(msgs,function(d){acc+=d;if(body)body.textContent=acc;var b=$('ai_chat');if(b)b.scrollTop=b.scrollHeight;},
@@ -2256,7 +2258,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260813d';
+var APP_VER='20260813e';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
