@@ -919,9 +919,13 @@ function renderToday(){var t=todayStr();var items=[];
   D.shots.forEach(function(x){if(x.st!=='已交付'&&x.dd&&x.dd<=t){items.push({tg:'分镜',tx:(x.no||'')+x.de,od:x.dd<t,fn:'moveShot',id:x.id});}});
   D.ledger.filter(function(x){return x.d===t&&x.t==='out'}).forEach(function(x){items.push({tg:'今日支出',tx:x.c+' ¥'+x.a,od:false,fn:null,id:x.id});});
   var overdue=items.filter(function(x){return x.od}).length;
+  try{if(window.AndroidBridge&&window.AndroidBridge.syncTasks){window.AndroidBridge.syncTasks(JSON.stringify({today:items.length,overdue:overdue,at:Date.now()}));}}catch(e){}
   $('todayCnt').innerHTML=(overdue?'<span class="pill-n red">'+overdue+'逾期</span> ':'')+'<span class="pill-n">'+items.length+'项</span>';
   if(!items.length){$('todayList').innerHTML='<div class="empty">今天没有待处理的事项 🎉</div>';return;}
   var html='';items.forEach(function(it){html+='<div class="trow'+(it.od?' od':'')+'"><span class="tg">'+it.tg+'</span><div class="tx">'+esc(it.tx)+(it.od?' <span class="m">逾期</span>':'')+'</div>';if(it.fn)html+='<button class="btn xs pri" onclick="'+it.fn+'(\''+it.id+'\')">处理</button>';html+='</div>';});$('todayList').innerHTML=html;}
+// 桥接：APK 内定期把今日摘要推给原生层，用于本地通知
+try{setInterval(function(){try{renderToday();}catch(e){}},60000);}catch(e){}
+document.addEventListener('visibilitychange',function(){if(!document.hidden)try{renderToday();}catch(e){}});
 
 // ===== AI ASSISTANT =====
 function aiKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();aiSendFromInput();}}
