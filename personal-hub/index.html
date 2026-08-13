@@ -411,13 +411,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M4.5 6.5h11a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 16V8a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M17 11l4-2.6v7.2L17 13z"/></svg><h3>成片产出</h3><div class="sp"><span class="mut2" id="vdCnt"></span></div></div><div class="bd"><div class="form"><input class="fw" id="vd_t" placeholder="成片标题"><input class="w110 half" id="vd_d" type="number" inputmode="numeric" placeholder="时长秒"><select class="w130 half" id="vd_s"><option>生成中</option><option>待剪辑</option><option>待审</option><option>已发布</option></select><input class="fw" id="vd_p" placeholder="发布平台/备注"><button class="btn pri" onclick="addVideo()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>登记</button></div><div class="stats" id="vdStats"></div><div id="vdList"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9v6M12 9v6M17 9v6"/></svg><h3>分镜时间轴</h3><div class="sp"><span class="mut2">点击镜头块切换 待拍摄→拍摄中→已交付</span></div></div><div class="bd"><div id="shotTimeline"></div></div></div>
 </div>
-<div class="card" id="dirCard"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v5h5"/></svg><h3>AI 导演</h3><div class="sp"><span class="mut2">自动构思·人物设定·成片</span></div></div><div class="bd">
-<textarea id="dir_idea" class="f1" rows="3" placeholder="说一个视频想法，如：做一个动漫风角色宣传片，主角是银发少女星，在霓虹都市奔跑" style="min-height:64px;font-size:16px"></textarea>
-<div class="form" style="margin-top:8px"><button class="btn pri" onclick="vdirDirector()">🧠 AI 自动构思</button><span class="mut2" style="font-size:12px;margin-left:6px">参考图（可选）：</span><input type="file" id="dir_ref" accept="image/*" onchange="vdirDirectorRef(this)" style="font-size:13px;max-width:200px"></div>
-<div id="dirPlan" style="margin-top:10px"></div>
-<div id="dirChar" style="margin-top:10px"></div>
-</div></div>
-<div class="card vdir"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI 助手 · 小林</h3><div class="sp"><span class="mut2">联网搜索 · 通用助手</span></div></div><div class="bd">
+<div class="card vdir"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI 助手 · 小林</h3><div class="sp"><span class="mut2">聊需求 · 出图 · 出视频 · 导演成片</span></div></div><div class="bd">
 <style>
 .vdir-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:768px){.vdir-cols{grid-template-columns:1fr}}
@@ -452,9 +446,15 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
  <span class="mut2" style="font-size:12px">直接说需求，小林自动判断出图/出视频；也能正常聊天</span>
  <span class="vdir-sp"></span>
  <button class="mem" type="button" onclick="vdirToggleMem()" title="生成记忆（自动纠错记录）">📓 记忆</button>
+<div class="vdir-mode" id="vdirMode">
+ <button class="on" data-mode="auto" onclick="vdirSetMode('auto')">自动</button>
+ <button data-mode="chat" onclick="vdirSetMode('chat')">闲聊</button>
+ <button data-mode="img" onclick="vdirSetMode('img')">出图</button>
+ <button data-mode="video" onclick="vdirSetMode('video')">出视频</button>
+ <button data-mode="director" onclick="vdirSetMode('director')">🎬 导演</button>
 </div>
-<div id="vdirRefBox" style="margin:6px 0 2px;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--sand2)"><label class="mut2">参考图（人物/场景一致性用，做图生视频时上传；平时可留空）</label><br><input type="file" id="vdir_ref" accept="image/*" onchange="vdirRefPreview()"><img id="vdir_refprev" style="max-width:100%;border-radius:8px;margin-top:6px;display:none"></div>
-  <div class="mut2" style="margin-bottom:6px">小林：直接说「画一只国风猫」「做个30秒茶饮宣传视频」「让这张参考图动起来」即可内联出图/出视频，无需复制提示词；普通问题它会联网搜索解答。</div>
+<div id="vdirRefBox" style="margin:6px 0 2px;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--sand2)"><label class="mut2">参考图（人物/场景一致性、图生视频、导演分镜成片共用；平时可留空）</label><br><input type="file" id="vdir_ref" accept="image/*" onchange="vdirRefPreview()"><img id="vdir_refprev" style="max-width:100%;border-radius:8px;margin-top:6px;display:none"></div>
+  <div class="mut2" style="margin-bottom:6px">小林：直接说「画一只国风猫」「做个30秒茶饮宣传视频」「让这张参考图动起来」即可内联出图/出视频；切到「🎬 导演」并描述想法，它会自动构思分镜、可选生成人物三视图、一键成片。参考图上传框同时供所有模式使用。</div>
   <div class="ai-chat" id="vdir_chat" style="height:340px"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>我是小林，你的通用 AI 助手（基于 Agnes 免费模型），可以联网搜索、帮你规划视频、写提示词、直接生成图片/视频，有疑问会主动问你</div></div></div>
   <div class="ai-input" style="margin-top:8px"><textarea id="vdir_input" placeholder="例如：画一只国风猫 / 做个30秒茶饮宣传视频 / 让参考图动起来…" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();vdirSubmit()}"></textarea><button class="btn ghost xs" id="vdirPlanBtn" onclick="vdirPlan()" title="用上方内容生成完整分镜方案">完整方案</button><button class="btn pri ai-send" id="vdirActBtn" onclick="vdirSubmit()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
 <div id="vdirMem" class="vdir-mem" style="display:none"></div>
@@ -612,10 +612,15 @@ function vdirDetectIntent(t){var hasRef=!!window.__vdirRef;
  if(/画|插画|海报|头像|配图|文生图|生成.*图片|logo|做张图|一张图|壁纸/.test(t))return 'img';
  return 'chat';}
 function vdirSubmit(){
+ window.__vdirMode=window.__vdirMode||'auto';
  var inp=$('vdir_input');if(!inp)return;var t=inp.value.trim();if(!t)return;
+ if(window.__vdirMode==='director'){vdirDirectorChat(t);return;}
+ if(window.__vdirMode==='chat'){vdirSend();return;}
+ if(window.__vdirMode==='img'||window.__vdirMode==='video'){vdirGenerateInline(window.__vdirMode,t);return;}
  var intent=vdirDetectIntent(t);
  if(intent==='chat'){vdirSend();}else{vdirGenerateInline(intent,t);}
 }
+function vdirSetMode(m){window.__vdirMode=m;var box=$('vdirMode');if(box)box.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-mode')===m);});var inp=$('vdir_input');if(inp){if(m==='director')inp.placeholder='描述一个视频想法，如：动漫风角色宣传片，银发少女在霓虹都市奔跑';else if(m==='img')inp.placeholder='画一只国风猫…';else if(m==='video')inp.placeholder='做个30秒茶饮宣传视频…';else inp.placeholder='例如：画一只国风猫 / 做个30秒茶饮宣传视频 / 让参考图动起来…';}}
 function vdirEsc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function vdirAddMsg(role,text,html){var box=$('vdir_chat');if(!box)return;var em=box.querySelector('.ai-empty');if(em)em.remove();
  var d=document.createElement('div');d.className='ai-msg '+(role==='bot'?'bot':'user');
@@ -653,7 +658,7 @@ async function vdirSend(){var inp=$('vdir_input');if(!inp)return;var m=inp.value
  vdirChatSend(msgs,
   function(d){acc+=d;if(body)body.textContent=acc;var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;},
   function(full){window.__vdirLast=full;if(!body)return;var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="vdirGenerateInline(\'img\',window.__vdirLast)">🖼️ 生成图片</button> <button class="btn xs" onclick="vdirUseAsPrompt()">🎬 生成视频</button> <button class="btn xs" onclick="vdirApplyPromptText()">存为提示词</button>';body.parentNode.appendChild(act);var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;}).catch(function(e){if(body)body.textContent='出错了：'+(e.message||e);});}
-async function vdirPlan(idea){if(idea===undefined){var inp=$('vdir_input');idea=inp?inp.value.trim():'';}if(!idea){toast('先在上方输入视频主题，或和导演聊完再生成');return;}
+async function vdirPlan(idea){if(idea===undefined){var inp=$('vdir_input');idea=inp?inp.value.trim():'';}if(!idea){toast('先在上方输入视频主题，或切到「🎬 导演」模式聊完再生成');return;}
  if(!(await agnesEnsureReady()))return;
  vdirAddMsg('user','主题：'+idea);var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';var acc='';
  vdirChatSend([{role:'system',content:'你是视频创作助手。请基于 Agnes 免费能力，为视频主题输出结构化方案：1)一句话创意 2)分镜列表（每条含镜号、画面描述、秒数）3)图片提示词（文生图用，agnes-image-2.1-flash）4)视频提示词（文生/图生视频用，agnes-video-v2.0）5)建议模型。'},{role:'user',content:'主题：'+idea}],
@@ -679,17 +684,17 @@ function vdirGenImgURL(prompt){
     fetch(url,{method:'POST',headers:hdr,body:body}).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error((j.error&&(j.error.message||j.error.msg))||('HTTP '+r.status));return j;});}).then(function(j){var u=(j.data&&j.data[0]&&j.data[0].url)||'';if(!u)throw new Error('未返回图片');res(u);}).catch(rej);
   });
 }
-function vdirDirectorRef(input){var f=input&&input.files&&input.files[0];if(!f){return;}var rd=new FileReader();rd.onload=function(){window.__vdirRef=rd.result;toast('参考图已就绪（用于视频一致性）');var p=$('dirPlan');};rd.readAsDataURL(f);}
-async function vdirDirector(){
-  var ta=$('dir_idea');var idea=ta?ta.value.trim():'';
+// 参考图现由小林卡的 vdirRefPreview 统一处理（导演/出图/出视频共用）
+async function vdirDirectorChat(idea){
+  if(!idea){var inp=$('vdir_input');idea=inp?inp.value.trim():'';}
   if(!idea){toast('先说一个视频想法');return;}
   if(!(await agnesEnsureReady()))return;
-  var box=$('dirPlan');if(box)box.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';
-  if($('dirChar'))$('dirChar').innerHTML='';
-  var sys={role:'system',content:'你是专业 AI 视频导演。请基于用户的一个视频想法，输出结构化创作方案。严格按以下格式（不要多余解释）：\n【创意】一句话核心创意\n【角色】是否需要固定角色。若需要，用一段文字描述角色（外貌、服饰、性格、典型场景），用于生成人物三视图；若不需要，只写“无”。\n【分镜】\n1. 画面描述 | 秒数\n2. 画面描述 | 秒数\n（每条一行，镜号+描述+竖线+秒数）'};
-  vdirChatSend([sys,{role:'user',content:idea}],null,function(full){vdirRenderDirPlan(full||'');});
+  vdirAddMsg('user',idea);var inp=$('vdir_input');if(inp)inp.value='';
+  var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');if(body)body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';
+  var sys={role:'system',content:'你是专业 AI 视频导演（也是助手小林）。请基于用户的一个视频想法，输出结构化创作方案。严格按以下格式（不要多余解释，不要 markdown 代码块）：\n【创意】一句话核心创意\n【角色】是否需要固定角色。若需要，用一段文字描述角色（外貌、服饰、性格、典型场景），用于生成人物三视图；若不需要，只写“无”。\n【分镜】\n1. 画面描述 | 秒数\n2. 画面描述 | 秒数\n（每条一行，镜号+描述+竖线+秒数）'};
+  vdirChatSend([sys,{role:'user',content:idea}],null,function(full){vdirRenderDirPlanChat(full||'',node);});
 }
-function vdirRenderDirPlan(full){
+function vdirRenderDirPlanChat(full,node){
   var concept='',char='',shots=[],mode=null;
   full.split(/\n+/).forEach(function(l){l=l.trim();
     if(l.indexOf('【创意】')>=0)concept=l.replace('【创意】','').replace(/^创意】/,'').trim();
@@ -702,31 +707,30 @@ function vdirRenderDirPlan(full){
     }
   });
   var hasChar=char&&!/无|不需要|否|none|no/i.test(char);
-  var box=$('dirPlan');if(!box)return;
   var h='<div class="mut2" style="margin-bottom:4px"><b>💡 创意：</b>'+esc(concept||'(未识别)')+'</div>';
   if(hasChar){
     window.__dirPlanChar=char;
     h+='<div class="mut2" style="margin-bottom:4px"><b>🧍 角色：</b>'+esc(char)+'</div>';
     if(window.__vdirRef)h+='<div class="mut2" style="color:#3aa655">已使用参考图，将用于视频一致性</div>';
-    else h+='<div class="form"><button class="btn pri sm" onclick="vdirGenCharSheet()">🎨 生成人物三视图</button><span class="mut2" style="font-size:12px">AI 当顾问，先出三视图你确认</span></div>';
+    else h+='<div class="ai-actions"><button class="btn pri xs" onclick="vdirGenCharSheet()">🎨 生成人物三视图</button><span class="mut2" style="font-size:12px">AI 当顾问，先出三视图你确认</span></div>';
   }else{h+='<div class="mut2">本方案无需固定角色，可直接生成</div>';}
   if(shots.length)h+='<div class="mut2" style="margin-top:6px"><b>🎞 分镜（'+shots.length+'）：</b></div><div class="mut2">'+shots.map(function(s,i){return (i+1)+'. '+esc(s.de)+' ('+s.du+'s)';}).join('<br>')+'</div>';
-  h+='<div class="form" style="margin-top:8px"><button class="btn pri" onclick="vdirDirectorApprove()">✅ 采纳分镜并生成视频</button></div>';
-  box.innerHTML=h;
+  h+='<div class="ai-actions" style="margin-top:8px"><button class="btn pri xs" onclick="vdirDirectorApprove()">✅ 采纳分镜并生成视频</button></div>';
+  if(node){var body=node.querySelector('.ai-body');if(body)body.innerHTML=h;var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;}
   window.__dirPlan={concept:concept,char:hasChar?char:'',shots:shots};
 }
 async function vdirGenCharSheet(){
   var char=window.__dirPlanChar||'';if(!char){toast('先构思方案');return;}
   if(!(await agnesEnsureReady()))return;
-  var box=$('dirChar');if(!box)return;box.innerHTML='<div class="mut2">正在生成人物三视图（正面/侧面/背面）…</div>';
+  var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');if(body)body.innerHTML='<div class="mut2">🎨 正在生成人物三视图（正面/侧面/背面）…</div>';
   var views=[['正面','front full body facing camera'],['侧面','side profile'],['背面','back view']];
   var urls=[];
   for(var i=0;i<views.length;i++){try{var u=await vdirGenImgURL(char+'，'+views[i][1]+'，角色设计三视图，纯白背景，全身清晰，动漫风格，无文字');urls.push(u);}catch(e){urls.push('');}}
   var ok=urls.filter(Boolean);
   var h='<div class="mut2" style="margin-bottom:6px">🎨 人物三视图（AI 建议，确认后用于视频一致性）</div><div style="display:flex;gap:8px;flex-wrap:wrap">';
   ok.forEach(function(u){h+='<img src="'+esc(u)+'" style="width:90px;height:120px;object-fit:cover;border-radius:8px;border:1px solid var(--line)">';});
-  h+='</div><div class="form" style="margin-top:10px"><button class="btn pri" onclick="vdirDirectorApprove()">✅ 同意，开始生成视频</button><button class="btn ghost" onclick="vdirDirectorSkipChar()">不用三视图，直接生成</button></div>';
-  box.innerHTML=h;
+  h+='</div><div class="ai-actions" style="margin-top:10px"><button class="btn pri xs" onclick="vdirDirectorApprove()">✅ 同意，开始生成视频</button><button class="btn ghost xs" onclick="vdirDirectorSkipChar()">不用三视图，直接生成</button></div>';
+  if(body)body.innerHTML=h;var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;
   window.__vdirDirUrls=ok;
   if(ok.length)window.__vdirRef=ok[0];
 }
@@ -2140,7 +2144,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260812o';
+var APP_VER='20260813a';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
