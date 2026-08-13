@@ -1846,11 +1846,12 @@ function dbGen(){
   var prompt=$('db_prompt')?$('db_prompt').value.trim():'';
   if(!prompt){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请先写画面描述</div>';return;}
   var size=$('db_size')?$('db_size').value:'1024x1024';
+  var wh=size.split('x');var w=parseInt(wh[0],10)||1024;var h=parseInt(wh[1],10)||1024;
   var n=$('db_n')?Math.max(1,Math.min(4,parseInt($('db_n').value||'1',10)||1)):1;
   var model=$('db_model')?$('db_model').value.trim():'';
   if(!model){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请先填写推理接入点 ID（ep-xxxx），在火山引擎 Ark 控制台从 Seedream 图像模型新建接入点获得</div>';return;}
   if(out)out.innerHTML='<div class="mut2">生成中…（豆包云端出图通常 10–40 秒）</div>';
-  var body=JSON.stringify({model:model,prompt:prompt,size:size,n:n});
+  var body=JSON.stringify({model:model,prompt:prompt,width:w,height:h,n:n});
   fetch('https://ark.cn-beijing.volces.com/api/v3/images/generations',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
@@ -1869,7 +1870,7 @@ function dbGen(){
   }).catch(function(e){
     var m=e.message||'';
     if(m.indexOf('Failed to fetch')>=0||m.indexOf('NetworkError')>=0||m.indexOf('CORS')>=0){
-      if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">浏览器跨域(CORS)被拦截：火山引擎通常不允许浏览器直连。可行方案：用 Supabase Edge Function 做代理转发（我可帮你加，需你授权 Supabase 或在控制台配置密钥）。需要代理版告诉我。</div>';
+      if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">网络/CORS 被拦截：请检查当前网络（企业防火墙可能拦截），或确认 Key 与接入点 ID 有效。</div>';
     }else if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请求出错：'+esc(m)+'</div>';
   });
 }
