@@ -360,6 +360,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <button data-t="ecom"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9H7.5z"/><path d="M6 6L5 3H2.5M9 20.5a1 1 0 1 0 0-.1M18 20.5a1 1 0 1 0 0-.1"/></svg>电商运营</button>
 <button data-t="hot"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg>今日热度</button>
 <button data-t="life"><svg class="ico" viewBox="0 0 24 24"><path d="M3.5 10.6L12 3.6l8.5 7v9a1.4 1.4 0 0 1-1.4 1.4H4.9a1.4 1.4 0 0 1-1.4-1.4z"/><path d="M9.3 21V13.4h5.4V21"/></svg>生活全能</button>
+<button data-t="ai"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>AI助手</button>
 <button data-t="doubao"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 17l-5-5L5 21"/></svg>豆包生图</button>
 </nav>
 </header>
@@ -410,8 +411,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M4.5 6.5h11a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 16V8a1.5 1.5 0 0 1 1.5-1.5z"/><path d="M17 11l4-2.6v7.2L17 13z"/></svg><h3>成片产出</h3><div class="sp"><span class="mut2" id="vdCnt"></span></div></div><div class="bd"><div class="form"><input class="fw" id="vd_t" placeholder="成片标题"><input class="w110 half" id="vd_d" type="number" inputmode="numeric" placeholder="时长秒"><select class="w130 half" id="vd_s"><option>生成中</option><option>待剪辑</option><option>待审</option><option>已发布</option></select><input class="fw" id="vd_p" placeholder="发布平台/备注"><button class="btn pri" onclick="addVideo()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>登记</button></div><div class="stats" id="vdStats"></div><div id="vdList"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9v6M12 9v6M17 9v6"/></svg><h3>分镜时间轴</h3><div class="sp"><span class="mut2">点击镜头块切换 待拍摄→拍摄中→已交付</span></div></div><div class="bd"><div id="shotTimeline"></div></div></div>
 </div>
-<div class="card vdir"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI 助手</h3><div class="sp"><span class="mut2" id="vdirRoleLabel">通用创作助手 · 小林（聊需求·出图·出视频·导演成片）</span></div></div><div class="bd">
-<div class="vdir-mode" id="vdirRoleSeg" style="margin-bottom:10px"><button class="on" data-role="create" onclick="setVdirRole('create')">🎨 通用创作助手</button><button data-role="data" onclick="setVdirRole('data')">📊 数据参谋</button></div>
+<div class="card vdir"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI 助手</h3><div class="sp"><span class="mut2" >通用创作助手 · 小林（聊需求·出图·出视频·导演成片）</span></div></div><div class="bd">
 <div id="vdirCreatePane">
 <style>
 .vdir-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -446,7 +446,8 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="vdir-bar">
  <span class="mut2" style="font-size:12px">直接说需求，小林自动判断出图/出视频；也能正常聊天</span>
  <span class="vdir-sp"></span>
- <button class="mem" type="button" onclick="vdirToggleMem()" title="生成记忆（自动纠错记录）">📓 记忆</button>
+ <button class="mem" type="button" onclick="vdirToggleHist()" title="历史对话">🗂 历史</button><button class="mem" type="button" onclick="vdirToggleMem()" title="生成记忆（自动纠错记录）">📓 记忆</button>
+<div class="ai-hist" id="vdir_hist" style="display:none"></div>
 <div class="vdir-mode" id="vdirMode">
  <button class="on" data-mode="auto" onclick="vdirSetMode('auto')">自动</button>
  <button data-mode="chat" onclick="vdirSetMode('chat')">闲聊</button>
@@ -462,30 +463,6 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="mut2" style="margin:12px 0 2px">生成画廊（本地保存）</div>
 <div class="vdir-gallery" id="vdirGallery"></div>
 </div>
-<div id="vdirDataPane" style="display:none"><div class="ai-wrap">
-<div class="ai-bar">
-  <button class="btn xs ghost" type="button" onclick="toggleChatHist()">🗂 历史对话</button>
-  <button class="btn xs ghost" type="button" onclick="newChat()">＋ 新对话</button>
-  <button class="btn xs ghost" type="button" onclick="clearChat()">清空</button>
-  <span class="ai-cur" id="curSessTx"></span>
-</div>
-<div class="ai-hist" id="aiHist" style="display:none"></div>
-<div class="ai-chips"><button class="ai-chip" onclick="aiQuick('总结一下今天要处理的事')">总结今天</button><button class="ai-chip" onclick="aiQuick('分析我这个月的支出情况，哪些可以省')">分析支出</button><button class="ai-chip" onclick="aiQuick('看看我的选题库，给我几个新选题建议')">选题建议</button><button class="ai-chip" onclick="aiQuick('帮我回顾一下最近的自媒体数据趋势')">数据复盘</button><button class="ai-chip" onclick="aiQuick('我有哪些逾期的任务？帮我排个优先级')">逾期处理</button></div>
-<div class="ai-ctx" id="ai_ctx"><div class="vdir-mode" id="ai_mode">
- <button class="on" data-mode="auto" onclick="aiMSetMode('auto')">自动</button>
- <button data-mode="chat" onclick="aiMSetMode('chat')">闲聊</button>
- <button data-mode="img" onclick="aiMSetMode('img')">出图</button>
- <button data-mode="video" onclick="aiMSetMode('video')">出视频</button>
- <button data-mode="director" onclick="aiMSetMode('director')">🎬导演</button>
-</div>
-<div id="aiRefBox" style="margin:6px 0 2px;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--sand2)"><label class="mut2">参考图（人物/场景一致性、图生视频、导演成片共用；平时可留空）</label><br><input type="file" id="ai_ref" accept="image/*" onchange="aiMRefPreview()"><img id="ai_refprev" style="max-width:100%;border-radius:8px;margin-top:6px;display:none"></div>
-<svg class="ico s" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.1"/></svg><span>AI助手可以查看你的待办、记账、选题、分镜和习惯数据，给出针对性建议</span></div>
-<div class="ai-chat" id="ai_chat"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>和你的AI助手聊聊吧<br>它了解你工作台上的所有数据</div></div></div>
-<div class="ai-atts" id="ai_atts" style="display:none"></div>
-<div class="ai-input"><button class="ai-attbtn" type="button" onclick="aiPickImage()" title="发送图片（小票可自动记账）"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="2"/><path d="M21 15l-5-5L5 21"/></svg></button><textarea id="ai_input" placeholder="输入消息…（Shift+Enter换行，可附图片让 AI 看图）" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiMSubmit()}" oninput="aiAutoResize(this)"></textarea><button class="btn pri ai-send" onclick="aiMSubmit()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
-<div class="vdir-gallery" id="aiGallery" style="margin-top:10px"></div>
-<input type="file" id="ai_file" accept="image/*" multiple style="display:none" onchange="aiOnImage(event)">
-</div></div>
 </div></div>
 </div></section>
 <section class="panel" id="p-life"><div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/><path d="M12 8v4M12 16h.1"/></svg><h3>生活</h3><div class="sp"><span class="mut2">记账·习惯·待办·日记</span></div></div><div class="bd"><div class="life-tabs" id="lifeTabs"><button class="on" data-lt="ledger" onclick="switchLifeTab('ledger')">记账</button><button data-lt="habit" onclick="switchLifeTab('habit')">习惯</button><button data-lt="todo" onclick="switchLifeTab('todo')">待办</button><button data-lt="diary" onclick="switchLifeTab('diary')">日记</button></div>
@@ -527,6 +504,24 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div id="hotList"><div class="empty">选择上方平台查看实时热榜</div></div>
 </div></div></section>
 <!-- 数据参谋面板已合并进「AI视频制作」标签页的「数据参谋」模式 -->
+<section class="panel" id="p-ai"><div class="grid">
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI 助手 · 数据参谋</h3><div class="sp"><span class="mut2">读懂你的待办/记账/选题/分镜/成片，给针对性建议 · 也能看图 · 图生图改图</span></div></div><div class="bd"><div class="ai-wrap">
+<div class="ai-bar">
+  <button class="btn xs ghost" type="button" onclick="toggleChatHist('ai','aiHist')">🗂 历史对话</button>
+  <button class="btn xs ghost" type="button" onclick="newChat('ai')">＋ 新对话</button>
+  <button class="btn xs ghost" type="button" onclick="clearChat('ai')">清空</button>
+  <span class="ai-cur" id="curSessTx"></span>
+</div>
+<div class="ai-hist" id="aiHist" style="display:none"></div>
+<div class="ai-chips"><button class="ai-chip" onclick="aiQuick('总结一下今天要处理的事')">总结今天</button><button class="ai-chip" onclick="aiQuick('分析我这个月的支出情况，哪些可以省')">分析支出</button><button class="ai-chip" onclick="aiQuick('看看我的选题库，给我几个新选题建议')">选题建议</button><button class="ai-chip" onclick="aiQuick('帮我回顾一下最近的自媒体数据趋势')">数据复盘</button><button class="ai-chip" onclick="aiQuick('我有哪些逾期的任务？帮我排个优先级')">逾期处理</button><button class="ai-chip" onclick="aiQuick('分析我的分镜脚本和导演成片进度，哪些镜头还没拍、建议怎么排期')">🎬 分镜/成片</button></div>
+<div class="ai-ctx" id="ai_ctx"><svg class="ico s" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.1"/></svg><span>AI助手可以查看你的待办、记账、选题、分镜、成片和习惯数据，给出针对性建议；可附图片让它看图，或用「🖼️图生图」按你的要求改图（借用豆包 Seedream 模型）</span></div>
+<div class="ai-chat" id="ai_chat"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>和你的AI助手聊聊吧<br>它能看图、能改图、也懂你工作台上的所有数据</div></div></div>
+<div class="ai-atts" id="ai_atts" style="display:none"></div>
+<div class="ai-input"><button class="ai-attbtn" type="button" onclick="aiPickImage()" title="附图片（让 AI 看图 / 用于图生图）"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="2"/><path d="M21 15l-5-5L5 21"/></svg></button><textarea id="ai_input" placeholder="输入消息…（Shift+Enter换行；附图后写要求可让 AI 看图；要点「🖼️图生图」按图改图）" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSendFromInput()}" oninput="aiAutoResize(this)"></textarea><button class="btn ghost ai-send" type="button" onclick="aiImg2Img()" title="用附图的图生图修改（借用豆包模型）" style="padding:0 10px;font-size:18px">🖼️</button><button class="btn pri ai-send" onclick="aiSendFromInput()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
+<div class="vdir-gallery" id="aiGallery" style="margin-top:10px"></div>
+<input type="file" id="ai_file" accept="image/*" multiple style="display:none" onchange="aiOnImage(event)">
+</div></div></div>
+</div></section>
 <section class="panel" id="p-doubao"><div class="grid">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 17l-5-5L5 21"/></svg><h3>豆包文生图</h3><div class="sp"><span class="mut2">火山引擎豆包（Doubao）独立生图</span></div></div><div class="bd"><div class="mut2" style="font-size:13px;background:var(--sand2);border:1px dashed var(--ac);border-radius:10px;padding:8px 10px;margin-bottom:12px;color:var(--ink)">💡 不想配 Key？用「AI视频制作-小林」或「AI助手」也能<b>免 Key 直接出图/出视频</b>。豆包通道适合需要火山引擎 Seedream 专属模型的场景。</div>
   <div class="form" style="margin-bottom:8px"><input id="db_key" type="password" class="f1" placeholder="豆包 API Key（ark-...，仅存本机浏览器）" style="min-height:38px"><button class="btn pri sm" onclick="saveDoubaoKey()">保存Key</button><span id="dbKeyHint" class="mut2" style="font-size:12px"></span></div>
@@ -554,6 +549,18 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
   <div class="mut2" style="font-size:12px;margin-bottom:8px">模型填「推理接入点 ID」（形如 <code>ep-20250xxxx</code>，<b>不是</b>模型名）。创建路径：火山引擎控制台 → 方舟 Ark → 推理接入点 → 从 Seedream 图像模型新建，把得到的 ID 粘到这里。</div>
   <div id="db_out" class="db-out"><div class="mut2">填好 Key、接入点 ID 和提示词，点生成。</div></div>
 </div></div>
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M3 5h18v14H3z"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg><h3>豆包图生图（以图改图）</h3><div class="sp"><span class="mut2">上传参考图 + 写要求，按豆包 Seedream 改图</span></div></div><div class="bd">
+  <div class="mut2" style="font-size:12px;margin-bottom:8px">叠加更改：勾选「以最近生成的图为底图」后，下一张会基于上一张继续改（就像豆包 App 的「继续编辑」）。</div>
+  <input type="file" id="db_i2i_ref" accept="image/*" style="min-height:38px;width:100%">
+  <div id="db_i2i_prev" style="margin:8px 0"></div>
+  <textarea id="db_i2i_prompt" class="f1" rows="3" placeholder="写你要怎么改这张图，如：把背景换成海边、保留人物" style="min-height:64px;font-size:16px"></textarea>
+  <div class="form" style="margin:8px 0">
+    <select id="db_i2i_size" class="f1" style="min-height:38px"><option value="1024x1024">1024×1024</option><option value="1024x768">1024×768</option><option value="768x1024">768×1024</option><option value="1280x720">1280×720</option><option value="720x1280">720×1280</option></select>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap"><input type="checkbox" id="db_i2i_chain"> 以最近生成的图为底图</label>
+  </div>
+  <button class="btn pri" onclick="dbGenImg2ImgUI()">🎨 图生图（改图）</button>
+  <div id="db_i2i_out" class="mut2" style="margin-top:8px"></div>
+</div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M3 5h18v14H3z"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg><h3>我的豆包图库</h3><div class="sp"><span class="mut2" id="dbCnt"></span></div></div><div class="bd"><div id="dbGallery" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px"></div></div></div>
 </div></section>
 <footer>数据云端自动备份+本地存储双保险<br>换设备登录即可同步，导出JSON可离线备份</footer>
@@ -565,6 +572,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <button data-t="ecom"><svg class="ico b" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9H7.5z"/><path d="M6 6L5 3H2.5M9 20.5a1 1 0 1 0 0-.1M18 20.5a1 1 0 1 0 0-.1"/></svg>电商运营</button>
 <button data-t="hot"><svg class="ico b" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg>热度</button>
 <button data-t="life"><svg class="ico b" viewBox="0 0 24 24"><path d="M3.5 10.6L12 3.6l8.5 7v9a1.4 1.4 0 0 1-1.4 1.4H4.9a1.4 1.4 0 0 1-1.4-1.4z"/><path d="M9.3 21V13.4h5.4V21"/></svg>生活</button>
+<button data-t="ai"><svg class="ico b" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>AI</button>
 <button data-t="doubao"><svg class="ico b" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 17l-5-5L5 21"/></svg>豆包</button>
 </div></div>
 <div class="mask" id="mask"><div class="dlg"><h3 id="dlgT">确认</h3><p id="dlgP"></p><div class="row"><button class="btn ghost" onclick="closeDlg()">取消</button><button class="btn pri" id="dlgOk">确定</button></div></div></div>
@@ -667,14 +675,14 @@ function vdirChatSend(messages,onDelta,onDone){
 }
 async function vdirSend(){AGNES_SCOPE='vdir';var inp=$('vdir_input');if(!inp)return;var m=inp.value.trim();if(!m)return;inp.value='';
  if(!(await agnesEnsureReady()))return;
- vdirAddMsg('user',m);var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';var acc='';
+ vdirAddMsg('user',m);recordChat('user',m,new Date().toTimeString().slice(0,5),null,'vdir');var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';var acc='';
  var ctx='';try{ctx=await agnesSearch(m);}catch(e){ctx='';}
  var msgs=[{role:'system',content:'你是小林，用户随身的 AI 专家 Agent，不是普通聊天机器人。你的核心能力：\n1. 深度理解：先准确抓住用户真实意图（哪怕表达模糊、口语化、有错字），再行动；信息不足时主动追问 1-2 个最关键的问题，不要瞎猜、不要啰嗦。\n2. 专家级视频创作：精通脚本/分镜/运镜/节奏/提示词工程。涉及生图给出可直接用的提示词（agnes-image-2.1-flash 文生图），涉及生视频给提示词加参数（agnes-video-v2.0 文生/图生视频，约 121 帧/24fps），并说明生成步骤。\n3. 桌面 EXE 应用专家：精通把网页/前端项目打包成 Windows 桌面 .exe 的各类方案与取舍——WebView2（WinForms/WPF 内嵌 Edge）、Tauri（Rust加WebView，体积小）、Electron（生态全但重）、以及纯原生（C#/C++/Win32）。能为用户选型、给打包命令与配置、解决常见坑（CORS、本地存储、离线运行、代码签名与 SmartScreen、自动更新、体积优化、中文乱码、高 DPI 缩放、托盘与开机自启）。也懂 Android APK（WebView 壳）与 PWA。\n4. 联网搜索：平台会把搜索到的网页摘要作为「联网搜索结果」发给你，请基于它们作答并尽量标注来源（URL）；无结果则用自身知识并说明。\n5. 可执行输出：复杂任务拆成步骤清单；给代码/配置直接给可复制块；用中文、条理清晰、不废话。\n你同时是视频导演与桌面应用架构师，用户问哪块就切换到哪块的专业模式。'}];
  if(ctx)msgs.push({role:'system',content:ctx});
  msgs.push({role:'user',content:m});
  vdirChatSend(msgs,
   function(d){acc+=d;if(body)body.textContent=acc;var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;},
-  function(full){window.__vdirLast=full;if(!body)return;var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="vdirGenerateInline(\'img\',window.__vdirLast)">🖼️ 生成图片</button> <button class="btn xs" onclick="vdirUseAsPrompt()">🎬 生成视频</button> <button class="btn xs" onclick="vdirApplyPromptText()">存为提示词</button>';body.parentNode.appendChild(act);var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;}).catch(function(e){if(body)body.textContent='出错了：'+(e.message||e);});}
+  function(full){window.__vdirLast=full;recordChat('assistant',full,new Date().toTimeString().slice(0,5),null,'vdir');if(!body)return;var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="vdirGenerateInline(\'img\',window.__vdirLast)">🖼️ 生成图片</button> <button class="btn xs" onclick="vdirUseAsPrompt()">🎬 生成视频</button> <button class="btn xs" onclick="vdirApplyPromptText()">存为提示词</button>';body.parentNode.appendChild(act);var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;}).catch(function(e){if(body)body.textContent='出错了：'+(e.message||e);});}
 async function vdirPlan(idea){AGNES_SCOPE='vdir';if(idea===undefined){var inp=$('vdir_input');idea=inp?inp.value.trim():'';}if(!idea){toast('先在上方输入视频主题，或切到「🎬 导演」模式聊完再生成');return;}
  if(!(await agnesEnsureReady()))return;
  vdirAddMsg('user','主题：'+idea);var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';var acc='';
@@ -1375,14 +1383,14 @@ function aiQuick(msg){$('ai_input').value=msg;aiSendFromInput();}
 async function aiSendFromInput(){var msg=$('ai_input').value.trim();if(!msg&&!aiImages.length)return;
   $('ai_input').value='';$('ai_input').style.height='auto';var ts=new Date().toTimeString().slice(0,5);
   var imgs=aiImages.slice(0,4);
-  aiAddMsg('user',msg,ts,imgs);recordChat('user',msg,ts,imgs);aiShowTyping();
+  aiAddMsg('user',msg,ts,imgs);recordChat('user',msg,ts,imgs,'ai');aiShowTyping();
   aiImages=[];renderAiAtts();
   try{var headers={'Content-Type':'application/json'};
     if(session&&session.access_token)headers['Authorization']='Bearer '+session.access_token;
-    var body={message:msg,today:todayStr(),history:D.chats.slice(-10).map(function(c){return{role:c.role,content:(c.content||'').replace(/<ACTIONS>[\s\S]*?<\/ACTIONS>/gi,'').trim()}}),images:imgs};
+    var ctx={};try{ctx={todos:(D.todos||[]).length,topics:(D.topics||[]).length,shots:(D.shots||[]).length,videos:(D.videos||[]).length,prompts:(D.prompts||[]).length,ledger:(D.ledger||[]).length};}catch(e){}var body={message:msg,today:todayStr(),context:ctx,history:D.chats.slice(-10).map(function(c){return{role:c.role,content:(c.content||'').replace(/<ACTIONS>[\s\S]*?<\/ACTIONS>/gi,'').trim()}}),images:imgs};
     var r=await fetch(AI_URL,{method:'POST',headers:headers,body:JSON.stringify(body)});
     var d=await r.json();aiHideTyping();
-    if(d.reply){var ts2=new Date().toTimeString().slice(0,5);aiAddMsg('bot',d.reply,ts2);recordChat('assistant',d.reply,ts2);if(d.contextSummary)aiUpdateContext(d.contextSummary);}
+    if(d.reply){var ts2=new Date().toTimeString().slice(0,5);aiAddMsg('bot',d.reply,ts2);recordChat('assistant',d.reply,ts2,'ai');if(d.contextSummary)aiUpdateContext(d.contextSummary);}
     else{aiAddMsg('bot','抱歉，出错了：'+(d.error||'未知错误'),new Date().toTimeString().slice(0,5));}
     if(d.actions&&d.actions.length){var res=applyActions(d.actions);
       if(res){var html='<div class="ai-act'+(res.fails.length?' fail':'')+'">'+(res.lines.length?'已为你处理：'+res.lines.join('；'):'')+(res.fails.length?((res.lines.length?'<br>':'')+'⚠ 部分失败：'+res.fails.join('；')):'')+'</div>';
@@ -1417,15 +1425,18 @@ function fallbackIntent(msg){
 function renderChatHistory(){var chat=$('ai_chat');if(!D.chats||!D.chats.length){chat.innerHTML='<div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>和你的AI助手聊聊吧<br>它了解你工作台上的所有数据</div></div>';return;}chat.innerHTML='';D.chats.forEach(function(c){aiAddMsg(c.role==='assistant'?'bot':'user',c.content,c.ts,c.images);});}
 function aiUpdateContext(s){var html='<svg class="ico s" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.1"/></svg>';if(s.overdue)html+='<span>逾期 <b>'+s.overdue+'</b></span>';if(s.todos)html+='<span>待办 <b>'+s.todos+'</b></span>';if(s.topics)html+='<span>选题 <b>'+s.topics+'</b></span>';if(s.scripts)html+='<span>分镜 <b>'+s.scripts+'</b></span>';if(s.monthlyExpense!==undefined)html+='<span>月支出 <b>¥'+s.monthlyExpense+'</b></span>';if(s.monthlyIncome!==undefined)html+='<span>月收入 <b>¥'+s.monthlyIncome+'</b></span>';  if(!s.overdue&&!s.todos&&!s.topics&&!s.scripts)html+='<span>暂无需要处理的数据</span>';$('ai_ctx').innerHTML=html;}
 
-// ===== AI 会话历史（多会话回溯） =====
-function curSession(){if(!D.curSid){D.curSid=uid();D.sessions.push({id:D.curSid,title:'新对话',created:todayStr(),msgs:[]});}var s=D.sessions.find(function(x){return x.id===D.curSid});if(!s){s={id:D.curSid,title:'新对话',created:todayStr(),msgs:[]};D.sessions.push(s);}return s;}
-function recordChat(role,content,ts,images){D.chats.push({id:uid(),role:role,content:content,ts:ts,images:images||[]});var s=curSession();if(!s.title||s.title==='新对话'){if(role==='user'&&content)s.title=content.slice(0,18);}s.msgs=D.chats.slice();s.updated=ts;saveLocal();}
-function toggleChatHist(){var h=$('aiHist');if(h.style.display==='none'){renderChatSessions();h.style.display='block';}else h.style.display='none';}
-function renderChatSessions(){var h=$('aiHist');if(!D.sessions||!D.sessions.length){h.innerHTML='<div class="empty">还没有历史对话</div>';return;}
-  h.innerHTML='<div class="hist-list">'+D.sessions.slice().reverse().map(function(s){return '<div class="hist-item" onclick="openSession(\''+s.id+'\')"><div class="t">'+esc(s.title||'对话')+'</div><div class="s">'+(s.msgs?s.msgs.length:0)+' 条 · '+(s.created||'')+'</div></div>';}).join('')+'</div>';}
-function openSession(id){var s=D.sessions.find(function(x){return x.id===id});if(!s)return;D.curSid=id;D.chats=(s.msgs||[]).map(function(m){return{id:m.id||uid(),role:m.role,content:m.content,ts:m.ts,images:m.images||[]};});renderChatHistory();var ht=$('aiHist');if(ht)ht.style.display='none';if($('curSessTx'))$('curSessTx').textContent='当前：'+(s.title||'对话');toast('已载入历史对话');}
-function newChat(){if(D.chats.length){var s=D.sessions.find(function(x){return x.id===D.curSid});if(s)s.msgs=D.chats.slice();}D.curSid=uid();D.sessions.push({id:D.curSid,title:'新对话',created:todayStr(),msgs:[]});D.chats=[];renderChatHistory();var ht=$('aiHist');if(ht)ht.style.display='none';if($('curSessTx'))$('curSessTx').textContent='新对话';toast('已开始新对话');}
-function clearChat(){D.chats=[];renderChatHistory();if(D.curSid){var s=D.sessions.find(function(x){return x.id===D.curSid});if(s)s.msgs=[];}saveLocal();}
+// ===== AI 会话历史（多会话回溯，按 scope 隔离：vdir=小林，ai=数据参谋） =====
+function curSession(scope){scope=scope||'ai';if(typeof D.curSid!=='object'||D.curSid===null){var _o=D.curSid;D.curSid={};if(_o)D.curSid.ai=_o;}D.curSid=D.curSid||{};if(!D.curSid[scope]){D.curSid[scope]=uid();D.sessions.push({id:D.curSid[scope],title:'新对话',created:todayStr(),msgs:[],scope:scope});}var s=D.sessions.find(function(x){return x.id===D.curSid[scope];});if(!s){s={id:D.curSid[scope],title:'新对话',created:todayStr(),msgs:[],scope:scope};D.sessions.push(s);}return s;}
+function recordChat(role,content,ts,images,scope){scope=scope||'ai';D.chats=D.chats||[];D.chats.push({id:uid(),role:role,content:content,ts:ts,images:images||[]});var s=curSession(scope);if(!s.title||s.title==='新对话'){if(role==='user'&&content)s.title=content.slice(0,18);}s.msgs=D.chats.slice();s.updated=ts;saveLocal();}
+function toggleChatHist(scope,elId){var h=$(elId);if(h.style.display==='none'){renderChatSessions(scope,elId);h.style.display='block';}else h.style.display='none';}
+function renderChatSessions(scope,elId){var h=$(elId);if(!D.sessions||!D.sessions.length){h.innerHTML='<div class="empty">还没有历史对话</div>';return;}
+  h.innerHTML='<div class="hist-list">'+D.sessions.filter(function(s){return (s.scope===scope)||(!s.scope&&scope==='ai');}).slice().reverse().map(function(s){return '<div class="hist-item" onclick="openSession(\''+s.id+'\')"><div class="t">'+esc(s.title||'对话')+'</div><div class="s">'+(s.msgs?s.msgs.length:0)+' 条 · '+(s.created||'')+'</div></div>';}).join('')+'</div>';}
+function openSession(id){var s=D.sessions.find(function(x){return x.id===id});if(!s)return;var sc=s.scope||'ai';D.curSid=D.curSid||{};D.curSid[sc]=id;D.chats=(s.msgs||[]).map(function(m){return{id:m.id||uid(),role:m.role,content:m.content,ts:m.ts,images:m.images||[]};});if(sc==='ai')renderChatHistory();else renderVdirChatHistory();var ht=$('aiHist');if(ht)ht.style.display='none';if($('curSessTx'))$('curSessTx').textContent='当前：'+(s.title||'对话');toast('已载入历史对话');}
+function newChat(scope){scope=scope||'ai';if(D.chats&&D.chats.length){var s=D.sessions.find(function(x){return x.id===(D.curSid&&D.curSid[scope]);});if(s)s.msgs=D.chats.slice();}D.curSid=D.curSid||{};D.curSid[scope]=uid();D.sessions.push({id:D.curSid[scope],title:'新对话',created:todayStr(),msgs:[],scope:scope});D.chats=[];if(scope==='ai')renderChatHistory();else renderVdirChatHistory();var ht=$('aiHist');if(ht)ht.style.display='none';if($('curSessTx'))$('curSessTx').textContent='新对话';toast('已开始新对话');}
+function clearChat(scope){scope=scope||'ai';D.chats=[];if(scope==='ai')renderChatHistory();else renderVdirChatHistory();var sid=D.curSid&&D.curSid[scope];if(sid){var s=D.sessions.find(function(x){return x.id===sid});if(s)s.msgs=[];}saveLocal();}
+function renderVdirChatHistory(){var chat=$('vdir_chat');if(!chat)return;if(!D.chats||!D.chats.length){chat.innerHTML='<div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>我是小林，你的通用 AI 助手<br>聊需求、出图、出视频、导演成片，对话会自动留痕</div></div>';return;}chat.innerHTML='';D.chats.forEach(function(c){vdirAddMsg(c.role==='assistant'?'bot':'user',c.content,c.ts,c.images);});}
+function loadActiveChat(scope){scope=scope||'ai';D.curSid=D.curSid||{};var sid=D.curSid[scope];var s=sid&&D.sessions.find(function(x){return x.id===sid;});D.chats=s&&s.msgs?s.msgs.map(function(m){return{id:m.id||uid(),role:m.role,content:m.content,ts:m.ts,images:m.images||[]};}):[];if(scope==='ai'){renderChatHistory();}else{renderVdirChatHistory();}}
+
 
 
 // ===== AI 图片附件 =====
@@ -1676,15 +1687,7 @@ function renderHotList(q){if(!hotCache){$('hotList').innerHTML='<div class="empt
 function searchHot(){renderHotList($('hotSearch').value);}
 
 // ===== TAB NAV =====
-function setVdirRole(r){
-  document.querySelectorAll('#vdirRoleSeg button').forEach(function(b){b.classList.toggle('on',b.dataset.role===r);});
-  var cp=$('vdirCreatePane'),dp=$('vdirDataPane');
-  if(cp)cp.style.display=r==='create'?'':'none';
-  if(dp)dp.style.display=r==='data'?'':'none';
-  var lab=$('vdirRoleLabel');
-  if(lab)lab.textContent=r==='create'?'通用创作助手 · 小林（聊需求·出图·出视频·导演成片）':'数据参谋 · 读懂你的待办/记账/选题，给针对性建议（也能出图出视频）';
-  if(r==='data'){try{renderChatHistory();}catch(e){}}
-}
+// setVdirRole 已废弃（合并撤销：小林为纯通用创作助手，数据参谋恢复独立 tab）
 function refViewUpload(slot,input){var f=input.files&&input.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var o=getRefViews()||{};o[slot]=rd.result;setRefViews(o);var im=$('ref_'+slot);if(im){im.src=rd.result;im.style.display='block';}var h=$('refViewsHint');if(h){var n=['front','side','back'].filter(function(s){return o[s];}).length;h.textContent='已上传 '+n+'/3 视图';}};rd.readAsDataURL(f);}
 function clearRefViews(){setRefViews(null);['front','side','back'].forEach(function(s){var im=$('ref_'+s);if(im){im.style.display='none';im.src='';}});var h=$('refViewsHint');if(h)h.textContent='';toast('已清空三视图');}
 function publishToMedia(id){
@@ -1705,10 +1708,10 @@ document.documentElement.style.setProperty('--ac', AC[t]||'var(--ac-top)');
   document.querySelectorAll('section.panel').forEach(function(p){p.classList.toggle('on',p.id==='p-'+t);});
   if(t==='ai')setTimeout(function(){$('ai_input').focus();},200);
   if(t==='hot'&&!hotLoaded)loadHot('weibo');
-  if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video')renderShotTimeline();if(t==='ecom'){renderEcomBoard();renderHotTabs();renderHotProducts();}}
+  if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video'){renderShotTimeline();loadActiveChat('vdir');}if(t==='ai')loadActiveChat('ai');if(t==='ecom'){renderEcomBoard();renderHotTabs();renderHotProducts();}}
 
 // ===== RENDER ALL =====
-function renderAll(){switchCat();renderKanban();renderAssets();renderStats();renderShots();renderShotTimeline();renderPrompts();renderVideos();renderLedger();renderHabits();renderTodos();renderProducts();renderEcomBoard();renderHotProducts();renderDiary();renderToday();renderTop();initHot();checkTip();var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;renderChatHistory();/* agnes video panel init (D ready here) */try{vdirGallery();setVdirRole('create');}catch(e){console.warn('vdir init',e);}if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb=$('vdirKeyBar');if(kb)kb.style.display='block';}});}}
+function renderAll(){switchCat();renderKanban();renderAssets();renderStats();renderShots();renderShotTimeline();renderPrompts();renderVideos();renderLedger();renderHabits();renderTodos();renderProducts();renderEcomBoard();renderHotProducts();renderDiary();renderToday();renderTop();initHot();checkTip();var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;renderChatHistory();/* agnes video panel init (D ready here) */try{vdirGallery();renderVdirChatHistory();}catch(e){console.warn('vdir init',e);}if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb=$('vdirKeyBar');if(kb)kb.style.display='block';}});}}
 
 // ===== TODAY HOME =====
 function hubName(){try{var n=localStorage.getItem('wb_personal_hub_name');if(n&&n.trim())return n.trim();}catch(e){}if(session&&session.user&&session.user.email)return session.user.email.split('@')[0];return '';}
@@ -2342,7 +2345,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260813h';
+var APP_VER='20260813i';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -2411,6 +2414,51 @@ function doInstall(){
 }
 function closeInstall(){$('installMask').classList.remove('on');}
 
+// ===== 数据参谋 · 图生图（借用豆包 Seedream 模型） =====
+function vdirToggleHist(){var h=$('vdir_hist');if(h.style.display==='none'){renderChatSessions('vdir','vdir_hist');h.style.display='block';}else h.style.display='none';}
+async function aiImg2Img(){
+  if(!aiImages.length){toast('先点 📎 附上要改的图');return;}
+  var instr=$('ai_input').value.trim();if(!instr){toast('写上你要怎么改这张图');return;}
+  var key=doubaoKey(),ep=doubaoGet('ep');
+  if(!key||!ep){toast('图生图借用豆包模型，请先在「豆包生图」填好 Key 和接入点 ID');return;}
+  var ref=aiImages[aiImages.length-1];var ts=new Date().toTimeString().slice(0,5);
+  $('ai_input').value='';$('ai_input').style.height='auto';var atts=aiImages.slice(0,4);aiImages=[];renderAiAtts();
+  aiAddMsg('user',instr,ts,atts);recordChat('user',instr,ts,atts,'ai');aiShowTyping();
+  try{
+    var urls=await dbGenImg2Img(ref,instr,'1024x1024',1);aiHideTyping();
+    urls.forEach(function(u){D.doubao=D.doubao||[];D.doubao.unshift({id:'d'+Date.now()+Math.random().toString(36).slice(2,5),url:u,prompt:instr,t:Date.now()});aiAddMsg('bot','已按你的要求改图（豆包 Seedream）',new Date().toTimeString().slice(0,5),[u]);recordChat('assistant','已按你的要求改图：'+instr,new Date().toTimeString().slice(0,5),[u],'ai');});
+    saveLocal();renderDoubaoGallery();toast('图生图完成，已存入豆包图库');
+  }catch(e){aiHideTyping();aiAddMsg('bot','图生图失败：'+(e.message||e),new Date().toTimeString().slice(0,5));}
+}
+// ===== 豆包 图生图底层（Ark images/generations + image 参考） =====
+async function dbGenImg2Img(ref,prompt,size,n){
+  var key=doubaoKey(),ep=doubaoGet('ep');
+  if(!key||!ep)throw new Error('请先在「豆包生图」填 Key 和接入点 ID');
+  var wh=size.split('x');var w=parseInt(wh[0],10)||1024;var h=parseInt(wh[1],10)||1024;
+  var body=JSON.stringify({model:ep,prompt:prompt,image:[ref],width:w,height:h,n:1});
+  var res=await fetch('https://ark.cn-beijing.volces.com/api/v3/images/generations',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:body}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j};});});
+  if(!res.ok){var m=(res.j&&res.j.error&&res.j.error.message)||JSON.stringify(res.j);throw new Error(m);}
+  var arr=(res.j&&res.j.data)||(res.j&&res.j.choices)||[];
+  return arr.map(function(it){return it.url||(it.b64_json?'data:image/png;base64,'+it.b64_json:null);}).filter(Boolean);
+}
+async function fileToDataURL(f){return new Promise(function(res,rej){var rd=new FileReader();rd.onload=function(){res(rd.result);};rd.onerror=rej;rd.readAsDataURL(f);});}
+async function dbGenImg2ImgUI(){
+  var key=doubaoKey(),ep=doubaoGet('ep');var out=$('db_i2i_out');
+  if(!key||!ep){if(out)out.innerHTML='<span style="color:#c0392b">请先在上方「豆包文生图」填好 Key 和接入点 ID</span>';return;}
+  var prompt=$('db_i2i_prompt').value.trim();if(!prompt){if(out)out.textContent='先写改图要求';return;}
+  var ref=null;
+  if($('db_i2i_chain')&&$('db_i2i_chain').checked&&window.__dbLastImg){ref=window.__dbLastImg;}
+  else{var f=$('db_i2i_ref')&&$('db_i2i_ref').files[0];if(f)ref=await fileToDataURL(f);}
+  if(!ref){if(out)out.textContent='先上传参考图，或勾选「以最近生成的图为底图」';return;}
+  if(out)out.textContent='生成中…';
+  try{
+    var urls=await dbGenImg2Img(ref,prompt,$('db_i2i_size').value||'1024x1024',1);
+    urls.forEach(function(u){D.doubao=D.doubao||[];D.doubao.unshift({id:'d'+Date.now()+Math.random().toString(36).slice(2,5),url:u,prompt:prompt,t:Date.now()});window.__dbLastImg=u;});
+    saveLocal();renderDoubaoGallery();
+    if(out)out.innerHTML='<span style="color:#3aa655">改图完成 ✓ 已存入豆包图库</span>';
+    toast('豆包图生图完成');
+  }catch(e){if(out)out.innerHTML='<span style="color:#c0392b">失败：'+(e.message||e).toString().slice(0,120)+'</span>';}
+}
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded',function(){
   document.querySelectorAll('nav.tabs button,.mbar button').forEach(function(b){b.addEventListener('click',function(){switchTab(this.dataset.t);});});
