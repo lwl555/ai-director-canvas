@@ -509,10 +509,19 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 </div>
 <div class="ai-hist" id="aiHist" style="display:none"></div>
 <div class="ai-chips"><button class="ai-chip" onclick="aiQuick('总结一下今天要处理的事')">总结今天</button><button class="ai-chip" onclick="aiQuick('分析我这个月的支出情况，哪些可以省')">分析支出</button><button class="ai-chip" onclick="aiQuick('看看我的选题库，给我几个新选题建议')">选题建议</button><button class="ai-chip" onclick="aiQuick('帮我回顾一下最近的自媒体数据趋势')">数据复盘</button><button class="ai-chip" onclick="aiQuick('我有哪些逾期的任务？帮我排个优先级')">逾期处理</button></div>
-<div class="ai-ctx" id="ai_ctx"><svg class="ico s" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.1"/></svg><span>AI助手可以查看你的待办、记账、选题、分镜和习惯数据，给出针对性建议</span></div>
+<div class="ai-ctx" id="ai_ctx"><div class="vdir-mode" id="ai_mode">
+ <button class="on" data-mode="auto" onclick="aiMSetMode('auto')">自动</button>
+ <button data-mode="chat" onclick="aiMSetMode('chat')">闲聊</button>
+ <button data-mode="img" onclick="aiMSetMode('img')">出图</button>
+ <button data-mode="video" onclick="aiMSetMode('video')">出视频</button>
+ <button data-mode="director" onclick="aiMSetMode('director')">🎬导演</button>
+</div>
+<div id="aiRefBox" style="margin:6px 0 2px;padding:8px;border:1px dashed var(--line);border-radius:10px;background:var(--sand2)"><label class="mut2">参考图（人物/场景一致性、图生视频、导演成片共用；平时可留空）</label><br><input type="file" id="ai_ref" accept="image/*" onchange="aiMRefPreview()"><img id="ai_refprev" style="max-width:100%;border-radius:8px;margin-top:6px;display:none"></div>
+<svg class="ico s" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.1"/></svg><span>AI助手可以查看你的待办、记账、选题、分镜和习惯数据，给出针对性建议</span></div>
 <div class="ai-chat" id="ai_chat"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>和你的AI助手聊聊吧<br>它了解你工作台上的所有数据</div></div></div>
 <div class="ai-atts" id="ai_atts" style="display:none"></div>
-<div class="ai-input"><button class="ai-attbtn" type="button" onclick="aiPickImage()" title="发送图片（小票可自动记账）"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="2"/><path d="M21 15l-5-5L5 21"/></svg></button><textarea id="ai_input" placeholder="输入消息…（Shift+Enter换行，可附图片让 AI 看图）" rows="1" onkeydown="aiKey(event)" oninput="aiAutoResize(this)"></textarea><button class="btn pri ai-send" onclick="aiSendFromInput()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
+<div class="ai-input"><button class="ai-attbtn" type="button" onclick="aiPickImage()" title="发送图片（小票可自动记账）"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="2"/><path d="M21 15l-5-5L5 21"/></svg></button><textarea id="ai_input" placeholder="输入消息…（Shift+Enter换行，可附图片让 AI 看图）" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiMSubmit()}" oninput="aiAutoResize(this)"></textarea><button class="btn pri ai-send" onclick="aiMSubmit()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
+<div class="vdir-gallery" id="aiGallery" style="margin-top:10px"></div>
 <input type="file" id="ai_file" accept="image/*" multiple style="display:none" onchange="aiOnImage(event)">
 </div></div></div></section>
 <section class="panel" id="p-doubao"><div class="grid">
@@ -594,6 +603,11 @@ function getModel(type){var ms=window.__MODELS||DEFAULT_MODELS;return ms.find(fu
 function videoMaxFrames(){var m=getModel('video');return (m&&m.maxFrames)||121;}
 function videoFps(){var m=getModel('video');return (m&&m.fps)||24;}
 
+var AGNES_SCOPE='vdir';
+function _scEl(s){return $(AGNES_SCOPE+s);}
+function _scGet(k){return window[AGNES_SCOPE+k];}
+function _scSet(k,v){window[AGNES_SCOPE+k]=v;}
+
 function agnesCheckProxy(){
   if(agnesProxyOk!==null)return Promise.resolve(agnesProxyOk);
   return fetch(AGNES_PROXY,{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({route:'chat',model:AGNES_MODEL.chat,messages:[{role:'user',content:'hi'}],stream:false,max_tokens:5})})
@@ -606,13 +620,13 @@ async function agnesEnsureReady(){
   if(agnesKey())return true;
   vdirWarnKey();return false;
 }
-function vdirDetectIntent(t){var hasRef=!!window.__vdirRef;
+function vdirDetectIntent(t){var hasRef=!!_scGet('Ref');
  if(hasRef&&/(图|参考图|这张|上传的图).*(动|视频|生成视频|变成视频)/.test(t))return 'i2v';
  if(/(图生视频|图转动|让.*图.*动|参考图.*视频|图变视频|把图.*视频)/.test(t))return 'i2v';
  if(/(视频|片子?|动画|动起来|运镜|分镜|成片|mv|混剪|短片|预告|片头|片尾|生成一段视频|做个视频|来个视频|视频生成|宣传片|广告片)/.test(t))return 'video';
  if(/(画|插画|海报|头像|logo|配图|文生图|生成.*图|做张图|一张图|壁纸|封面|表情|漫画|图标|草图|示意图|概念图|三视图|角色图|设计图|出图|来张图|给我图|图)/.test(t))return 'img';
  return 'chat';}
-function vdirSubmit(){
+function vdirSubmit(){AGNES_SCOPE='vdir';
  window.__vdirMode=window.__vdirMode||'auto';
  var inp=$('vdir_input');if(!inp)return;var t=inp.value.trim();if(!t)return;
  if(window.__vdirMode==='director'){vdirDirectorChat(t);return;}
@@ -621,7 +635,7 @@ function vdirSubmit(){
  var intent=vdirDetectIntent(t);
  if(intent==='chat'){vdirSend();}else{vdirGenerateInline(intent,t);}
 }
-function vdirSetMode(m){window.__vdirMode=m;var box=$('vdirMode');if(box)box.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-mode')===m);});var inp=$('vdir_input');if(inp){if(m==='director')inp.placeholder='描述一个视频想法，如：动漫风角色宣传片，银发少女在霓虹都市奔跑';else if(m==='img')inp.placeholder='画一只国风猫…';else if(m==='video')inp.placeholder='做个30秒茶饮宣传视频…';else inp.placeholder='例如：画一只国风猫 / 做个30秒茶饮宣传视频 / 让参考图动起来…';}}
+function vdirSetMode(m){AGNES_SCOPE='vdir';window.__vdirMode=m;var box=$('vdirMode');if(box)box.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-mode')===m);});var inp=$('vdir_input');if(inp){if(m==='director')inp.placeholder='描述一个视频想法，如：动漫风角色宣传片，银发少女在霓虹都市奔跑';else if(m==='img')inp.placeholder='画一只国风猫…';else if(m==='video')inp.placeholder='做个30秒茶饮宣传视频…';else inp.placeholder='例如：画一只国风猫 / 做个30秒茶饮宣传视频 / 让参考图动起来…';}}
 function vdirEsc(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function vdirAddMsg(role,text,html){var box=$('vdir_chat');if(!box)return;var em=box.querySelector('.ai-empty');if(em)em.remove();
  var d=document.createElement('div');d.className='ai-msg '+(role==='bot'?'bot':'user');
@@ -649,7 +663,7 @@ function vdirChatSend(messages,onDelta,onDone){
       var rd=r.body.getReader();var dec=new TextDecoder();var buf='';var full='';var reason='';
       return new Promise(function(res,rej){function step(){rd.read().then(function(o){if(o.done){if(onDone)onDone(full,reason);return res(full);}buf+=dec.decode(o.value,{stream:true});var i;while((i=buf.indexOf('\n'))>=0){var line=buf.slice(0,i).trim();buf=buf.slice(i+1);if(!line.startsWith('data:'))continue;var p=line.slice(5).trim();if(!p||p==='[DONE]')continue;try{var j=JSON.parse(p);var c=j.choices&&j.choices[0]&&j.choices[0].delta;if(c){if(c.reasoning_content)reason+=c.reasoning_content;if(c.content){full+=c.content;if(onDelta)onDelta(c.content);}}}catch(e){}}step();}).catch(function(e){rej(e);});}step();});});
 }
-async function vdirSend(){var inp=$('vdir_input');if(!inp)return;var m=inp.value.trim();if(!m)return;inp.value='';
+async function vdirSend(){AGNES_SCOPE='vdir';var inp=$('vdir_input');if(!inp)return;var m=inp.value.trim();if(!m)return;inp.value='';
  if(!(await agnesEnsureReady()))return;
  vdirAddMsg('user',m);var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';var acc='';
  var ctx='';try{ctx=await agnesSearch(m);}catch(e){ctx='';}
@@ -659,22 +673,22 @@ async function vdirSend(){var inp=$('vdir_input');if(!inp)return;var m=inp.value
  vdirChatSend(msgs,
   function(d){acc+=d;if(body)body.textContent=acc;var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;},
   function(full){window.__vdirLast=full;if(!body)return;var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="vdirGenerateInline(\'img\',window.__vdirLast)">🖼️ 生成图片</button> <button class="btn xs" onclick="vdirUseAsPrompt()">🎬 生成视频</button> <button class="btn xs" onclick="vdirApplyPromptText()">存为提示词</button>';body.parentNode.appendChild(act);var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;}).catch(function(e){if(body)body.textContent='出错了：'+(e.message||e);});}
-async function vdirPlan(idea){if(idea===undefined){var inp=$('vdir_input');idea=inp?inp.value.trim():'';}if(!idea){toast('先在上方输入视频主题，或切到「🎬 导演」模式聊完再生成');return;}
+async function vdirPlan(idea){AGNES_SCOPE='vdir';if(idea===undefined){var inp=$('vdir_input');idea=inp?inp.value.trim():'';}if(!idea){toast('先在上方输入视频主题，或切到「🎬 导演」模式聊完再生成');return;}
  if(!(await agnesEnsureReady()))return;
  vdirAddMsg('user','主题：'+idea);var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';var acc='';
  vdirChatSend([{role:'system',content:'你是视频创作助手。请基于 Agnes 免费能力，为视频主题输出结构化方案：1)一句话创意 2)分镜列表（每条含镜号、画面描述、秒数）3)图片提示词（文生图用，agnes-image-2.1-flash）4)视频提示词（文生/图生视频用，agnes-video-v2.0）5)建议模型。'},{role:'user',content:'主题：'+idea}],
   function(d){acc+=d;if(body)body.textContent=acc;var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;},
   function(full){window.__vdirPlan=full;if(!body)return;var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="vdirApplyShots()">拆为分镜</button> <button class="btn xs" onclick="vdirApplyPrompt()">存为提示词</button> <button class="btn xs" onclick="vdirUsePlanGen()">生成示例视频</button>';body.parentNode.appendChild(act);var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;}).catch(function(e){if(body)body.textContent='出错了：'+(e.message||e);});}
-function vdirApplyShots(){if(!window.__vdirPlan){toast('先生成方案');return;}
+function vdirApplyShots(){AGNES_SCOPE='vdir';if(!window.__vdirPlan){toast('先生成方案');return;}
  var lines=window.__vdirPlan.split(/\n+/).map(function(s){return s.trim();}).filter(function(s){return s.length>0;});
  var picked=lines.filter(function(s){return /^\d+[.、]/.test(s)||/^[Ss]\d/.test(s)||/镜\s*\d/.test(s);});
  if(!picked.length)picked=lines;var n=0;
  picked.slice(0,20).forEach(function(ln){D.shots.push({id:uid(),pj:'',no:'',de:ln.replace(/^\d+[.、]\s*/,''),du:0,dd:'',st:'待拍摄',ct:todayStr()});n++;});
  saveLocal();scheduleCloudSync();renderShots();renderShotTimeline();renderToday();toast('已拆入 '+n+' 个分镜');}
 function vdirApplyPrompt(){if(!window.__vdirPlan){toast('先生成方案');return;}D.prompts.push({id:uid(),n:'视频方案 '+todayStr(),m:AGNES_MODEL.img,s:4,x:window.__vdirPlan,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
-function vdirUseAsPrompt(){if(!window.__vdirLast){toast('先和导演聊一下');return;}vdirGenerateInline('video',window.__vdirLast);}
-function vdirApplyPromptText(){if(!window.__vdirLast){toast('先聊一下');return;}D.prompts.push({id:uid(),n:'视频方案 '+todayStr(),m:AGNES_MODEL.chat,s:4,x:window.__vdirLast,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
-function vdirUsePlanGen(){if(!window.__vdirPlan){toast('先生成方案');return;}vdirGenerateInline('video',window.__vdirPlan);}
+function vdirUseAsPrompt(){AGNES_SCOPE='vdir';if(!window.__vdirLast){toast('先和导演聊一下');return;}vdirGenerateInline('video',window.__vdirLast);}
+function vdirApplyPromptText(){AGNES_SCOPE='vdir';if(!window.__vdirLast){toast('先聊一下');return;}D.prompts.push({id:uid(),n:'视频方案 '+todayStr(),m:AGNES_MODEL.chat,s:4,x:window.__vdirLast,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
+function vdirUsePlanGen(){AGNES_SCOPE='vdir';if(!window.__vdirPlan){toast('先生成方案');return;}vdirGenerateInline('video',window.__vdirPlan);}
 // ===== AI 导演（自动思考 · 人物设定 · 成片）=====
 function vdirGenImgURL(prompt){
   return new Promise(function(res,rej){
@@ -686,7 +700,7 @@ function vdirGenImgURL(prompt){
   });
 }
 // 参考图现由小林卡的 vdirRefPreview 统一处理（导演/出图/出视频共用）
-async function vdirDirectorChat(idea){
+async function vdirDirectorChat(idea){AGNES_SCOPE='vdir';
   if(!idea){var inp=$('vdir_input');idea=inp?inp.value.trim():'';}
   if(!idea){toast('先说一个视频想法');return;}
   if(!(await agnesEnsureReady()))return;
@@ -720,7 +734,7 @@ function vdirRenderDirPlanChat(full,node){
   if(node){var body=node.querySelector('.ai-body');if(body)body.innerHTML=h;var b=$('vdir_chat');if(b)b.scrollTop=b.scrollHeight;}
   window.__dirPlan={concept:concept,char:hasChar?char:'',shots:shots};
 }
-async function vdirGenCharSheet(){
+async function vdirGenCharSheet(){AGNES_SCOPE='vdir';
   var char=window.__dirPlanChar||'';if(!char){toast('先构思方案');return;}
   if(!(await agnesEnsureReady()))return;
   var node=vdirAddMsg('bot','');var body=node.querySelector('.ai-body');if(body)body.innerHTML='<div class="mut2">🎨 正在生成人物三视图（正面/侧面/背面）…</div>';
@@ -735,15 +749,15 @@ async function vdirGenCharSheet(){
   window.__vdirDirUrls=ok;
   if(ok.length)window.__vdirRef=ok[0];
 }
-function vdirDirectorAdopt(){
+function vdirDirectorAdopt(){AGNES_SCOPE='vdir';
   if(!window.__dirPlan||!window.__dirPlan.shots.length){toast('先构思方案');return;}
   var n=0;window.__dirPlan.shots.forEach(function(s){D.shots.push({id:uid(),pj:'',no:'',de:s.de,du:s.du||0,dd:'',st:'待拍摄',ct:todayStr()});n++;});
   saveLocal();scheduleCloudSync();renderShots();renderShotTimeline();renderToday();toast('已采纳 '+n+' 个分镜');
 }
-function vdirDirectorApprove(){vdirDirectorAdopt();setTimeout(function(){vdirBatchFilm();},300);}
-function vdirDirectorSkipChar(){window.__vdirDirUrls=[];vdirDirectorApprove();}
-function vdirRefPreview(){var f=$('vdir_ref')&&$('vdir_ref').files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var im=$('vdir_refprev');if(im){im.src=rd.result;im.style.display='block';}window.__vdirRef=rd.result;};rd.readAsDataURL(f);}
-async function vdirGenerateInline(mode,p){
+function vdirDirectorApprove(){AGNES_SCOPE='vdir';vdirDirectorAdopt();setTimeout(function(){vdirBatchFilm();},300);}
+function vdirDirectorSkipChar(){AGNES_SCOPE='vdir';window.__vdirDirUrls=[];vdirDirectorApprove();}
+function vdirRefPreview(){AGNES_SCOPE='vdir';var f=$('vdir_ref')&&$('vdir_ref').files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var im=$('vdir_refprev');if(im){im.src=rd.result;im.style.display='block';}window.__vdirRef=rd.result;};rd.readAsDataURL(f);}
+async function vdirGenerateInline(mode,p){AGNES_SCOPE='vdir';
  if(!p){toast('先写生成内容');return;}
  if(!(await agnesEnsureReady()))return;
  vdirAddMsg('user',p);var inp=$('vdir_input');if(inp)inp.value='';
@@ -754,15 +768,15 @@ async function vdirGenerateInline(mode,p){
  if(mode==='img')return vdirGenImage(p,body);
  return vdirGenVideo(p,body,ref,0);
 }
-function vdirToggleMem(){var m=$('vdirMem');if(!m)return;m.style.display=(m.style.display==='none'||!m.style.display)?'block':'none';if(m.style.display==='block')vdirRenderMem();}
-function vdirRenderMem(){var box=$('vdirMem');if(!box)return;var arr=(D.genLog||[]).slice().reverse();if(!arr.length){box.innerHTML='<div class="mut2">还没有生成记录。每次生成/出错都会自动记到这里，并自动纠错。</div>';return;}
+function vdirToggleMem(){AGNES_SCOPE='vdir';var m=_scEl('Mem');if(!m)return;m.style.display=(m.style.display==='none'||!m.style.display)?'block':'none';if(m.style.display==='block')vdirRenderMem();}
+function vdirRenderMem(){var box=_scEl('Mem');if(!box)return;var arr=(D.genLog||[]).slice().reverse();if(!arr.length){box.innerHTML='<div class="mut2">还没有生成记录。每次生成/出错都会自动记到这里，并自动纠错。</div>';return;}
  box.innerHTML='<div class="mut2" style="margin-bottom:6px">📓 生成记忆（自动纠错日志，最新在上）</div>'+arr.map(function(g){var cls=g.status==='成功'?'ok':(g.status==='生成中'?'':'bad');var modeName={chat:'对话',img:'文生图',video:'文生视频',i2v:'图生视频'}[g.mode]||g.mode;return '<div class="gl"><span class="'+cls+'">['+esc(g.status)+']</span> <b>'+modeName+'</b> · '+esc(g.t)+'<br><span class="mut2">'+esc((g.prompt||'').slice(0,90))+'</span></div>';}).join('');}
 function vdirLogGen(mode,prompt,status){
  if(!D.genLog)D.genLog=[];
  var last=D.genLog[D.genLog.length-1];
  if(last&&last.mode===mode&&last.prompt===prompt&&last.status==='生成中'){last.status=status;last.t=nowStr();}
  else D.genLog.push({t:nowStr(),mode:mode,prompt:prompt,status:status});
- saveLocal();if($('vdirMem')&&$('vdirMem').style.display!=='none')vdirRenderMem();}
+ saveLocal();if(_scEl('Mem')&&_scEl('Mem').style.display!=='none')vdirRenderMem();}
 function nowStr(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
 // (removed: superseded by vdirRefPreview)
 async function vdirGenerate(){vdirSubmit();}
@@ -875,7 +889,7 @@ function vdirBuildSegs(){
   return segs;
 }
 
-async function vdirBatchFilm(){
+async function vdirBatchFilm(){AGNES_SCOPE='vdir';
   if(!(D.shots&&D.shots.length)){toast('先添加分镜脚本');return;}
   if(!(await agnesEnsureReady()))return;
   var segs=vdirBuildSegs();
@@ -889,7 +903,7 @@ function vdirFilmRun(i){
   if(i>=vdirFilm.segs.length){vdirFilmFinish();return;}
   var seg=vdirFilm.segs[i];
   vdirFilmProg(i, '⏳ 生成 '+(seg.no?seg.no+' ':'')+'第 '+seg.part+'/'+seg.total+' 段');
-  vdirGenVideo(seg.prompt, null, window.__vdirRef||null, 0, function(url){
+  vdirGenVideo(seg.prompt, null, _scGet('Ref')||null, 0, function(url){
     if(url){vdirFilm.results[i]=url; vdirFilm.done++;}
     vdirFilmProg(i, url?'✅':'❌');
     vdirFilmRun(i+1);
@@ -974,7 +988,7 @@ function vdirJoinVideos(urls,cb){
 }
 
 function vdirSaveMedia(it){if(!D.vmedia)D.vmedia=[];it.id=uid();D.vmedia.unshift(it);saveLocal();scheduleCloudSync();}
-function vdirGallery(){if(!D)D=defaultD();var box=$('vdirGallery');if(!box)return;var arr=D.vmedia||[];if(!arr.length){box.innerHTML='<div class="mut2">还没有生成记录</div>';return;}
+function vdirGallery(){if(!D)D=defaultD();var box=_scEl('Gallery');if(!box)return;var arr=D.vmedia||[];if(!arr.length){box.innerHTML='<div class="mut2">还没有生成记录</div>';return;}
  box.innerHTML=arr.map(function(it){
    var media;
    if(it.t==='video'){
@@ -1199,6 +1213,103 @@ function renderToday(){var t=todayStr();var items=[];
 try{setInterval(function(){try{renderToday();}catch(e){}},60000);}catch(e){}
 document.addEventListener('visibilitychange',function(){if(!document.hidden)try{renderToday();}catch(e){}});
 
+
+
+// ===== 独立 AI助手板块：与视频面板小林同款媒体引擎（复用纯函数，互不干扰）=====
+function aiMSetMode(m){AGNES_SCOPE='ai';window.__aiMode=m;var box=$('ai_mode');if(box)box.querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-mode')===m);});var inp=$('ai_input');if(inp){if(m==='director')inp.placeholder='描述视频想法，如：动漫风角色宣传片，银发少女在霓虹都市奔跑';else if(m==='img')inp.placeholder='画一只国风猫…';else if(m==='video')inp.placeholder='做个30秒茶饮宣传视频…';else if(m==='chat')inp.placeholder='问AI助手你的待办/记账/选题…（也可让它直接处理数据）';else inp.placeholder='自动判断出图/出视频；或说需求让AI助手处理你的数据';}}
+function aiMAddMsg(role,text,html){var box=$('ai_chat');if(!box)return;var em=box.querySelector('.ai-empty');if(em)em.remove();
+ var d=document.createElement('div');d.className='ai-msg '+(role==='bot'?'bot':'user');
+ var av=document.createElement('div');av.className='av';
+ av.innerHTML=role==='bot'?'<svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z" fill="currentColor"/></svg>':'<svg class="ico" viewBox="0 0 24 24"><path d="M12 12c2.2 0 4-1.8 4-4s-1.8-4-4-4-4 1.8-4 4 1.8 4 4 4zm0 2c-2.7 0-8 1.3-8 4v2h16v-2c0-2.7-5.3-4-8-4z" fill="currentColor"/></svg>';
+ var bub=document.createElement('div');bub.className='bubble';
+ if(role==='bot'){var tag=document.createElement('div');tag.className='ai-tag';tag.textContent='# 小林';bub.appendChild(tag);}
+ var body=document.createElement('div');body.className='ai-body';
+ if(html)body.innerHTML=html;else body.textContent=text;
+ bub.appendChild(body);d.appendChild(av);d.appendChild(bub);box.appendChild(d);box.scrollTop=box.scrollHeight;return d;}
+function aiMSubmit(){AGNES_SCOPE='ai';var m=window.__aiMode||'auto';var inp=$('ai_input');var t=inp?inp.value.trim():'';
+ if(m==='chat'){aiSendFromInput();return;}
+ if(m==='director'){aiMDirectorChat(t);return;}
+ if(m==='img'||m==='video'){if(!t){toast('先写内容');return;}aiMGenerateInline(m,t);return;}
+ if(!t)return;var it=vdirDetectIntent(t);
+ if(it==='chat'){aiSendFromInput();}else aiMGenerateInline(it,t);}
+async function aiMSend(){AGNES_SCOPE='ai';var inp=$('ai_input');if(!inp)return;var m=inp.value.trim();if(!m)return;inp.value='';
+ if(!(await agnesEnsureReady()))return;
+ aiMAddMsg('user',m);var node=aiMAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';var acc='';
+ var ctx='';try{ctx=await agnesSearch(m);}catch(e){ctx='';}
+ var msgs=[{role:'system',content:'你是小林，用户随身的 AI 专家 Agent，不是普通聊天机器人。核心能力：1)深度理解用户真实意图（模糊/口语/错字也能抓，信息不足主动追问）；2)专家级视频创作：脚本/分镜/运镜/提示词工程，生图给 agnes-image-2.1-flash 提示词，生视频给 agnes-video-v2.0 参数（约121帧/24fps）；3)桌面 EXE 应用专家：WebView2/Tauri/Electron/原生C#C++ 选型与打包、CORS/离线/签名/SmartScreen/高DPI/托盘自启等坑，也懂 Android APK 与 PWA；4)联网搜索：基于平台给的网页摘要作答并标注来源；5)可执行输出：步骤清单、可复制代码块。你同时是视频导演与桌面应用架构师。'}];
+ if(ctx)msgs.push({role:'system',content:ctx});
+ msgs.push({role:'user',content:m});
+ vdirChatSend(msgs,function(d){acc+=d;if(body)body.textContent=acc;var b=$('ai_chat');if(b)b.scrollTop=b.scrollHeight;},
+  function(full){window.__aiLast=full;if(!body)return;var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="aiMGenerateInline(\'img\',window.__aiLast)">🖼️ 生成图片</button> <button class="btn xs" onclick="aiMUseAsPrompt()">🎬 生成视频</button> <button class="btn xs" onclick="aiMApplyPromptText()">存为提示词</button>';body.parentNode.appendChild(act);var b=$('ai_chat');if(b)b.scrollTop=b.scrollHeight;}).catch(function(e){if(body)body.textContent='出错了：'+(e.message||e);});}
+async function aiMPlan(idea){if(idea===undefined){var inp=$('ai_input');idea=inp?inp.value.trim():'';}if(!idea){toast('先输入视频主题');return;}
+ if(!(await agnesEnsureReady()))return;
+ aiMAddMsg('user','主题：'+idea);var node=aiMAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';var acc='';
+ vdirChatSend([{role:'system',content:'你是视频创作助手。为视频主题输出结构化方案：1)一句话创意 2)分镜列表（镜号、画面描述、秒数）3)图片提示词（agnes-image-2.1-flash）4)视频提示词（agnes-video-v2.0）5)建议模型。'},{role:'user',content:'主题：'+idea}],
+  function(d){acc+=d;if(body)body.textContent=acc;var b=$('ai_chat');if(b)b.scrollTop=b.scrollHeight;},
+  function(full){window.__aiPlan=full;if(!body)return;var act=document.createElement('div');act.className='ai-actions';act.innerHTML='<button class="btn xs" onclick="aiMApplyShots()">拆为分镜</button> <button class="btn xs" onclick="aiMApplyPrompt()">存为提示词</button> <button class="btn xs" onclick="aiMUsePlanGen()">生成示例视频</button>';body.parentNode.appendChild(act);var b=$('ai_chat');if(b)b.scrollTop=b.scrollHeight;}).catch(function(e){if(body)body.textContent='出错了：'+(e.message||e);});}
+function aiMApplyShots(){if(!window.__aiPlan){toast('先生成方案');return;}
+ var lines=window.__aiPlan.split(/\n+/).map(function(x){return x.trim();}).filter(function(x){return x.length>0;});
+ var picked=lines.filter(function(x){return /^\d+[.、]/.test(x)||/^[Ss]\d/.test(x)||/镜\s*\d/.test(x);});
+ if(!picked.length)picked=lines;var n=0;
+ picked.slice(0,20).forEach(function(ln){D.shots.push({id:uid(),pj:'',no:'',de:ln.replace(/^\d+[.、]\s*/,''),du:0,dd:'',st:'待拍摄',ct:todayStr()});n++;});
+ saveLocal();scheduleCloudSync();renderShots();renderShotTimeline();renderToday();toast('已拆入 '+n+' 个分镜');}
+function aiMApplyPrompt(){if(!window.__aiPlan){toast('先生成方案');return;}D.prompts.push({id:uid(),n:'视频方案 '+todayStr(),m:AGNES_MODEL.img,s:4,x:window.__aiPlan,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
+function aiMUseAsPrompt(){if(!window.__aiLast){toast('先和AI聊一下');return;}aiMGenerateInline('video',window.__aiLast);}
+function aiMApplyPromptText(){if(!window.__aiLast){toast('先聊一下');return;}D.prompts.push({id:uid(),n:'视频方案 '+todayStr(),m:AGNES_MODEL.chat,s:4,x:window.__aiLast,ct:todayStr()});saveLocal();scheduleCloudSync();renderPrompts();toast('已存为提示词');}
+function aiMUsePlanGen(){if(!window.__aiPlan){toast('先生成方案');return;}aiMGenerateInline('video',window.__aiPlan);}
+async function aiMDirectorChat(idea){AGNES_SCOPE='ai';if(!idea){var inp=$('ai_input');idea=inp?inp.value.trim():'';}
+ if(!idea){toast('先说一个视频想法');return;}
+ if(!(await agnesEnsureReady()))return;
+ aiMAddMsg('user',idea);var inp=$('ai_input');if(inp)inp.value='';
+ var node=aiMAddMsg('bot','');var body=node.querySelector('.ai-body');if(body)body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';
+ var sys={role:'system',content:'你是专业 AI 视频导演（也是助手小林）。请基于用户的一个视频想法，输出结构化创作方案。严格按以下格式（不要多余解释，不要 markdown 代码块）：\n【创意】一句话核心创意\n【角色】是否需要固定角色。若需要，用一段文字描述角色（外貌、服饰、性格、典型场景），用于生成人物三视图；若不需要，只写“无”。\n【分镜】\n1. 画面描述 | 秒数\n2. 画面描述 | 秒数\n（每条一行，镜号+描述+竖线+秒数）'};
+ vdirChatSend([sys,{role:'user',content:idea}],null,function(full){aiMRenderDirPlan(full||'',node);});}
+function aiMRenderDirPlan(full,node){AGNES_SCOPE='ai';var concept='',char='',shots=[],mode=null;
+ full.split(/\n+/).forEach(function(l){l=l.trim();
+  if(l.indexOf('【创意】')>=0)concept=l.replace('【创意】','').replace(/^创意】/,'').trim();
+  else if(l.indexOf('【角色】')>=0){char=l.replace('【角色】','').replace(/^角色】/,'').trim();mode=null;}
+  else if(l.indexOf('【分镜】')>=0){mode='shot';}
+  else if(mode==='shot'){var mm=l.match(/^(\d+)[.、)]\s*(.+?)(?:\s*\|\s*(\d+)\s*秒?)?$/);if(mm)shots.push({de:mm[2].trim(),du:parseInt(mm[3]||'5',10)});else if(/^\d+/.test(l))shots.push({de:l.replace(/^\d+[.、)]\s*/,'').trim(),du:5});}
+ });
+ var hasChar=char&&!/无|不需要|否|none|no/i.test(char);
+ var h='<div class="mut2" style="margin-bottom:4px"><b>💡 创意：</b>'+esc(concept||'(未识别)')+'</div>';
+ if(hasChar){window.__aiDirPlanChar=char;h+='<div class="mut2" style="margin-bottom:4px"><b>🧍 角色：</b>'+esc(char)+'</div>';if(window.__aiRef)h+='<div class="mut2" style="color:#3aa655">已使用参考图，将用于视频一致性</div>';else h+='<div class="ai-actions"><button class="btn pri xs" onclick="aiMGenCharSheet()">🎨 生成人物三视图</button><span class="mut2" style="font-size:12px">AI 当顾问，先出三视图你确认</span></div>';}
+ else{h+='<div class="mut2">本方案无需固定角色，可直接生成</div>';}
+ if(shots.length)h+='<div class="mut2" style="margin-top:6px"><b>🎞 分镜（'+shots.length+'）：</b></div><div class="mut2">'+shots.map(function(s,i){return (i+1)+'. '+esc(s.de)+' ('+s.du+'s)';}).join('<br>')+'</div>';
+ h+='<div class="ai-actions" style="margin-top:8px"><button class="btn pri xs" onclick="aiMDirectorApprove()">✅ 采纳分镜并生成视频</button></div>';
+ if(node){var body=node.querySelector('.ai-body');if(body)body.innerHTML=h;var b=$('ai_chat');if(b)b.scrollTop=b.scrollHeight;}
+ window.__aiDirPlan={concept:concept,char:hasChar?char:'',shots:shots};}
+async function aiMGenCharSheet(){AGNES_SCOPE='ai';var char=window.__aiDirPlanChar||'';if(!char){toast('先构思方案');return;}
+ if(!(await agnesEnsureReady()))return;
+ var node=aiMAddMsg('bot','');var body=node.querySelector('.ai-body');if(body)body.innerHTML='<div class="mut2">🎨 正在生成人物三视图（正面/侧面/背面）…</div>';
+ var views=[['正面','front full body facing camera'],['侧面','side profile'],['背面','back view']];
+ var urls=[];
+ for(var i=0;i<views.length;i++){try{var u=await vdirGenImgURL(char+'，'+views[i][1]+'，角色设计三视图，纯白背景，全身清晰，动漫风格，无文字');urls.push(u);}catch(e){urls.push('');}}
+ var ok=urls.filter(Boolean);
+ var h='<div class="mut2" style="margin-bottom:6px">🎨 人物三视图（AI 建议，确认后用于视频一致性）</div><div style="display:flex;gap:8px;flex-wrap:wrap">';
+ ok.forEach(function(u){h+='<img src="'+esc(u)+'" style="width:90px;height:120px;object-fit:cover;border-radius:8px;border:1px solid var(--line)">';});
+ h+='</div><div class="ai-actions" style="margin-top:10px"><button class="btn pri xs" onclick="aiMDirectorApprove()">✅ 同意，开始生成视频</button><button class="btn ghost xs" onclick="aiMDirectorSkipChar()">不用三视图，直接生成</button></div>';
+ if(body)body.innerHTML=h;var b=$('ai_chat');if(b)b.scrollTop=b.scrollHeight;
+ window.__aiDirUrls=ok;if(ok.length)window.__aiRef=ok[0];}
+function aiMDirectorAdopt(){if(!window.__aiDirPlan||!window.__aiDirPlan.shots.length){toast('先构思方案');return;}
+ var n=0;window.__aiDirPlan.shots.forEach(function(s){D.shots.push({id:uid(),pj:'',no:'',de:s.de,du:s.du||0,dd:'',st:'待拍摄',ct:todayStr()});n++;});
+ saveLocal();scheduleCloudSync();renderShots();renderShotTimeline();renderToday();toast('已采纳 '+n+' 个分镜');}
+async function aiMDirectorApprove(){AGNES_SCOPE='ai';if(!(await agnesEnsureReady()))return;if(!window.__aiDirPlan||!window.__aiDirPlan.shots.length){toast('先构思方案');return;}
+ var shots=window.__aiDirPlan.shots;var ref=window.__aiRef||null;var char=window.__aiDirPlan.char||'';
+ aiMAddMsg('bot','🎬 开始按分镜生成视频（共 '+shots.length+' 段，保持角色/风格一致）…');
+ shots.forEach(function(s){AGNES_SCOPE='ai';vdirGenVideo((s.de||'')+'。'+(char?('角色设定：'+char+'。'):'')+'电影级质感，风格统一，色调一致',null,ref,0);});
+ toast('已提交 '+shots.length+' 段视频生成');}
+function aiMDirectorSkipChar(){window.__aiDirUrls=[];aiMDirectorApprove();}
+function aiMRefPreview(){AGNES_SCOPE='ai';var f=$('ai_ref')&&$('ai_ref').files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){var im=$('ai_refprev');if(im){im.src=rd.result;im.style.display='block';}window.__aiRef=rd.result;};rd.readAsDataURL(f);}
+async function aiMGenerateInline(mode,p){AGNES_SCOPE='ai';if(!p){toast('先写生成内容');return;}
+ if(!(await agnesEnsureReady()))return;
+ aiMAddMsg('user',p);var inp=$('ai_input');if(inp)inp.value='';
+ var node=aiMAddMsg('bot','');var body=node.querySelector('.ai-body');body.innerHTML='<div class="ai-typing"><span></span><span></span><span></span></div>';
+ var ref=(mode==='i2v')?(window.__aiRef||null):null;
+ if(mode==='i2v'&&!ref){body.innerHTML='<div class="mut2" style="color:#c0392b">图生视频请先在上方「参考图」处上传图片（用于人物/场景一致性），再发送</div>';return;}
+ vdirLogGen(mode,p,'生成中');
+ if(mode==='img')return vdirGenImage(p,body);
+ return vdirGenVideo(p,body,ref,0);}
 // ===== AI ASSISTANT =====
 function aiKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();aiSendFromInput();}}
 function aiAutoResize(el){el.style.height='auto';el.style.height=Math.min(140,el.scrollHeight)+'px';}
@@ -2145,7 +2256,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260813c';
+var APP_VER='20260813d';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
