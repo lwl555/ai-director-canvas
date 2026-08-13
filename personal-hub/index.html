@@ -889,6 +889,25 @@ function vdirBuildSegs(){
   return segs;
 }
 
+async function vdirFilmGenImage(prompt){
+  var imgExtra={response_format:'b64_json'};
+  if(GEN_PARAMS.seed)imgExtra.seed=Number(GEN_PARAMS.seed);
+  if(GEN_PARAMS.negative)imgExtra.negative_prompt=GEN_PARAMS.negative;
+  var url,hdr,body;
+  if(agnesProxyOk){
+    url=AGNES_PROXY;hdr={'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'};
+    body=JSON.stringify({route:'image',model:AGNES_MODEL.img,prompt:prompt,size:'1K',ratio:GEN_PARAMS.ratio||'16:9',extra_body:imgExtra});
+  }else{
+    url=AGNES_BASE+'/images/generations';hdr={'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()};
+    body=JSON.stringify({model:AGNES_MODEL.img,prompt:prompt,size:'1K',ratio:GEN_PARAMS.ratio||'16:9',extra_body:imgExtra});
+  }
+  var r=await fetch(url,{method:'POST',headers:hdr,body:body});
+  var j=await r.json();
+  if(!r.ok)throw new Error((j.error&&(j.error.message||j.error.msg))||('HTTP '+r.status));
+  var b64=(j.data&&j.data[0]&&j.data[0].b64_json)||'';
+  if(!b64)throw new Error('未返回图片');
+  return 'data:image/png;base64,'+b64;
+}
 async function vdirBatchFilm(){AGNES_SCOPE='vdir';
   if(!(D.shots&&D.shots.length)){toast('先添加分镜脚本');return;}
   if(!(await agnesEnsureReady()))return;
@@ -899,11 +918,16 @@ async function vdirBatchFilm(){AGNES_SCOPE='vdir';
   vdirFilmRun(0);
 }
 
-function vdirFilmRun(i){
+async function vdirFilmRun(i){
   if(i>=vdirFilm.segs.length){vdirFilmFinish();return;}
   var seg=vdirFilm.segs[i];
-  vdirFilmProg(i, '⏳ 生成 '+(seg.no?seg.no+' ':'')+'第 '+seg.part+'/'+seg.total+' 段');
-  vdirGenVideo(seg.prompt, null, _scGet('Ref')||null, 0, function(url){
+  vdirFilmProg(i, '⏳ 文字→图片 '+(seg.no?seg.no+' ':'')+'第 '+seg.part+'/'+seg.total+' 段');
+  var imgData=null;
+  try{ imgData=await vdirFilmGenImage(seg.prompt); }catch(e){}
+  if(!imgData){vdirFilmProg(i,'⚠️ 出图失败→纯文字生成');}
+  vdirFilmProg(i, '⏳ 图片→视频');
+  var ref=imgData||(_scGet('Ref')||null);
+  vdirGenVideo(seg.prompt, null, ref, 0, function(url){
     if(url){vdirFilm.results[i]=url; vdirFilm.done++;}
     vdirFilmProg(i, url?'✅':'❌');
     vdirFilmRun(i+1);
@@ -2035,7 +2059,7 @@ function doubaoSetKey(v){try{localStorage.setItem('wb_personal_hub_doubao_key',(
 function doubaoGet(k){try{return localStorage.getItem('wb_personal_hub_doubao_'+k)||'';}catch(e){return '';}}
 function doubaoSet(k,v){try{localStorage.setItem('wb_personal_hub_doubao_'+k,(v==null?'':v));}catch(e){}}
 function saveDoubaoKey(){var el=$('db_key');if(!el)return;var v=el.value.trim();doubaoSetKey(v);var h=$('dbKeyHint');if(h){h.style.color='#3aa655';h.textContent=v?'已保存':'已清除';}toast(v?'豆包 Key 已保存':'已清除');}
-function dbGen(){
+async function dbGen(){
   var key=doubaoKey();var out=$('db_out');
   if(!key){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请先在上方填写并保存豆包 Key</div>';return;}
   var prompt=$('db_prompt')?$('db_prompt').value.trim():'';
@@ -2049,29 +2073,31 @@ function dbGen(){
   var szEl=$('db_size');if(szEl)doubaoSet('size',szEl.value);
   var nEl=$('db_n');if(nEl)doubaoSet('n',nEl.value);
   if(!model){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请先填写推理接入点 ID（ep-xxxx），在火山引擎 Ark 控制台从 Seedream 图像模型新建接入点获得</div>';return;}
-  if(out)out.innerHTML='<div class="mut2">生成中…（豆包云端出图通常 10–40 秒）</div>';
-  var body=JSON.stringify({model:model,prompt:prompt,width:w,height:h,n:n});
-  fetch('https://ark.cn-beijing.volces.com/api/v3/images/generations',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-    body:body
-  }).then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
-  .then(function(res){
-    if(!res.ok){var msg=(res.j&&res.j.error&&res.j.error.message)||JSON.stringify(res.j);if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">生成失败：'+esc(msg)+'</div>';return;}
-    var arr=(res.j&&res.j.data)||(res.j&&res.j.choices)||[];
-    var urls=arr.map(function(it){return it.url||(it.b64_json?'data:image/png;base64,'+it.b64_json:null);}).filter(Boolean);
-    if(!urls.length){if(out)out.innerHTML='<div class="mut2">未返回图片，原始：'+esc(JSON.stringify(res.j).slice(0,200))+'</div>';return;}
-    D.doubao=D.doubao||[];
-    urls.forEach(function(u){D.doubao.unshift({id:'d'+Date.now()+Math.random().toString(36).slice(2,5),url:u,prompt:prompt,t:Date.now()});});
+  D.doubao=D.doubao||[];
+  if(out)out.innerHTML='<div class="mut2">生成中…（共 '+n+' 张，逐张生成，约 '+(n*20)+' 秒）</div>';
+  var ok=0,fail=0;
+  for(var i=0;i<n;i++){
+    try{
+      var body=JSON.stringify({model:model,prompt:prompt,width:w,height:h,n:1});
+      var res=await fetch('https://ark.cn-beijing.volces.com/api/v3/images/generations',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+        body:body
+      }).then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});});
+      if(!res.ok){var m2=(res.j&&res.j.error&&res.j.error.message)||JSON.stringify(res.j);fail++;if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">第'+(i+1)+'张失败：'+esc(m2).slice(0,120)+'</div>';}
+      else{
+        var arr=(res.j&&res.j.data)||(res.j&&res.j.choices)||[];
+        var urls=arr.map(function(it){return it.url||(it.b64_json?'data:image/png;base64,'+it.b64_json:null);}).filter(Boolean);
+        urls.forEach(function(u){D.doubao.unshift({id:'d'+Date.now()+Math.random().toString(36).slice(2,5),url:u,prompt:prompt,t:Date.now()});});
+        ok+=urls.length;
+      }
+    }catch(e){fail++;var m=e.message||'';if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">第'+(i+1)+'张出错：'+(m.indexOf('Failed to fetch')>=0||m.indexOf('CORS')>=0?'网络/CORS 被拦截，请检查网络或 Key/接入点':esc(m).slice(0,120))+'</div>';}
     saveLocal();renderDoubaoGallery();
-    if(out)out.innerHTML='<div class="mut2" style="color:#3aa655">生成完成 ✓ 共 '+urls.length+' 张</div>';
-    toast('豆包图片生成完成');
-  }).catch(function(e){
-    var m=e.message||'';
-    if(m.indexOf('Failed to fetch')>=0||m.indexOf('NetworkError')>=0||m.indexOf('CORS')>=0){
-      if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">网络/CORS 被拦截：请检查当前网络（企业防火墙可能拦截），或确认 Key 与接入点 ID 有效。</div>';
-    }else if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请求出错：'+esc(m)+'</div>';
-  });
+    if(out)out.innerHTML='<div class="mut2">已生成 '+ok+'/'+n+' 张…</div>';
+  }
+  saveLocal();renderDoubaoGallery();
+  if(out)out.innerHTML='<div class="mut2" style="color:#3aa655">生成完成 ✓ 共 '+ok+' 张'+(fail?'（'+fail+' 张失败）':'')+'</div>';
+  toast('豆包图片生成完成'+(ok?'':'：全部失败'));
 }
 function renderDoubaoGallery(){
   var g=$('dbGallery');if(!g)return;
@@ -2079,10 +2105,27 @@ function renderDoubaoGallery(){
   var c=$('dbCnt');if(c)c.textContent=D.doubao.length+' 张';
   if(!D.doubao.length){g.innerHTML='<div class="mut2">还没有生成的图片</div>';return;}
   g.innerHTML=D.doubao.slice(0,60).map(function(x){
-    return '<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff"><img src="'+esc(x.url)+'" alt="" loading="lazy" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block"><div style="padding:6px;font-size:12px;color:#555">'+esc((x.prompt||'').slice(0,40))+'</div><button class="btn xs ghost" style="width:100%" onclick="dbDel(\''+x.id+'\')">删除</button></div>';
+    var u=JSON.stringify(x.url);
+    return '<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff"><img src="'+esc(x.url)+'" alt="" loading="lazy" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;cursor:zoom-in" onclick="showLightbox('+u+')"><div style="padding:6px;font-size:12px;color:#555">'+esc((x.prompt||'').slice(0,40))+'</div><div style="display:flex;gap:6px;padding:0 6px 6px"><button class="btn xs ghost" style="flex:1" onclick="downloadImg('+u+')">⤓ 下载</button><button class="btn xs ghost" style="flex:1" onclick="dbDel(\''+x.id+'\')">删除</button></div></div>';
   }).join('');
 }
 function dbDel(id){D.doubao=(D.doubao||[]).filter(function(x){return x.id!==id;});saveLocal();renderDoubaoGallery();}
+function showLightbox(url){
+  if(!$('imgLightbox')){
+    var d=document.createElement('div');d.id='imgLightbox';d.className='mask';
+    d.setAttribute('onclick','if(event.target===this)hideLightbox()');
+    d.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px"><img id="lbImg" src="" style="max-width:94vw;max-height:78vh;border-radius:12px;object-fit:contain;box-shadow:0 8px 30px rgba(0,0,0,.45)"><div style="display:flex;gap:10px"><button class="btn pri" onclick="downloadImg(window.__lbUrl)">⤓ 下载图片</button><button class="btn" onclick="hideLightbox()">关闭</button></div></div>';
+    document.body.appendChild(d);
+  }
+  $('imgLightbox').style.display='flex';$('lbImg').src=url;window.__lbUrl=url;
+}
+function hideLightbox(){$('imgLightbox').style.display='none';}
+async function downloadImg(url){
+  try{
+    if(url.indexOf('data:')===0){var a=document.createElement('a');a.href=url;a.download='personal_hub_'+Date.now()+'.png';a.click();return;}
+    var r=await fetch(url);var b=await r.blob();var a2=document.createElement('a');a2.href=URL.createObjectURL(b);a2.download='personal_hub_'+Date.now()+'.png';a2.click();setTimeout(function(){URL.revokeObjectURL(a2.href);},2000);
+  }catch(e){window.open(url,'_blank');}
+}
 // 提示词优化：优先用 agnes 模型，失败回退本地增强
 function dbChatText(j){if(!j)return '';if(j.choices&&j.choices[0]){var c=j.choices[0];if(c.message&&c.message.content)return c.message.content;if(c.content)return c.content;if(c.text)return c.text;}if(j.content)return j.content;if(j.output)return typeof j.output==='string'?j.output:JSON.stringify(j.output);return '';}
 async function dbCallChat(messages){
@@ -2097,7 +2140,7 @@ async function dbCallChat(messages){
   throw new Error('no-ai');
 }
 function dbLocalEnhance(raw,ta,hint){
-  var t=raw+'，电影级质感，8K 超高清，细节丰富，自然光影，氛围感强，构图平衡，主体突出，专业摄影，风格统一，色彩细腻';
+  var t=raw+'，电影级质感，8K 超高清，极致细节，自然光影，氛围感强，构图平衡，主体突出，专业摄影，风格统一，色彩细腻，大师级作品，锐利对焦，丰富层次，体积光，胶片感';
   ta.value=t;doubaoSet('prompt',t);
   if(hint){hint.style.color='#b8860b';hint.textContent='已本地增强（未联网 AI）';}
   toast('已本地增强提示词');
@@ -2107,7 +2150,7 @@ async function dbOptimizePrompt(){
   if(!raw){toast('先写点画面描述再优化');return;}
   var btn=$('dbOptBtn'),hint=$('dbOptHint');
   if(btn)btn.disabled=true;if(hint){hint.style.color='';hint.textContent='优化中…';}
-  var sys={role:'system',content:'你是顶尖的中文 AI 绘画提示词优化师。用户给出一句简短画面描述，请扩写成一段详细、富有电影感与画面张力、适合 Seedream/即梦/Midjourney 等文生图模型的提示词。必须包含：主体与特征、环境场景、光线氛围、构图、风格流派、画质词（如 8K、高清、细节丰富、电影级质感）。用中文输出，可穿插英文画质标签，不要解释、不要序号，直接给优化后的提示词本身。'};
+  var sys={role:'system',content:'你是顶尖的中英文 AI 绘画提示词架构师，擅长把一句话画面描述扩写成专业级文生图提示词。用户给出简短描述，请输出【一段】高质量提示词（不要解释、不要序号、不要代码块），要求：\n1) 主体与特征具体化（外貌、服饰、姿态、表情、动作、材质）；\n2) 环境场景细节化（地点、季节、天气、时间、背景元素、氛围物）；\n3) 光影与情绪（主光方向、光质、色彩情绪、空气感、体积光）；\n4) 构图与镜头（景别、视角、景深、运镜感、留白）；\n5) 风格流派明确（如电影感/动漫/写实/水彩/赛博朋克/国风，并指明画风参考）；\n6) 画质词（8K、超清、极致细节、电影级质感、锐利、大师作品）。\n中文为主，可穿插英文画质/风格标签（如 cinematic, ultra-detailed, masterpiece, volumetric lighting）。若用户描述已含风格或主体，则保留并强化，不得篡改主体意图。'};
   try{
     var t=await dbCallChat([sys,{role:'user',content:raw}]);
     if(t&&t.trim()){ta.value=t.trim();doubaoSet('prompt',t.trim());if(hint){hint.style.color='#3aa655';hint.textContent='已优化 ✓';}toast('提示词已优化');}
