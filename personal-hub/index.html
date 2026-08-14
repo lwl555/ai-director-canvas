@@ -585,21 +585,21 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
   <div class="form" style="margin:8px 0">
     <select id="db_size" class="f1" style="min-height:38px" onchange="dbSizeSelChange('t2i')">
       <option value="orig">📐 按参考图比例（自动）</option>
-      <option value="1024x1024" selected>1024×1024（方）</option>
-      <option value="1024x768">1024×768（横）</option>
-      <option value="768x1024">768×1024（竖）</option>
-      <option value="1280x720">1280×720（横）</option>
-      <option value="720x1280">720×1280（竖）</option>
-      <option value="1536x1024">1536×1024（横大）</option>
-      <option value="1024x1536">1024×1536（竖大）</option>
+      <option value="2048x2048" selected>2048×2048（1:1 方）</option>
+      <option value="2816x1584">2816×1584（16:9 横）</option>
+      <option value="1584x2816">1584×2816（9:16 竖）</option>
+      <option value="2368x1776">2368×1776（4:3 横）</option>
+      <option value="1776x2368">1776×2368（3:4 竖）</option>
+      <option value="2496x1664">2496×1664（3:2 横）</option>
+      <option value="1664x2496">1664×2496（2:3 竖）</option>
       <option value="custom">自定义宽高…</option>
     </select>
     <select id="db_n" class="f1" style="min-height:38px">
       <option value="1">1 张</option><option value="2">2 张</option><option value="3">3 张</option><option value="4">4 张</option>
     </select>
   </div>
-  <div id="db_t2i_ratio_wrap" style="display:none;margin:6px 0"><input type="file" id="db_t2i_ratioref" accept="image/*" style="min-height:38px;width:100%"><div class="mut2" style="font-size:12px">选一张图作为比例参考（生成图会按它的宽高比输出；留空则默认 1024×1024）</div></div>
-  <div id="db_t2i_custom_wrap" class="form" style="display:none;margin:6px 0"><input id="db_cw" type="number" class="f1" placeholder="宽 512-2048" min="512" max="2048" style="min-height:38px"><input id="db_ch" type="number" class="f1" placeholder="高 512-2048" min="512" max="2048" style="min-height:38px"></div>
+  <div id="db_t2i_ratio_wrap" style="display:none;margin:6px 0"><input type="file" id="db_t2i_ratioref" accept="image/*" style="min-height:38px;width:100%"><div class="mut2" style="font-size:12px">选一张图作为比例参考（生成图会按它的宽高比输出；留空则默认 2048×2048）</div></div>
+  <div id="db_t2i_custom_wrap" class="form" style="display:none;margin:6px 0"><input id="db_cw" type="number" class="f1" placeholder="宽 1-4096" min="1" max="4096" style="min-height:38px"><input id="db_ch" type="number" class="f1" placeholder="高 1-4096" min="1" max="4096" style="min-height:38px"></div>
   <div id="db_size_hint" class="mut2" style="font-size:12px;margin-bottom:6px"></div>
   <div class="form" style="margin-bottom:4px">
     <input id="db_model" class="f1" placeholder="推理接入点 ID（ep-xxxx），在火山引擎控制台创建" style="min-height:38px" onchange="saveDoubaoEp()">
@@ -617,11 +617,11 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
   <textarea id="db_i2i_prompt" class="f1" rows="3" placeholder="写你要怎么改这张图，如：把背景换成海边、保留人物" style="min-height:64px;font-size:16px"></textarea>
   <div class="form" style="margin:8px 0"><button class="btn ghost sm" onclick="dbOptimizePrompt('db_i2i_prompt')" id="dbI2iOptBtn">✨ 优化提示词</button><span id="dbI2iOptHint" class="mut2" style="font-size:12px"></span></div>
   <div class="form" style="margin:8px 0">
-    <select id="db_i2i_size" class="f1" style="min-height:38px" onchange="dbSizeSelChange('i2i')"><option value="orig">📐 按参考图比例（自动）</option><option value="1024x1024" selected>1024×1024</option><option value="1024x768">1024×768</option><option value="768x1024">768×1024</option><option value="1280x720">1280×720</option><option value="720x1280">720×1280</option><option value="custom">自定义宽高…</option></select>
+    <select id="db_i2i_size" class="f1" style="min-height:38px" onchange="dbSizeSelChange('i2i')"><option value="orig">📐 按参考图比例（自动）</option><option value="2048x2048" selected>2048×2048</option><option value="2816x1584">2816×1584（16:9）</option><option value="1584x2816">1584×2816（9:16）</option><option value="2368x1776">2368×1776（4:3）</option><option value="1776x2368">1776×2368（3:4）</option><option value="2496x1664">2496×1664（3:2）</option><option value="1664x2496">1664×2496（2:3）</option><option value="custom">自定义宽高…</option></select>
     <select id="db_i2i_n" class="f1" style="min-height:38px"><option value="1">1 张</option><option value="2">2 张</option><option value="3">3 张</option><option value="4">4 张</option></select>
     <label style="display:flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap"><input type="checkbox" id="db_i2i_chain" onchange="dbI2iChainToggle()"> 以最近生成的图为底图</label>
   </div>
-  <div id="db_i2i_custom_wrap" class="form" style="display:none;margin:6px 0"><input id="db_i2i_cw" type="number" class="f1" placeholder="宽 512-2048" min="512" max="2048" style="min-height:38px"><input id="db_i2i_ch" type="number" class="f1" placeholder="高 512-2048" min="512" max="2048" style="min-height:38px"></div>
+  <div id="db_i2i_custom_wrap" class="form" style="display:none;margin:6px 0"><input id="db_i2i_cw" type="number" class="f1" placeholder="宽 1-4096" min="1" max="4096" style="min-height:38px"><input id="db_i2i_ch" type="number" class="f1" placeholder="高 1-4096" min="1" max="4096" style="min-height:38px"></div>
   <div id="db_i2i_size_hint" class="mut2" style="font-size:12px;margin:6px 0"></div>
   <button class="btn pri" onclick="dbGenImg2ImgUI()">🎨 图生图（改图）</button>
   <div id="db_i2i_out" class="mut2" style="margin-top:8px"></div>
@@ -2301,20 +2301,34 @@ async function dbGen(){
   toast('豆包图片生成完成'+(r.urls.length?'':'：全部失败'));
 }
 // ===== 尺寸/比例解析（文生图 + 图生图通用）=====
+// Seedream 像素模式硬约束：总像素 [3686400, 16777216]，每边 ≤4096，宽高比 [1/16,16]
 function dbClampDims(w,h){
   w=Math.round(Number(w)||1024); h=Math.round(Number(h)||1024);
-  if(w<1)w=1024; if(h<1)h=1024;
-  var MAX=2048, MIN=512, scale=1;
-  scale=Math.min(scale, MAX/w, MAX/h);                 // 缩到不超上限，保持比例
-  var up=Math.max(MIN/w, MIN/h);                       // 需要放大到不低于下限
-  if(up>1 && w*up<=MAX && h*up<=MAX) scale=up;         // 仅当放大后仍不超上限才放大
-  w=Math.round(w*scale); h=Math.round(h*scale);
-  w=Math.max(MIN,Math.min(MAX,w)); h=Math.max(MIN,Math.min(MAX,h));
+  if(!(w>0))w=1024; if(!(h>0))h=1024;
+  var MINP=3686400, MAXP=16777216, MAXS=4096;
+  if(w>MAXS)w=MAXS; if(h>MAXS)h=MAXS;
+  var r=w/h;
+  if(r>16){w=Math.round(h*16);r=w/h;}
+  if(r<1/16){h=Math.round(w*16);r=w/h;}
+  if(w*h<MINP){                                   // 整体按比例放大到满足最小像素
+    var s=Math.sqrt(MINP/(w*h));
+    w=Math.round(w*s); h=Math.round(h*s);
+    if(w>MAXS||h>MAXS){var m=Math.max(w,h);var k=MAXS/m;w=Math.round(w*k);h=Math.round(h*k);}
+  }
+  if(w*h>MAXP){                                   // 整体按比例缩到不超过最大像素
+    var s2=Math.sqrt((w*h)/MAXP);
+    w=Math.round(w/s2); h=Math.round(h/s2);
+  }
+  if(w<1)w=1; if(h<1)h=1;
+  if(w*h<MINP){                                   // 极端比例兜底（API 可能仍拒，属物理限制）
+    var rr=w/h;
+    if(w>=h){w=MAXS;h=Math.round(w/rr);} else {h=MAXS;w=Math.round(h*rr);}
+  }
   return w+'x'+h;
 }
 function dbGetImgDims(src){return new Promise(function(res){var im=new Image();im.onload=function(){res({w:im.naturalWidth||1024,h:im.naturalHeight||1024});};im.onerror=function(){res(null);};im.src=src;});}
 async function dbResolveSizeCore(val,refDataUrl,cw,ch){
-  if(val==='orig'){if(refDataUrl){var d=await dbGetImgDims(refDataUrl);if(d)return dbClampDims(d.w,d.h);}return '1024x1024';}
+  if(val==='orig'){if(refDataUrl){var d=await dbGetImgDims(refDataUrl);if(d)return dbClampDims(d.w,d.h);}return '2048x2048';}
   if(val==='custom'){return dbClampDims(parseInt(cw)||1024,parseInt(ch)||1024);}
   return val;
 }
@@ -2327,8 +2341,8 @@ function dbSizeSelChange(prefix){
   if(ratioWrap)ratioWrap.style.display=val==='orig'?'block':'none';
   if(customWrap)customWrap.style.display=val==='custom'?'block':'none';
   if(hint){
-    if(val==='orig')hint.textContent=prefix==='t2i'?'已在上方出现「比例参考图」入口：选一张图，生成图会按它的宽高比输出（不选则默认 1024×1024）。':'将按你上传的参考图（或勾选「以最近生成的图为底图」时的那张）的宽高比生成。';
-    else if(val==='custom')hint.textContent='宽度/高度范围 512–2048，自动取整。';
+    if(val==='orig')hint.textContent=prefix==='t2i'?'在上方可上传「比例参考图」：生成图会按它的真实宽高比输出（不选则默认 2048×2048）。':'将按你上传的参考图（或勾选「以最近生成的图为底图」时的那张）的真实宽高比生成。';
+    else if(val==='custom')hint.textContent='宽度/高度范围 1–4096；总像素需 ≥ 368 万（约 1920×1920），会自动取整并钳制。';
     else hint.textContent='';
   }
 }
@@ -2472,13 +2486,14 @@ async function downloadImg(url){
 }
 // 提示词优化：优先用 agnes 模型，失败回退本地增强
 function dbChatText(j){if(!j)return '';if(j.choices&&j.choices[0]){var c=j.choices[0];if(c.message&&c.message.content)return c.message.content;if(c.content)return c.content;if(c.text)return c.text;}if(j.content)return j.content;if(j.output)return typeof j.output==='string'?j.output:JSON.stringify(j.output);return '';}
-async function dbCallChat(messages){
+async function dbCallChat(messages,temperature){
+  var T=(typeof temperature==='number'?temperature:(CHAT_PARAMS.temperature||0.8));
   if(typeof agnesCheckProxy==='function'){try{await agnesCheckProxy();}catch(e){}}
   if(agnesProxyOk){
-    var r=await fetch(AGNES_PROXY,{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({route:'chat',model:AGNES_MODEL.chat,messages:messages,stream:false,temperature:(CHAT_PARAMS.temperature||0.8),max_tokens:(CHAT_PARAMS.max_tokens||1024)})});
+    var r=await fetch(AGNES_PROXY,{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({route:'chat',model:AGNES_MODEL.chat,messages:messages,stream:false,temperature:T,max_tokens:(CHAT_PARAMS.max_tokens||1024)})});
     return dbChatText(await r.json());
   }else if(agnesKey()){
-    var r2=await fetch(AGNES_BASE+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()},body:JSON.stringify({model:AGNES_MODEL.chat,messages:messages,stream:false,temperature:(CHAT_PARAMS.temperature||0.8),max_tokens:(CHAT_PARAMS.max_tokens||1024)})});
+    var r2=await fetch(AGNES_BASE+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+agnesKey()},body:JSON.stringify({model:AGNES_MODEL.chat,messages:messages,stream:false,temperature:T,max_tokens:(CHAT_PARAMS.max_tokens||1024)})});
     return dbChatText(await r2.json());
   }
   throw new Error('no-ai');
@@ -2494,9 +2509,9 @@ async function dbOptimizePrompt(targetId){
   if(!raw){toast('先写点画面描述再优化');return;}
   var isI2i=(targetId==='db_i2i_prompt');var btn=$(isI2i?'dbI2iOptBtn':'dbOptBtn'),hint=$(isI2i?'dbI2iOptHint':'dbOptHint');
   if(btn)btn.disabled=true;if(hint){hint.style.color='';hint.textContent='优化中…';}
-  var sys={role:'system',content:'你是顶尖的中英文 AI 绘画提示词架构师，擅长把一句话画面描述扩写成专业级文生图提示词。用户给出简短描述，请输出【一段】高质量提示词（不要解释、不要序号、不要代码块），要求：\n1) 主体与特征具体化（外貌、服饰、姿态、表情、动作、材质）；\n2) 环境场景细节化（地点、季节、天气、时间、背景元素、氛围物）；\n3) 光影与情绪（主光方向、光质、色彩情绪、空气感、体积光）；\n4) 构图与镜头（景别、视角、景深、运镜感、留白）；\n5) 风格流派明确（如电影感/动漫/写实/水彩/赛博朋克/国风，并指明画风参考）；\n6) 画质词（8K、超清、极致细节、电影级质感、锐利、大师作品）。\n中文为主，可穿插英文画质/风格标签（如 cinematic, ultra-detailed, masterpiece, volumetric lighting）。若用户描述已含风格或主体，则保留并强化，不得篡改主体意图。'};
+  var sys={role:'system',content:'你是 AI 绘画提示词润色助手。任务：在【不改动用户原意】的前提下，仅做“增强”，绝不“重写”。\n必须严格遵守：\n1) 严格保留用户描述中的主体、人物、场景、动作、时代、画风、风格、情绪——一字不改、不删、不替换。\n2) 只在原句基础上【追加】画质与表现力修饰词，如：细节更丰富、光影更自然、构图更舒服、质感更真实、镜头感、氛围感、8K、超清、电影级。\n3) 绝对禁止：新增任何用户没提到的主体/人物/物体；禁止把写实改成动漫、把国风改成赛博朋克等任何风格切换；禁止凭空编造新元素或新场景。\n4) 若用户已写明风格，沿用其风格，不得另起炉灶。\n5) 输出【一段】文字，不加解释、不加序号、不加代码块，不重复无关内容。\n中文为主，可点缀英文画质标签（cinematic, ultra-detailed, 8k）。'};
   try{
-    var t=await dbCallChat([sys,{role:'user',content:raw}]);
+    var t=await dbCallChat([sys,{role:'user',content:raw}],0.4);
     if(t&&t.trim()){ta.value=t.trim();doubaoSet('prompt',t.trim());if(hint){hint.style.color='#3aa655';hint.textContent='已优化 ✓';}toast('提示词已优化');}
     else dbLocalEnhance(raw,ta,hint);
   }catch(e){dbLocalEnhance(raw,ta,hint);}
@@ -2649,7 +2664,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260814j';
+var APP_VER='20260814k';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
