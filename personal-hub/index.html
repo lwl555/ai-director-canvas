@@ -626,7 +626,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
   <button class="btn pri" onclick="dbGenImg2ImgUI()">🎨 图生图（改图）</button>
   <div id="db_i2i_out" class="mut2" style="margin-top:8px"></div>
 </div></div>
-<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M3 5h18v14H3z"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg><h3>我的豆包图库</h3><div class="sp"><span class="mut2" id="dbCnt"></span></div></div><div class="bd"><div id="dbGallery" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px"></div></div></div>
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M3 5h18v14H3z"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg><h3>我的豆包图库</h3><div class="sp"><span class="mut2" id="dbCnt"></span></div></div><div class="bd"><div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap"><button id="dbCleanBtn" class="btn ghost sm" onclick="dbCleanupCloud()">🧹 清理云端旧图</button><span class="mut2" style="font-size:12px;align-self:center">删除图库里已不存在的云端图，释放存储配额（需先跑授权 SQL）</span></div><div id="dbGallery" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px"></div></div></div>
 </div></section>
 <section class="panel" id="p-notes"><div class="grid">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M14 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9l-7-6z"/><path d="M14 3v6h6"/></svg><h3>我的便签墙</h3><div class="sp"><span class="mut2" id="notesPanelCount"></span></div></div><div class="bd">
@@ -2364,7 +2364,38 @@ function renderDoubaoGallery(){
     return '<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff"><img src="'+a+'" alt="" loading="lazy" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;cursor:zoom-in" data-u="'+a+'" onclick="showLightbox(this.getAttribute(\'data-u\'))"><div style="padding:6px;font-size:12px;color:#555">'+esc((x.prompt||'').slice(0,40))+'</div><div style="display:flex;gap:6px;padding:0 6px 6px"><button class="btn xs ghost" style="flex:1" data-u="'+a+'" onclick="copyImgLink(this.getAttribute(\'data-u\'))">🔗 复制</button><button class="btn xs ghost" style="flex:1" onclick="dbDel(\''+x.id+'\')">删除</button></div></div>';
   }).join('');
 }
-function dbDel(id){D.doubao=(D.doubao||[]).filter(function(x){return x.id!==id;});saveLocal();renderDoubaoGallery();}
+function dbDel(id){
+  try{var rec=(D.doubao||[]).find(function(x){return x.id===id;});if(rec&&rec.url&&rec.url.indexOf(SB_URL+'/storage/v1/object/public/ph-images/')===0)dbDeleteCloud(rec.url);}catch(e){}
+  D.doubao=(D.doubao||[]).filter(function(x){return x.id!==id;});saveLocal();renderDoubaoGallery();
+}
+async function dbDeleteCloud(url){
+  try{
+    var base=SB_URL+'/storage/v1/object/public/ph-images/';
+    if(url.indexOf(base)!==0)return;
+    var name=url.slice(base.length);
+    await fetch(SB_URL+'/storage/v1/object/ph-images/'+name,{method:'DELETE',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON}});
+  }catch(e){}
+}
+async function dbCleanupCloud(){
+  var btn=document.getElementById('dbCleanBtn');
+  if(btn){btn.disabled=true;btn.textContent='清理中…';}
+  try{
+    var lr=await fetch(SB_URL+'/storage/v1/object/list/ph-images',{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({prefix:'db/',limit:2000})});
+    if(!lr.ok){toast('读取云端图列表失败，可能未授权删除策略');return;}
+    var objs=await lr.json();
+    if(!Array.isArray(objs)||!objs.length){toast('云端没有可清理的旧图');return;}
+    var keep=new Set((D.doubao||[]).map(function(x){return x.url;}).filter(Boolean));
+    var del=0,fail=0;
+    for(var i=0;i<objs.length;i++){
+      var name=objs[i].name;
+      var url=SB_URL+'/storage/v1/object/public/ph-images/'+name;
+      if(keep.has(url))continue;
+      try{var r=await fetch(SB_URL+'/storage/v1/object/ph-images/'+name,{method:'DELETE',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON}});if(r.ok)del++;else fail++;}catch(e){fail++;}
+    }
+    toast('云端清理完成：删除 '+del+' 张'+(fail?'（'+fail+' 张失败，可能未授权删除）':''));
+  }catch(e){toast('清理出错：'+(e.message||e));}
+  finally{if(btn){btn.disabled=false;btn.textContent='🧹 清理云端旧图';}}
+}
 async function fitImg(src){
   return await new Promise(function(res){
     try{
@@ -2396,6 +2427,17 @@ function storeDoubao(dataUrl,prompt,persist){
 async function dbUploadImage(dataUrl){
   try{
     if(!dataUrl||dataUrl.indexOf('data:')!==0)return null;
+    // A) 上传前压缩：最长边 1280，统一 jpeg 0.82，单图体积降到 ~0.3-0.8MB，省存储配额
+    try{
+      var im=new Image();
+      await new Promise(function(r){im.onload=r;im.onerror=r;im.src=dataUrl;});
+      var max=1280,w=im.naturalWidth||1024,h=im.naturalHeight||1024;
+      var sc=Math.min(1,max/Math.max(w,h));
+      var cw=Math.max(1,Math.round(w*sc)),ch=Math.max(1,Math.round(h*sc));
+      var cv=document.createElement('canvas');cv.width=cw;cv.height=ch;
+      cv.getContext('2d').drawImage(im,0,0,cw,ch);
+      dataUrl=cv.toDataURL('image/jpeg',0.82);
+    }catch(e){}
     var c=dataUrl.indexOf(','); if(c<0)return null;
     var meta=dataUrl.slice(5,c);
     var isPng=/png/i.test(meta);
@@ -2664,7 +2706,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260814k';
+var APP_VER='20260815a';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
