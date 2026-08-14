@@ -568,10 +568,10 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 </div>
 <div class="ai-hist" id="aiHist" style="display:none"></div>
 <div class="ai-chips"><button class="ai-chip" onclick="aiQuick('总结一下今天要处理的事')">总结今天</button><button class="ai-chip" onclick="aiQuick('分析我这个月的支出情况，哪些可以省')">分析支出</button><button class="ai-chip" onclick="aiQuick('看看我的选题库，给我几个新选题建议')">选题建议</button><button class="ai-chip" onclick="aiQuick('帮我回顾一下最近的自媒体数据趋势')">数据复盘</button><button class="ai-chip" onclick="aiQuick('我有哪些逾期的任务？帮我排个优先级')">逾期处理</button><button class="ai-chip" onclick="aiQuick('分析我的分镜脚本和导演成片进度，哪些镜头还没拍、建议怎么排期')">🎬 分镜/成片</button></div>
-<div class="ai-ctx" id="ai_ctx"><svg class="ico s" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.1"/></svg><span>AI助手可以查看你的待办、记账、选题、分镜、成片和习惯数据，给出针对性建议；可附图片让它看图，或用「🖼️图生图」按你的要求改图（借用豆包 Seedream 模型）</span></div>
+<div class="ai-ctx" id="ai_ctx"><svg class="ico s" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.1"/></svg><span>AI助手可以查看你的待办、记账、选题、分镜、成片和习惯数据，给出针对性建议；可附图片让它<b>看图分析</b>，用 🎨 <b>生成图片</b>（文生图），或用 🖼️ <b>按你的要求改图</b>（都借用豆包 Seedream 模型）。附图后写「改成…」会自动走改图，写「分析/这是什么」会走看图分析。</span></div>
 <div class="ai-chat" id="ai_chat"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>和你的AI助手聊聊吧<br>它能看图、能改图、也懂你工作台上的所有数据</div></div></div>
 <div class="ai-atts" id="ai_atts" style="display:none"></div>
-<div class="ai-input"><button class="ai-attbtn" type="button" onclick="aiPickImage()" title="附图片（让 AI 看图 / 用于图生图）"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="2"/><path d="M21 15l-5-5L5 21"/></svg></button><textarea id="ai_input" placeholder="输入消息…（Shift+Enter换行；附图后写要求可让 AI 看图；要点「🖼️图生图」按图改图）" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSendFromInput()}" oninput="aiAutoResize(this)"></textarea><button class="btn ghost ai-send" type="button" onclick="aiImg2Img()" title="用附图的图生图修改（借用豆包模型）" style="padding:0 10px;font-size:18px">🖼️</button><button class="btn pri ai-send" onclick="aiSendFromInput()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
+<div class="ai-input"><button class="ai-attbtn" type="button" onclick="aiPickImage()" title="附图片（让 AI 看图 / 用于图生图）"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="2"/><path d="M21 15l-5-5L5 21"/></svg></button><textarea id="ai_input" placeholder="输入消息…（Shift+Enter换行；附图后写要求可让 AI 看图；要点「🖼️图生图」按图改图）" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSendFromInput()}" oninput="aiAutoResize(this)"></textarea><button class="btn ghost ai-send" type="button" onclick="aiGenImageT2I()" title="用豆包模型生成图片（文生图）" style="padding:0 10px;font-size:16px">🎨</button><button class="btn ghost ai-send" type="button" onclick="aiImg2Img()" title="用附图的图生图修改（借用豆包模型）" style="padding:0 10px;font-size:18px">🖼️</button><button class="btn pri ai-send" onclick="aiSendFromInput()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
 <div class="vdir-gallery" id="aiGallery" style="margin-top:10px"></div>
 <input type="file" id="ai_file" accept="image/*" multiple style="display:none" onchange="aiOnImage(event)">
 </div></div></div>
@@ -583,19 +583,24 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
   <textarea id="db_prompt" class="f1" rows="3" placeholder="描述你想生成的画面，如：赛博朋克风格的城市夜景，霓虹灯，雨夜" style="min-height:64px;font-size:16px"></textarea>
   <div class="form" style="margin:8px 0"><button class="btn ghost sm" onclick="dbOptimizePrompt()" id="dbOptBtn">✨ 优化提示词</button><span id="dbOptHint" class="mut2" style="font-size:12px"></span></div>
   <div class="form" style="margin:8px 0">
-    <select id="db_size" class="f1" style="min-height:38px">
-      <option value="1024x1024">1024×1024（方）</option>
+    <select id="db_size" class="f1" style="min-height:38px" onchange="dbSizeSelChange('t2i')">
+      <option value="orig">📐 按参考图比例（自动）</option>
+      <option value="1024x1024" selected>1024×1024（方）</option>
       <option value="1024x768">1024×768（横）</option>
       <option value="768x1024">768×1024（竖）</option>
       <option value="1280x720">1280×720（横）</option>
       <option value="720x1280">720×1280（竖）</option>
       <option value="1536x1024">1536×1024（横大）</option>
       <option value="1024x1536">1024×1536（竖大）</option>
+      <option value="custom">自定义宽高…</option>
     </select>
     <select id="db_n" class="f1" style="min-height:38px">
       <option value="1">1 张</option><option value="2">2 张</option><option value="3">3 张</option><option value="4">4 张</option>
     </select>
   </div>
+  <div id="db_t2i_ratio_wrap" style="display:none;margin:6px 0"><input type="file" id="db_t2i_ratioref" accept="image/*" style="min-height:38px;width:100%"><div class="mut2" style="font-size:12px">选一张图作为比例参考（生成图会按它的宽高比输出；留空则默认 1024×1024）</div></div>
+  <div id="db_t2i_custom_wrap" class="form" style="display:none;margin:6px 0"><input id="db_cw" type="number" class="f1" placeholder="宽 512-2048" min="512" max="2048" style="min-height:38px"><input id="db_ch" type="number" class="f1" placeholder="高 512-2048" min="512" max="2048" style="min-height:38px"></div>
+  <div id="db_size_hint" class="mut2" style="font-size:12px;margin-bottom:6px"></div>
   <div class="form" style="margin-bottom:4px">
     <input id="db_model" class="f1" placeholder="推理接入点 ID（ep-xxxx），在火山引擎控制台创建" style="min-height:38px" onchange="saveDoubaoEp()">
     <button class="btn ghost sm" onclick="saveDoubaoEp()">保存ID</button>
@@ -612,10 +617,12 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
   <textarea id="db_i2i_prompt" class="f1" rows="3" placeholder="写你要怎么改这张图，如：把背景换成海边、保留人物" style="min-height:64px;font-size:16px"></textarea>
   <div class="form" style="margin:8px 0"><button class="btn ghost sm" onclick="dbOptimizePrompt('db_i2i_prompt')" id="dbI2iOptBtn">✨ 优化提示词</button><span id="dbI2iOptHint" class="mut2" style="font-size:12px"></span></div>
   <div class="form" style="margin:8px 0">
-    <select id="db_i2i_size" class="f1" style="min-height:38px"><option value="1024x1024">1024×1024</option><option value="1024x768">1024×768</option><option value="768x1024">768×1024</option><option value="1280x720">1280×720</option><option value="720x1280">720×1280</option></select>
+    <select id="db_i2i_size" class="f1" style="min-height:38px" onchange="dbSizeSelChange('i2i')"><option value="orig">📐 按参考图比例（自动）</option><option value="1024x1024" selected>1024×1024</option><option value="1024x768">1024×768</option><option value="768x1024">768×1024</option><option value="1280x720">1280×720</option><option value="720x1280">720×1280</option><option value="custom">自定义宽高…</option></select>
     <select id="db_i2i_n" class="f1" style="min-height:38px"><option value="1">1 张</option><option value="2">2 张</option><option value="3">3 张</option><option value="4">4 张</option></select>
     <label style="display:flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap"><input type="checkbox" id="db_i2i_chain" onchange="dbI2iChainToggle()"> 以最近生成的图为底图</label>
   </div>
+  <div id="db_i2i_custom_wrap" class="form" style="display:none;margin:6px 0"><input id="db_i2i_cw" type="number" class="f1" placeholder="宽 512-2048" min="512" max="2048" style="min-height:38px"><input id="db_i2i_ch" type="number" class="f1" placeholder="高 512-2048" min="512" max="2048" style="min-height:38px"></div>
+  <div id="db_i2i_size_hint" class="mut2" style="font-size:12px;margin:6px 0"></div>
   <button class="btn pri" onclick="dbGenImg2ImgUI()">🎨 图生图（改图）</button>
   <div id="db_i2i_out" class="mut2" style="margin-top:8px"></div>
 </div></div>
@@ -1152,6 +1159,9 @@ function fmtDate(d){if(!d)return'';var dt=new Date(d+'T00:00:00');return(dt.getM
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function toast(msg){var t=$('toast');t.textContent=msg;t.classList.add('on');setTimeout(function(){t.classList.remove('on')},2200);}
 function saveLocal(){try{localStorage.setItem(DK,JSON.stringify(D))}catch(e){toast('存储失败')}}
+var __saveTimer=null;
+function saveLocalSoon(){if(__saveTimer)return;__saveTimer=setTimeout(function(){__saveTimer=null;try{saveLocal();}catch(e){}},400);}
+window.addEventListener('beforeunload',function(){if(__saveTimer){clearTimeout(__saveTimer);__saveTimer=null;try{saveLocal();}catch(e){}}});
 function loadLocal(){try{var s=localStorage.getItem(DK);if(s){var d=JSON.parse(s);D=Object.assign(defaultD(),d)}}catch(e){}}
 function dlgConfirm(title,msg,onOk){$('dlgT').textContent=title;$('dlgP').textContent=msg;$('dlgOk').onclick=function(){closeDlg();onOk()};$('mask').classList.add('on');}
 function closeDlg(){$('mask').classList.remove('on');}
@@ -1505,8 +1515,13 @@ function aiShowTyping(){var chat=$('ai_chat');var empty=chat.querySelector('.ai-
 function aiHideTyping(){var t=$('aiTyping');if(t)t.remove();}
 function aiQuick(msg){$('ai_input').value=msg;aiSendFromInput();}
 async function aiSendFromInput(){var msg=$('ai_input').value.trim();if(!msg&&!aiImages.length)return;
-  $('ai_input').value='';$('ai_input').style.height='auto';var ts=new Date().toTimeString().slice(0,5);
   var imgs=aiImages.slice(0,4);
+  if(imgs.length&&msg){
+    var mod=/改|换|变成|改成|重绘|重画|风格|修改|调整|把.{0,12}成|去除|换背景|加个|涂抹|修图|p\s?图|ps\b|把.*?改为|换成|调成/i.test(msg);
+    var ana=/分析|识别|是什么|什么|描述|看看|讲|介绍|这张|这图|认|检测|读|翻译|文字|提取|说说|帮我看|怎么看|什么意思|啥|讲讲|说明/i.test(msg);
+    if(mod&&!ana){await aiImg2Img(msg,imgs);return;}
+  }
+  $('ai_input').value='';$('ai_input').style.height='auto';var ts=new Date().toTimeString().slice(0,5);
   aiAddMsg('user',msg,ts,imgs);recordChat('user',msg,ts,imgs,'ai');aiShowTyping();
   aiImages=[];renderAiAtts();
   try{var headers={'Content-Type':'application/json'};
@@ -2244,44 +2259,68 @@ function doubaoGet(k){
 function doubaoSet(k,v){if(k==='ep'){D.dbEp=(v==null?'':v);}try{localStorage.setItem('wb_personal_hub_doubao_'+k,(v==null?'':v));}catch(e){}}
 function saveDoubaoKey(){var el=$('db_key');if(!el)return;var v=el.value.trim();doubaoSetKey(v);var h=$('dbKeyHint');if(h){h.style.color='#3aa655';h.textContent=v?'已保存':'已清除';}scheduleCloudSync();toast(v?'豆包 Key 已保存':'已清除');}
 function saveDoubaoEp(){var el=$('db_model');if(!el)return;var v=el.value.trim();doubaoSet('ep',v);var h=$('dbEpHint');if(h){h.style.color='#3aa655';h.textContent=v?'已保存':'已清除';}saveLocalSafe();scheduleCloudSync();toast(v?'接入点 ID 已保存':'已清除');}
-async function dbGen(){
-  var key=doubaoKey();var out=$('db_out');
-  if(!key){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请先在上方填写并保存豆包 Key</div>';return;}
-  var prompt=$('db_prompt')?$('db_prompt').value.trim():'';
-  if(!prompt){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请先写画面描述</div>';return;}
-  var size=$('db_size')?$('db_size').value:'1024x1024';
+// 豆包生图核心：只负责调用接口 + 压缩，不碰 UI（供文生图 / AI 板块复用）
+async function dbGenCore(prompt,size,n,key,ep){
   var wh=size.split('x');var w=parseInt(wh[0],10)||1024;var h=parseInt(wh[1],10)||1024;
-  var n=$('db_n')?Math.max(1,Math.min(4,parseInt($('db_n').value||'1',10)||1)):1;
-  var model=$('db_model')?$('db_model').value.trim():'';
-  if(model)doubaoSet('ep',model);
-  doubaoSet('prompt',prompt);
-  var szEl=$('db_size');if(szEl)doubaoSet('size',szEl.value);
-  var nEl=$('db_n');if(nEl)doubaoSet('n',nEl.value);
-  if(!model){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请先填写推理接入点 ID（ep-xxxx），在火山引擎 Ark 控制台从 Seedream 图像模型新建接入点获得</div>';return;}
-  D.doubao=D.doubao||[];
-  if(out)out.innerHTML='<div class="mut2">生成中…（共 '+n+' 张，逐张生成，约 '+(n*20)+' 秒）</div>';
-  var ok=0,fail=0,allUrls=[];
+  var ok=[],fail=0;
   for(var i=0;i<n;i++){
     try{
-      var body=JSON.stringify({model:model,prompt:prompt,width:w,height:h,n:1,response_format:'b64_json'});
+      var body=JSON.stringify({model:ep,prompt:prompt,width:w,height:h,n:1,response_format:'b64_json'});
       var res=await fetch('https://ark.cn-beijing.volces.com/api/v3/images/generations',{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
         body:body
       }).then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});});
-      if(!res.ok){var m2=(res.j&&res.j.error&&res.j.error.message)||JSON.stringify(res.j);fail++;if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">第'+(i+1)+'张失败：'+esc(m2).slice(0,120)+'</div>';}
-      else{
-        var arr=(res.j&&res.j.data)||(res.j&&res.j.choices)||[];
-        var raws=arr.map(function(it){return (it.b64_json?'data:image/png;base64,'+it.b64_json:null)||(it.url||null);}).filter(Boolean);
-        for(var k=0;k<raws.length;k++){var f=await fitImg(raws[k]);storeDoubao(f,prompt);allUrls.push(f);window.__dbLastImg=f;ok++;}
-      }
-    }catch(e){fail++;var m=e.message||'';if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">第'+(i+1)+'张出错：'+(m.indexOf('Failed to fetch')>=0||m.indexOf('CORS')>=0?'网络/CORS 被拦截，请检查网络或 Key/接入点':esc(m).slice(0,120))+'</div>';}
-    renderDoubaoGallery();
-    if(out)out.innerHTML='<div class="mut2">已生成 '+ok+'/'+n+' 张…</div>';
+      if(!res.ok){fail++;continue;}
+      var arr=(res.j&&res.j.data)||(res.j&&res.j.choices)||[];
+      var raws=arr.map(function(it){return (it.b64_json?'data:image/png;base64,'+it.b64_json:null)||(it.url||null);}).filter(Boolean);
+      for(var k=0;k<raws.length;k++){ok.push(await fitImg(raws[k]));}
+    }catch(e){fail++;}
   }
-  renderDoubaoGallery();
-  if(out)out.innerHTML='<div class="mut2" style="color:#3aa655">生成完成 ✓ 共 '+ok+' 张'+(fail?'（'+fail+' 张失败）':'')+'</div>'+dbThumbGrid(allUrls);
-  toast('豆包图片生成完成'+(ok?'':'：全部失败'));
+  return {urls:ok,fail:fail};
+}
+async function dbGen(){
+  var key=doubaoKey();var out=$('db_out');
+  if(!key){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请先在上方填写并保存豆包 Key</div>';return;}
+  var prompt=$('db_prompt')?$('db_prompt').value.trim():'';
+  if(!prompt){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请先写画面描述</div>';return;}
+  var model=$('db_model')?$('db_model').value.trim():'';
+  if(model)doubaoSet('ep',model);
+  doubaoSet('prompt',prompt);
+  var szEl=$('db_size');if(szEl)doubaoSet('size',szEl.value);
+  var nEl=$('db_n');var n=nEl?Math.max(1,Math.min(4,parseInt(nEl.value||'1',10)||1)):1;if(nEl)doubaoSet('n',nEl.value);
+  if(!model){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请先填写推理接入点 ID（ep-xxxx），在火山引擎 Ark 控制台从 Seedream 图像模型新建接入点获得</div>';return;}
+  var rawSize=szEl?szEl.value:'1024x1024';
+  var refD=rawSize==='orig'?await dbT2iRatioRefData():null;
+  var size=await dbResolveSizeCore(rawSize,refD,$('db_cw')?$('db_cw').value:null,$('db_ch')?$('db_ch').value:null);
+  if(out)out.innerHTML='<div class="mut2">生成中…（共 '+n+' 张，逐张生成，约 '+(n*20)+' 秒）</div>';
+  var r=await dbGenCore(prompt,size,n,key,model);
+  r.urls.forEach(function(u){storeDoubao(u,prompt,false);window.__dbLastImg=u;});
+  saveLocal();renderDoubaoGallery();
+  if(out)out.innerHTML='<div class="mut2" style="color:#3aa655">生成完成 ✓ 共 '+r.urls.length+' 张'+(r.fail?'（'+r.fail+' 张失败）':'')+'</div>'+dbThumbGrid(r.urls);
+  toast('豆包图片生成完成'+(r.urls.length?'':'：全部失败'));
+}
+// ===== 尺寸/比例解析（文生图 + 图生图通用）=====
+function dbClampDims(w,h){w=Math.max(512,Math.min(2048,Math.round(w||1024)));h=Math.max(512,Math.min(2048,Math.round(h||1024)));return w+'x'+h;}
+function dbGetImgDims(src){return new Promise(function(res){var im=new Image();im.onload=function(){res({w:im.naturalWidth||1024,h:im.naturalHeight||1024});};im.onerror=function(){res(null);};im.src=src;});}
+async function dbResolveSizeCore(val,refDataUrl,cw,ch){
+  if(val==='orig'){if(refDataUrl){var d=await dbGetImgDims(refDataUrl);if(d)return dbClampDims(d.w,d.h);}return '1024x1024';}
+  if(val==='custom'){return dbClampDims(parseInt(cw)||1024,parseInt(ch)||1024);}
+  return val;
+}
+async function dbT2iRatioRefData(){var f=$('db_t2i_ratioref')&&$('db_t2i_ratioref').files[0];if(!f)return null;return await fileToDataURL(f);}
+function dbSizeSelChange(prefix){
+  var sel=$(prefix==='t2i'?'db_size':'db_i2i_size');var val=sel?sel.value:'';
+  var ratioWrap=$(prefix==='t2i'?'db_t2i_ratio_wrap':'db_i2i_ratio_wrap');
+  var customWrap=$(prefix==='t2i'?'db_t2i_custom_wrap':'db_i2i_custom_wrap');
+  var hint=$(prefix==='t2i'?'db_size_hint':'db_i2i_size_hint');
+  if(ratioWrap)ratioWrap.style.display=val==='orig'?'block':'none';
+  if(customWrap)customWrap.style.display=val==='custom'?'block':'none';
+  if(hint){
+    if(val==='orig')hint.textContent=prefix==='t2i'?'已在上方出现「比例参考图」入口：选一张图，生成图会按它的宽高比输出（不选则默认 1024×1024）。':'将按你上传的参考图（或勾选「以最近生成的图为底图」时的那张）的宽高比生成。';
+    else if(val==='custom')hint.textContent='宽度/高度范围 512–2048，自动取整。';
+    else hint.textContent='';
+  }
 }
 function dbThumbGrid(urls){
   if(!urls||!urls.length)return '';
@@ -2321,11 +2360,11 @@ async function fitImg(src){
     }catch(e){res(src);}
   });
 }
-function storeDoubao(dataUrl,prompt){
+function storeDoubao(dataUrl,prompt,persist){
   D.doubao=D.doubao||[];
   D.doubao.unshift({id:'d'+Date.now()+Math.random().toString(36).slice(2,5),url:dataUrl,prompt:prompt||'',t:Date.now()});
   if(D.doubao.length>40)D.doubao=D.doubao.slice(0,40);
-  saveLocalSafe();
+  if(persist===false)saveLocalSoon();else saveLocalSafe();
 }
 function saveLocalSafe(){
   try{saveLocal();return;}catch(e){}
@@ -2538,7 +2577,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260814f';
+var APP_VER='20260814g';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -2609,19 +2648,38 @@ function closeInstall(){$('installMask').classList.remove('on');}
 
 // ===== 数据参谋 · 图生图（借用豆包 Seedream 模型） =====
 function vdirToggleHist(){var h=$('vdir_hist');if(h.style.display==='none'){renderChatSessions('vdir','vdir_hist');h.style.display='block';}else h.style.display='none';}
-async function aiImg2Img(){
-  if(!aiImages.length){toast('先点 📎 附上要改的图');return;}
-  var instr=$('ai_input').value.trim();if(!instr){toast('写上你要怎么改这张图');return;}
+async function aiImg2Img(instr,imgsArr){
+  var useDom=(imgsArr===undefined);
+  var atts=useDom?aiImages.slice(0,4):imgsArr;
+  if(!atts||!atts.length){toast('先点 📎 附上要改的图');return;}
+  var ins=(instr!=null)?String(instr).trim():'';
+  if(useDom)ins=$('ai_input').value.trim();
+  if(!ins){toast('写上你要怎么改这张图');return;}
   var key=doubaoKey(),ep=doubaoGet('ep');
   if(!key||!ep){toast('图生图借用豆包模型，请先在「豆包生图」填好 Key 和接入点 ID');return;}
-  var ref=aiImages[aiImages.length-1];var ts=new Date().toTimeString().slice(0,5);
-  $('ai_input').value='';$('ai_input').style.height='auto';var atts=aiImages.slice(0,4);aiImages=[];renderAiAtts();
-  aiAddMsg('user',instr,ts,atts);recordChat('user',instr,ts,atts,'ai');aiShowTyping();
+  var ref=atts[atts.length-1];var ts=new Date().toTimeString().slice(0,5);
+  if(useDom){$('ai_input').value='';$('ai_input').style.height='auto';aiImages=[];renderAiAtts();}
+  aiAddMsg('user',ins,ts,atts);recordChat('user',ins,ts,atts,'ai');aiShowTyping();
   try{
-    var raws=await dbGenImg2Img(ref,instr,'1024x1024',1);aiHideTyping();
-    for(var zi=0;zi<raws.length;zi++){var u=await fitImg(raws[zi]);storeDoubao(u,instr);aiAddMsg('bot','已按你的要求改图（豆包 Seedream）',new Date().toTimeString().slice(0,5),[u]);recordChat('assistant','已按你的要求改图：'+instr,new Date().toTimeString().slice(0,5),[u],'ai');}
+    var raws=await dbGenImg2Img(ref,ins,'1024x1024',1);aiHideTyping();
+    for(var zi=0;zi<raws.length;zi++){var u=await fitImg(raws[zi]);storeDoubao(u,ins);aiAddMsg('bot','已按你的要求改图（豆包 Seedream）',new Date().toTimeString().slice(0,5),[u]);recordChat('assistant','已按你的要求改图：'+ins,new Date().toTimeString().slice(0,5),[u],'ai');}
     renderDoubaoGallery();toast('图生图完成，已存入豆包图库');
   }catch(e){aiHideTyping();aiAddMsg('bot','图生图失败：'+(e.message||e),new Date().toTimeString().slice(0,5));}
+}
+// AI 助手板块：文生图（借用豆包 Seedream 模型）
+async function aiGenImageT2I(){
+  var prompt=$('ai_input').value.trim();if(!prompt){toast('先写要生成的画面');return;}
+  var key=doubaoKey(),ep=doubaoGet('ep');
+  if(!key||!ep){toast('生成图片借用豆包模型，请先在「豆包生图」填好 Key 和接入点 ID');return;}
+  $('ai_input').value='';$('ai_input').style.height='auto';
+  var ts=new Date().toTimeString().slice(0,5);
+  aiAddMsg('user',prompt,ts);recordChat('user',prompt,ts,[],'ai');aiShowTyping();
+  try{
+    var r=await dbGenCore(prompt,'1024x1024',1,key,ep);aiHideTyping();
+    if(!r.urls.length){aiAddMsg('bot','图片生成失败'+(r.fail?'（接口返回错误，请检查 Key/接入点）':''),new Date().toTimeString().slice(0,5));return;}
+    for(var zi=0;zi<r.urls.length;zi++){var u=r.urls[zi];storeDoubao(u,prompt);aiAddMsg('bot','已用豆包 Seedream 生成图片',new Date().toTimeString().slice(0,5),[u]);recordChat('assistant','已生成图片：'+prompt,new Date().toTimeString().slice(0,5),[u],'ai');}
+    renderDoubaoGallery();toast('图片已生成并存入豆包图库');
+  }catch(e){aiHideTyping();aiAddMsg('bot','生成失败：'+(e.message||e),new Date().toTimeString().slice(0,5));}
 }
 // ===== 豆包 图生图底层（Ark images/generations + image 参考） =====
 async function dbGenImg2Img(ref,prompt,size,n){
@@ -2647,14 +2705,17 @@ async function dbGenImg2ImgUI(){
   var key=doubaoKey(),ep=doubaoGet('ep');var out=$('db_i2i_out');
   if(!key||!ep){if(out)out.innerHTML='<span style="color:#c0392b">请先在上方「豆包文生图」填好 Key 和接入点 ID</span>';return;}
   var prompt=$('db_i2i_prompt').value.trim();if(!prompt){if(out)out.textContent='先写改图要求';return;}
-  var ref=null;
-  if($('db_i2i_chain')&&$('db_i2i_chain').checked&&window.__dbLastImg){ref=window.__dbLastImg;}
+  var ref=null;var chain=($('db_i2i_chain')&&$('db_i2i_chain').checked);
+  if(chain&&window.__dbLastImg){ref=window.__dbLastImg;}
   else{var f=$('db_i2i_ref')&&$('db_i2i_ref').files[0];if(f)ref=await fileToDataURL(f);}
   if(!ref){if(out)out.textContent='先上传参考图，或勾选「以最近生成的图为底图」';return;}
+  var rawSize=$('db_i2i_size')?$('db_i2i_size').value:'1024x1024';
+  var refD=rawSize==='orig'?ref:null;
+  var size=await dbResolveSizeCore(rawSize,refD,$('db_i2i_cw')?$('db_i2i_cw').value:null,$('db_i2i_ch')?$('db_i2i_ch').value:null);
   if(out)out.textContent='生成中…';
   try{
     var n=Math.max(1,Math.min(4,parseInt(($('db_i2i_n')?$('db_i2i_n').value:'1')||'1',10)||1));
-    var raws=await dbGenImg2Img(ref,prompt,$('db_i2i_size').value||'1024x1024',n);
+    var raws=await dbGenImg2Img(ref,prompt,size,n);
     var outs=[];
     for(var yi=0;yi<raws.length;yi++){var u=await fitImg(raws[yi]);storeDoubao(u,prompt);window.__dbLastImg=u;outs.push(u);}
     renderDoubaoGallery();
