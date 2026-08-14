@@ -2337,7 +2337,7 @@ function dbThumbGrid(urls){
   return '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:10px">'+
     urls.map(function(u){
       var a=esc(u);
-      return '<div style="position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff"><img src="'+a+'" alt="" loading="lazy" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;cursor:zoom-in" data-u="'+a+'" onclick="showLightbox(this.getAttribute(\'data-u\'))" onerror="this.style.display=\'none\'"><button class="btn xs ghost" style="position:absolute;right:4px;bottom:4px;opacity:.92" data-u="'+a+'" onclick="downloadImg(this.getAttribute(\'data-u\'))">⤓ 下载</button></div>';
+      return '<div style="position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff"><img src="'+a+'" alt="" loading="lazy" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;cursor:zoom-in" data-u="'+a+'" onclick="showLightbox(this.getAttribute(\'data-u\'))" onerror="this.style.display=\'none\'"><button class="btn xs ghost" style="position:absolute;right:4px;bottom:4px;opacity:.92" data-u="'+a+'" onclick="copyImgLink(this.getAttribute(\'data-u\'))">🔗 复制</button></div>';
     }).join('')+'</div>';
 }
 function renderDoubaoGallery(){
@@ -2347,7 +2347,7 @@ function renderDoubaoGallery(){
   if(!D.doubao.length){g.innerHTML='<div class="mut2">还没有生成的图片</div>';return;}
   g.innerHTML=D.doubao.slice(0,60).map(function(x){
     var a=esc(x.url);
-    return '<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff"><img src="'+a+'" alt="" loading="lazy" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;cursor:zoom-in" data-u="'+a+'" onclick="showLightbox(this.getAttribute(\'data-u\'))"><div style="padding:6px;font-size:12px;color:#555">'+esc((x.prompt||'').slice(0,40))+'</div><div style="display:flex;gap:6px;padding:0 6px 6px"><button class="btn xs ghost" style="flex:1" data-u="'+a+'" onclick="downloadImg(this.getAttribute(\'data-u\'))">⤓ 下载</button><button class="btn xs ghost" style="flex:1" onclick="dbDel(\''+x.id+'\')">删除</button></div></div>';
+    return '<div style="border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff"><img src="'+a+'" alt="" loading="lazy" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;cursor:zoom-in" data-u="'+a+'" onclick="showLightbox(this.getAttribute(\'data-u\'))"><div style="padding:6px;font-size:12px;color:#555">'+esc((x.prompt||'').slice(0,40))+'</div><div style="display:flex;gap:6px;padding:0 6px 6px"><button class="btn xs ghost" style="flex:1" data-u="'+a+'" onclick="copyImgLink(this.getAttribute(\'data-u\'))">🔗 复制</button><button class="btn xs ghost" style="flex:1" onclick="dbDel(\''+x.id+'\')">删除</button></div></div>';
   }).join('');
 }
 function dbDel(id){D.doubao=(D.doubao||[]).filter(function(x){return x.id!==id;});saveLocal();renderDoubaoGallery();}
@@ -2388,12 +2388,33 @@ function showLightbox(url){
   if(!$('imgLightbox')){
     var d=document.createElement('div');d.id='imgLightbox';d.className='mask';
     d.setAttribute('onclick','if(event.target===this)hideLightbox()');
-    d.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px"><img id="lbImg" src="" style="max-width:94vw;max-height:78vh;border-radius:12px;object-fit:contain;box-shadow:0 8px 30px rgba(0,0,0,.45)"><div style="display:flex;gap:10px"><button class="btn pri" onclick="downloadImg(window.__lbUrl)">⤓ 下载图片</button><button class="btn" onclick="hideLightbox()">关闭</button></div></div>';
+    d.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px"><img id="lbImg" src="" style="max-width:94vw;max-height:78vh;border-radius:12px;object-fit:contain;box-shadow:0 8px 30px rgba(0,0,0,.45)"><div style="display:flex;gap:10px"><button class="btn pri" onclick="copyImgLink(window.__lbUrl)">🔗 复制链接</button><button class="btn" onclick="hideLightbox()">关闭</button></div></div>';
     document.body.appendChild(d);
   }
   $('imgLightbox').style.display='flex';$('lbImg').src=url;window.__lbUrl=url;
 }
 function hideLightbox(){$('imgLightbox').style.display='none';}
+function copyTextFallback(t){
+  try{
+    var ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.top='-9999px';ta.style.opacity='0';document.body.appendChild(ta);ta.focus();ta.select();
+    var ok=false;try{ok=document.execCommand('copy');}catch(e){}
+    document.body.removeChild(ta);return ok;
+  }catch(e){return false;}
+}
+function copyText(t){
+  return new Promise(function(res){
+    try{
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){res(true);}).catch(function(){res(copyTextFallback(t));});}
+      else res(copyTextFallback(t));
+    }catch(e){res(copyTextFallback(t));}
+  });
+}
+async function copyImgLink(url){
+  if(!url){toast('图片链接为空');return;}
+  var ok=await copyText(url);
+  if(ok)toast('已复制图片链接，请在浏览器打开此链接并保存图片');
+  else toast('复制失败，请长按图片选择「复制链接」');
+}
 async function downloadImg(url){
   if(!url)return;
   try{
@@ -2587,7 +2608,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260814h';
+var APP_VER='20260814i';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
