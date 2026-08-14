@@ -31,7 +31,7 @@ body{background:var(--paper);background-image:radial-gradient(circle at 1px 1px,
 .auth-form .btn{width:100%;margin-top:6px}
 .auth-err{color:var(--rust);font-size:13.5px;margin-top:8px;min-height:18px}
 .auth-note{color:var(--ink3);font-size:12.5px;text-align:center;margin-top:16px;line-height:1.7}
-.auth-offline{display:block;width:100%;background:none;border:none;font-family:inherit;font-size:13.5px;color:var(--ink2);cursor:pointer;padding:10px;margin-top:8px;text-decoration:underline;text-align:center}
+.auth-offline{display:block;width:100%;background:var(--field);border:1.5px solid var(--line2);border-radius:10px;font-family:inherit;font-size:14px;color:var(--ink);cursor:pointer;padding:12px;margin-top:12px;text-align:center;transition:.15s}.auth-offline:hover{border-color:var(--clay);color:var(--clay)}
 .auth-offline:hover{color:var(--clay)}
 header{padding:22px 0 10px}
 .brand{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
@@ -1112,13 +1112,21 @@ async function doLogin(e){e.preventDefault();$('li_err').textContent='';
   try{var r=await fetch(SB_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({email:$('li_email').value,password:$('li_pwd').value})});
     var d=await r.json();if(!r.ok)throw new Error(d.error_description||d.msg||d.message||'登录失败');
     session=d;saveSession();enterApp();
-  }catch(err){$('li_err').textContent=err.message}}
+  }catch(err){
+    var m=err.message||'';
+    var isNet=/Failed to fetch|NetworkError|net::ERR|CORS|timeout|无法连接/i.test(m);
+    $('li_err').innerHTML='<div style="margin-bottom:4px">'+(isNet?'登录服务器连不上（可能被广告拦截/公司网络/地区 DNS 拦截），你可以':'登录出错，你可以')+'<a href="javascript:offlineMode()" style="color:var(--clay);text-decoration:underline;font-weight:500">不登录，离线使用 →</a></div><div style="font-size:12px;color:var(--rust)">'+esc(m)+'</div>';
+  }}
 async function doSignup(e){e.preventDefault();$('su_err').textContent='';
   try{var r=await fetch(SB_URL+'/auth/v1/signup',{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json'},body:JSON.stringify({email:$('su_email').value,password:$('su_pwd').value})});
     var d=await r.json();if(!r.ok)throw new Error(d.error_description||d.msg||d.message||'注册失败');
     if(d.access_token){session=d;saveSession();enterApp();}
     else{$('su_err').textContent='注册成功！如已关闭邮箱验证可直接登录';authTab('login');$('li_email').value=$('su_email').value;$('li_pwd').value=$('su_pwd').value;}
-  }catch(err){$('su_err').textContent=err.message}}
+  }catch(err){
+    var m=err.message||'';
+    var isNet=/Failed to fetch|NetworkError|net::ERR|CORS|timeout|无法连接/i.test(m);
+    $('su_err').innerHTML='<div style="margin-bottom:4px">'+(isNet?'注册服务器连不上（可能被广告拦截/公司网络/地区 DNS 拦截），你可以':'注册出错，你可以')+'<a href="javascript:offlineMode()" style="color:var(--clay);text-decoration:underline;font-weight:500">不登录，离线使用 →</a></div><div style="font-size:12px;color:var(--rust)">'+esc(m)+'</div>';
+  }}
 function doLogout(){session=null;localStorage.removeItem(SK);location.reload();}
 function offlineMode(){isOffline=true;session=null;localStorage.removeItem(SK);enterApp();}
 function saveSession(){if(session)localStorage.setItem(SK,JSON.stringify(session));}
@@ -2426,7 +2434,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260814a';
+var APP_VER='20260814b';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
