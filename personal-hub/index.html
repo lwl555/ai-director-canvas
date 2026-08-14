@@ -595,9 +595,11 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
     </select>
   </div>
   <div class="form" style="margin-bottom:4px">
-    <input id="db_model" class="f1" placeholder="推理接入点 ID（ep-xxxx），在火山引擎控制台创建" style="min-height:38px">
+    <input id="db_model" class="f1" placeholder="推理接入点 ID（ep-xxxx），在火山引擎控制台创建" style="min-height:38px" onchange="saveDoubaoEp()">
+    <button class="btn ghost sm" onclick="saveDoubaoEp()">保存ID</button>
     <button class="btn pri" onclick="dbGen()">🎨 生成图片</button>
   </div>
+  <div id="dbEpHint" class="mut2" style="font-size:12px;margin-bottom:8px"></div>
   <div class="mut2" style="font-size:12px;margin-bottom:8px">模型填「推理接入点 ID」（形如 <code>ep-20250xxxx</code>，<b>不是</b>模型名）。创建路径：火山引擎控制台 → 方舟 Ark → 推理接入点 → 从 Seedream 图像模型新建，把得到的 ID 粘到这里。</div>
   <div id="db_out" class="db-out"><div class="mut2">填好 Key、接入点 ID 和提示词，点生成。</div></div>
 </div></div>
@@ -1134,7 +1136,7 @@ function vdirSavePrompt(){var t=$('vdir_input').value.trim();if(!t){toast('先�
 var SK='ph_session_v1',DK='ph_data_v1';
 var session=null,isOffline=false,curTab='top',syncTimer=null;
 var D=defaultD();
-function defaultD(){return {posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],vmedia:[],genLog:[],ledger:[],habits:[],hLogs:{},todos:[],products:[],doubao:[],diary:[],notes:[],budget:0,chats:[],sessions:[],curSid:null,reminders:[],wcity:'',del:{posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],vmedia:[],ledger:[],todos:[],habits:[],habitLogs:[],products:[],diary:[]}};}
+function defaultD(){return {posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],vmedia:[],genLog:[],ledger:[],habits:[],hLogs:{},todos:[],products:[],doubao:[],diary:[],notes:[],dbKey:'',dbEp:'',budget:0,chats:[],sessions:[],curSid:null,reminders:[],wcity:'',del:{posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],vmedia:[],ledger:[],todos:[],habits:[],habitLogs:[],products:[],diary:[]}};}
 function defaultDel(){return {posts:[],assets:[],stats:[],shots:[],prompts:[],videos:[],vmedia:[],ledger:[],todos:[],habits:[],habitLogs:[],products:[],diary:[],notes:[]};}
 function migrateDiaryToNotes(){if(!D.notes)D.notes=[];if(D.notes.length===0&&D.diary&&D.diary.length){D.notes=D.diary.map(function(x){return {id:x.id||uid(),title:'',content:x.c||'',color:'yellow',pin:false,remind:'',created:x.ct||x.d||todayStr(),updated:x.ct||x.d||todayStr()};});saveLocal();}}
 var CATS={out:['餐饮','交通','购物','住房','娱乐','医疗','教育','其他'],in:['工资','副业','理财','红包','其他']};
@@ -1217,7 +1219,7 @@ async function syncToCloud(){if(isOffline||!session)return;setSyncStatus('syncin
       var dels=D.del[type]||[];
       if(dels.length){var dr=await fetch(SB_URL+'/rest/v1/'+TABLES[type]+'?id=in.('+dels.join(',')+')',{method:'DELETE',headers:hD});if(dr.ok){D.del[type]=[];saveLocal();}}
     }
-    await syncHabitsToCloud(token);await syncBudgetToCloud(token);setSyncStatus('ok');
+    await syncHabitsToCloud(token);await syncBudgetToCloud(token);await syncDoubaoCredsToCloud(token);setSyncStatus('ok');
   }catch(e){console.error(e);setSyncStatus('err');}}
 async function syncFromCloud(){if(isOffline||!session)return;setSyncStatus('syncing','拉取数据…');
   try{if(isTokenExpired())await refreshToken();var token=session.access_token;var hG={'apikey':SB_ANON,'Authorization':'Bearer '+token};
@@ -1226,7 +1228,7 @@ async function syncFromCloud(){if(isOffline||!session)return;setSyncStatus('sync
     await syncHabitsFromCloud(token);
     if(D.del.habits.length)D.habits=D.habits.filter(function(h){return D.del.habits.indexOf(h.id)<0});
     if(D.del.habitLogs.length){var dl=D.del.habitLogs;for(var k in D.hLogs){var pp=k.split('|');if(dl.indexOf(pp[0]+'_'+pp[1])>=0)delete D.hLogs[k];}}
-    await syncBudgetFromCloud(token);
+    await syncBudgetFromCloud(token);await syncDoubaoCredsFromCloud(token);
     var cr=await fetch(SB_URL+'/rest/v1/ph_ai_chats?select=role,content,created_at&order=created_at.asc',{headers:hG});
     if(cr.ok){var cs=await cr.json();
       var cloud=cs.map(function(c){return{role:c.role==='assistant'?'assistant':'user',content:String(c.content||'').replace(/^\[图片×\d+\]\s*/,''),ts:(c.created_at||'').slice(11,16)};});
@@ -1252,6 +1254,14 @@ async function syncBudgetToCloud(token){var h={'apikey':SB_ANON,'Authorization':
 async function syncBudgetFromCloud(token){var h={'apikey':SB_ANON,'Authorization':'Bearer '+token};
   var r=await fetch(SB_URL+'/rest/v1/ph_profiles?select=settings',{headers:h});
   if(r.ok){var d=await r.json();if(d.length&&d[0].settings&&d[0].settings.budget)D.budget=d[0].settings.budget;}}
+// 豆包 Key / 接入点 ID 云端同步（独立表，避免敏感字段进普通数据表）
+async function syncDoubaoCredsToCloud(token){try{var h={'apikey':SB_ANON,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'};
+  await fetch(SB_URL+'/rest/v1/ph_doubao?on_conflict=id',{method:'POST',headers:h,body:JSON.stringify([{id:session.user.id,key:D.dbKey||'',ep:D.dbEp||''}])});
+  }catch(e){console.warn('doubao creds sync failed',e);}}
+async function syncDoubaoCredsFromCloud(token){try{var h={'apikey':SB_ANON,'Authorization':'Bearer '+token};
+  var r=await fetch(SB_URL+'/rest/v1/ph_doubao?select=key,ep',{headers:h});
+  if(r.ok){var d=await r.json();if(d.length){if(d[0].key)D.dbKey=d[0].key;if(d[0].ep)D.dbEp=d[0].ep;saveLocalSafe();try{var k=document.getElementById('db_key');if(k&&!k.value)k.value=D.dbKey;}catch(e){}try{var m=document.getElementById('db_model');if(m&&!m.value)m.value=D.dbEp;}catch(e){}}}
+  }catch(e){console.warn('doubao creds pull failed',e);}}
 function scheduleCloudSync(){if(isOffline||!session)return;if(syncTimer)clearTimeout(syncTimer);syncTimer=setTimeout(syncToCloud,3000);}
 async function manualSync(){if(isOffline){toast('离线模式无法同步');return;}await syncToCloud();toast('已同步到云端');}
 
@@ -2213,11 +2223,25 @@ function degToCompass(d){d=parseInt(d)||0;var dirs=['北','东北','东','东南
 function saveWeatherSrc(){var k=$('qw_key').value.trim();var h=$('qw_host').value.trim().replace(/^https?:\/\//,'');var hint=$('wsrcHint');try{localStorage.setItem('wb_personal_hub_qwkey',k);localStorage.setItem('wb_personal_hub_qwhost',h);}catch(e){}if(k&&h){hint.textContent='已保存，刷新中…';hint.style.color='#3aa655';toggleWsrc(false);weatherCache=null;fetchWeather(D.wcity||'',typeof D.wcity==='string'&&D.wcity.indexOf(',')>-1);}else if(!k&&!h){hint.textContent='已清除，改用 Open-Meteo';hint.style.color='#3aa655';toggleWsrc(false);weatherCache=null;fetchWeather(D.wcity||'',typeof D.wcity==='string'&&D.wcity.indexOf(',')>-1);}else{hint.textContent='Key 和 Host 都要填，或都留空';hint.style.color='#e8784f';}}
 function toggleWsrc(force){var p=$('wsrcPanel');if(!p)return;var show=(typeof force==='boolean')?force:(p.style.display==='none');p.style.display=show?'block':'none';if(show){$('qw_key').value=qwKey();$('qw_host').value=qwHost();var nm=$('hub_name');if(nm){try{nm.value=localStorage.getItem('wb_personal_hub_name')||'';}catch(e){}}var ak=$('agnes_key');if(ak){try{ak.value=localStorage.getItem('wb_personal_hub_agnes_key')||'';}catch(e){}}var hint=$('wsrcHint');if(hint)hint.textContent=qwReady()?'当前：和风天气(详细)':'当前：Open-Meteo(兜底)';}renderModelSelects();fillParamsUI();}
 /* ===== 豆包独立生图（火山引擎 Ark 图像 API）===== */
-function doubaoKey(){try{return localStorage.getItem('wb_personal_hub_doubao_key')||'';}catch(e){return '';}}
-function doubaoSetKey(v){try{localStorage.setItem('wb_personal_hub_doubao_key',(v||'').trim());}catch(e){}}
-function doubaoGet(k){try{return localStorage.getItem('wb_personal_hub_doubao_'+k)||'';}catch(e){return '';}}
-function doubaoSet(k,v){try{localStorage.setItem('wb_personal_hub_doubao_'+k,(v==null?'':v));}catch(e){}}
-function saveDoubaoKey(){var el=$('db_key');if(!el)return;var v=el.value.trim();doubaoSetKey(v);var h=$('dbKeyHint');if(h){h.style.color='#3aa655';h.textContent=v?'已保存':'已清除';}toast(v?'豆包 Key 已保存':'已清除');}
+function doubaoKey(){
+  if(D.dbKey)return D.dbKey;
+  try{var k=localStorage.getItem('wb_personal_hub_doubao_key');if(k)return k;}catch(e){}
+  var el=document.getElementById('db_key');if(el&&el.value&&el.value.trim())return el.value.trim();
+  return '';
+}
+function doubaoSetKey(v){D.dbKey=(v||'').trim();try{localStorage.setItem('wb_personal_hub_doubao_key',D.dbKey);}catch(e){}saveLocalSafe();}
+function doubaoGet(k){
+  if(k==='ep'){
+    if(D.dbEp)return D.dbEp;
+    try{var e=localStorage.getItem('wb_personal_hub_doubao_ep');if(e)return e;}catch(x){}
+    var el=document.getElementById('db_model');if(el&&el.value&&el.value.trim())return el.value.trim();
+    return '';
+  }
+  try{return localStorage.getItem('wb_personal_hub_doubao_'+k)||'';}catch(e){return '';}
+}
+function doubaoSet(k,v){if(k==='ep'){D.dbEp=(v==null?'':v);}try{localStorage.setItem('wb_personal_hub_doubao_'+k,(v==null?'':v));}catch(e){}}
+function saveDoubaoKey(){var el=$('db_key');if(!el)return;var v=el.value.trim();doubaoSetKey(v);var h=$('dbKeyHint');if(h){h.style.color='#3aa655';h.textContent=v?'已保存':'已清除';}scheduleCloudSync();toast(v?'豆包 Key 已保存':'已清除');}
+function saveDoubaoEp(){var el=$('db_model');if(!el)return;var v=el.value.trim();doubaoSet('ep',v);var h=$('dbEpHint');if(h){h.style.color='#3aa655';h.textContent=v?'已保存':'已清除';}saveLocalSafe();scheduleCloudSync();toast(v?'接入点 ID 已保存':'已清除');}
 async function dbGen(){
   var key=doubaoKey();var out=$('db_out');
   if(!key){if(out)out.innerHTML='<div class="mut2" style="color:#c0392b">请先在上方填写并保存豆包 Key</div>';return;}
@@ -2512,7 +2536,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260814d';
+var APP_VER='20260814e';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -2611,7 +2635,10 @@ async function dbGenImg2Img(ref,prompt,size,n){
 async function fileToDataURL(f){return new Promise(function(res,rej){var rd=new FileReader();rd.onload=function(){res(rd.result);};rd.onerror=rej;rd.readAsDataURL(f);});}
 // 图生图：选参考图后平台内压缩预览
 async function dbI2iRefPrev(){var prev=$('db_i2i_prev');var f=$('db_i2i_ref')&&$('db_i2i_ref').files[0];if(!prev)return;if(!f){prev.innerHTML='';return;}
-  try{var raw=await fileToDataURL(f);var cmp=await fitImg(raw);prev.innerHTML='<img src="'+cmp+'" alt="" style="max-width:100%;max-height:180px;border-radius:10px;border:1px solid var(--line);display:block"><div class="mut2" style="font-size:12px;margin-top:4px">已选参考图（已压缩预览，原图用于改图）</div>';}catch(e){prev.innerHTML='<div class="mut2" style="color:#c0392b">图片读取失败</div>';}}
+  try{var raw=await fileToDataURL(f);
+    prev.innerHTML='<img src="'+raw+'" alt="" style="max-width:100%;max-height:200px;border-radius:10px;border:1px solid var(--line);display:block"><div class="mut2" style="font-size:12px;margin-top:4px">已选参考图（原图用于改图）</div>';
+    fitImg(raw).then(function(cmp){prev.innerHTML='<img src="'+cmp+'" alt="" style="max-width:100%;max-height:200px;border-radius:10px;border:1px solid var(--line);display:block"><div class="mut2" style="font-size:12px;margin-top:4px">已选参考图（已压缩预览，原图用于改图）</div>';}).catch(function(){});
+  }catch(e){prev.innerHTML='<div class="mut2" style="color:#c0392b">图片读取失败</div>';}}
 // 图生图：勾选「以最近生成为底图」时显示底图预览；无底图则提示并取消
 function dbI2iChainToggle(){var prev=$('db_i2i_prev');var cb=$('db_i2i_chain');if(!cb)return;if(cb.checked){if(window.__dbLastImg){prev.innerHTML='<img src="'+window.__dbLastImg+'" alt="" style="max-width:100%;max-height:180px;border-radius:10px;border:1px solid var(--ac-doubao,#7c4dff);display:block"><div class="mut2" style="font-size:12px;margin-top:4px">将以此前生成的图为底图继续改图</div>';}else{toast('还没有生成过的图，请先在「豆包文生图」生成一张');cb.checked=false;prev.innerHTML='';}}else{if(prev)prev.innerHTML='';}}
 async function dbGenImg2ImgUI(){
