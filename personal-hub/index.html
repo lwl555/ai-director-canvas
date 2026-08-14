@@ -626,7 +626,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
   <button class="btn pri" onclick="dbGenImg2ImgUI()">🎨 图生图（改图）</button>
   <div id="db_i2i_out" class="mut2" style="margin-top:8px"></div>
 </div></div>
-<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M3 5h18v14H3z"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg><h3>我的豆包图库</h3><div class="sp"><span class="mut2" id="dbCnt"></span></div></div><div class="bd"><div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap"><button id="dbCleanBtn" class="btn ghost sm" onclick="dbCleanupCloud()">🧹 清理云端旧图</button><span class="mut2" style="font-size:12px;align-self:center">删除图库里已不存在的云端图，释放存储配额（需先跑授权 SQL）</span></div><div id="dbGallery" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px"></div></div></div>
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M3 5h18v14H3z"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg><h3>我的豆包图库</h3><div class="sp"><span class="mut2" id="dbCnt"></span></div></div><div class="bd"><div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap"><button id="dbCleanBtn" class="btn ghost sm" onclick="dbCleanupCloud()">🧹 清理云端旧图</button><button id="dbUpBtn" class="btn ghost sm" onclick="dbUploadAll()">☁️ 全部上传到云端</button><span class="mut2" style="font-size:12px;align-self:center">「清云端」只删图库里已不存在的云端图；「上传云端」把本地旧图转成可复制的永久网址</span></div><div id="dbGallery" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px"></div></div></div>
 </div></section>
 <section class="panel" id="p-notes"><div class="grid">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M14 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9l-7-6z"/><path d="M14 3v6h6"/></svg><h3>我的便签墙</h3><div class="sp"><span class="mut2" id="notesPanelCount"></span></div></div><div class="bd">
@@ -2376,6 +2376,25 @@ async function dbDeleteCloud(url){
     await fetch(SB_URL+'/storage/v1/object/ph-images/'+name,{method:'DELETE',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON}});
   }catch(e){}
 }
+async function dbUploadAll(){
+  var btn=document.getElementById('dbUpBtn');
+  if(btn){btn.disabled=true;btn.textContent='上传中…';}
+  try{
+    var list=(D.doubao||[]).filter(function(x){return x.url&&x.url.indexOf('data:')===0;});
+    if(!list.length){toast('没有需要上传的本地图（都已为网络链接）');return;}
+    var ok=0,fail=0;
+    for(var i=0;i<list.length;i++){
+      try{
+        var up=await dbUploadImage(list[i].url);
+        if(up){var rec=(D.doubao||[]).find(function(x){return x.id===list[i].id;});if(rec){rec.url=up;}ok++;}
+        else fail++;
+      }catch(e){fail++;}
+    }
+    saveLocalSafe();renderDoubaoGallery();
+    toast('全部上传完成：成功 '+ok+' 张'+(fail?'（'+fail+' 张失败，可能网络/未授权）':''));
+  }catch(e){toast('上传出错：'+(e.message||e));}
+  finally{if(btn){btn.disabled=false;btn.textContent='☁️ 全部上传到云端';}}
+}
 async function dbCleanupCloud(){
   var btn=document.getElementById('dbCleanBtn');
   if(btn){btn.disabled=true;btn.textContent='清理中…';}
@@ -2707,7 +2726,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260815b';
+var APP_VER='20260815c';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
