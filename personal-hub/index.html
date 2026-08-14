@@ -2265,7 +2265,7 @@ async function dbGenCore(prompt,size,n,key,ep){
   var ok=[],fail=0;
   for(var i=0;i<n;i++){
     try{
-      var body=JSON.stringify({model:ep,prompt:prompt,width:w,height:h,n:1,response_format:'b64_json'});
+      var body=JSON.stringify({model:ep,prompt:prompt,size:size,n:1,response_format:'b64_json'});
       var res=await fetch('https://ark.cn-beijing.volces.com/api/v3/images/generations',{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
@@ -2301,7 +2301,17 @@ async function dbGen(){
   toast('豆包图片生成完成'+(r.urls.length?'':'：全部失败'));
 }
 // ===== 尺寸/比例解析（文生图 + 图生图通用）=====
-function dbClampDims(w,h){w=Math.max(512,Math.min(2048,Math.round(w||1024)));h=Math.max(512,Math.min(2048,Math.round(h||1024)));return w+'x'+h;}
+function dbClampDims(w,h){
+  w=Math.round(Number(w)||1024); h=Math.round(Number(h)||1024);
+  if(w<1)w=1024; if(h<1)h=1024;
+  var MAX=2048, MIN=512, scale=1;
+  scale=Math.min(scale, MAX/w, MAX/h);                 // 缩到不超上限，保持比例
+  var up=Math.max(MIN/w, MIN/h);                       // 需要放大到不低于下限
+  if(up>1 && w*up<=MAX && h*up<=MAX) scale=up;         // 仅当放大后仍不超上限才放大
+  w=Math.round(w*scale); h=Math.round(h*scale);
+  w=Math.max(MIN,Math.min(MAX,w)); h=Math.max(MIN,Math.min(MAX,h));
+  return w+'x'+h;
+}
 function dbGetImgDims(src){return new Promise(function(res){var im=new Image();im.onload=function(){res({w:im.naturalWidth||1024,h:im.naturalHeight||1024});};im.onerror=function(){res(null);};im.src=src;});}
 async function dbResolveSizeCore(val,refDataUrl,cw,ch){
   if(val==='orig'){if(refDataUrl){var d=await dbGetImgDims(refDataUrl);if(d)return dbClampDims(d.w,d.h);}return '1024x1024';}
@@ -2577,7 +2587,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260814g';
+var APP_VER='20260814h';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -2685,8 +2695,7 @@ async function aiGenImageT2I(){
 async function dbGenImg2Img(ref,prompt,size,n){
   var key=doubaoKey(),ep=doubaoGet('ep');
   if(!key||!ep)throw new Error('请先在「豆包生图」填 Key 和接入点 ID');
-  var wh=size.split('x');var w=parseInt(wh[0],10)||1024;var h=parseInt(wh[1],10)||1024;
-  var body=JSON.stringify({model:ep,prompt:prompt,image:[ref],width:w,height:h,n:n,response_format:'b64_json'});
+  var body=JSON.stringify({model:ep,prompt:prompt,image:[ref],size:size,n:n,response_format:'b64_json'});
   var res=await fetch('https://ark.cn-beijing.volces.com/api/v3/images/generations',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:body}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j};});});
   if(!res.ok){var m=(res.j&&res.j.error&&res.j.error.message)||JSON.stringify(res.j);throw new Error(m);}
   var arr=(res.j&&res.j.data)||(res.j&&res.j.choices)||[];
