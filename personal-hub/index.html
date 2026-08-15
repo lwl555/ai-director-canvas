@@ -2531,6 +2531,9 @@ async function dbDeleteCloud(url){
     if(url.indexOf(base)!==0)return;
     var name=url.slice(base.length);
     await fetch(SB_URL+'/storage/v1/object/ph-images/'+name,{method:'DELETE',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON}});
+    // 同时删除旁挂元数据
+    var sm=/\.(jpe?g|png|gif|webp|bmp)$/i.exec(name);
+    if(sm){var jn=name.slice(0,sm.index)+'.json';try{await fetch(SB_URL+'/storage/v1/object/ph-images/'+jn,{method:'DELETE',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON}});}catch(e){}}
   }catch(e){}
 }
 async function dbUploadAll(){
@@ -2542,7 +2545,7 @@ async function dbUploadAll(){
     var ok=0,fail=0;
     for(var i=0;i<list.length;i++){
       try{
-        var up=await dbUploadImage(list[i].url);
+        var up=await dbUploadImage(list[i].url,{prompt:list[i].prompt,t:list[i].t});
         if(up){var rec=(D.doubao||[]).find(function(x){return x.id===list[i].id;});if(rec){rec.url=up;}ok++;}
         else fail++;
       }catch(e){fail++;}
@@ -2561,13 +2564,23 @@ async function dbCleanupCloud(){
     var objs=await lr.json();
     if(!Array.isArray(objs)||!objs.length){toast('云端没有可清理的旧图');return;}
     var keep=new Set((D.doubao||[]).map(function(x){return x.url;}).filter(Boolean));
+    var isImg=function(n){return /\.(jpe?g|png|gif|webp|bmp)$/i.test(n||'');};
+    var isJson=function(n){return /\.json$/i.test(n||'');};
+    var imgBases=new Set(objs.filter(function(o){return isImg(o.name);}).map(function(o){return o.name.replace(/\.(jpe?g|png|gif|webp|bmp)$/i,'');}));
     var del=0,fail=0;
+    function delObj(fullName){return fetch(SB_URL+'/storage/v1/object/ph-images/'+fullName,{method:'DELETE',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON}}).then(function(rr){if(rr.ok)del++;else if(rr.status!==404){fail++;console.warn('cleanup delete fail',fullName,rr.status);}}).catch(function(e){fail++;console.warn('cleanup delete err',fullName,e);});}
     for(var i=0;i<objs.length;i++){
       var name=objs[i].name;
-      var fullName='db/'+name;
-      var url=SB_URL+'/storage/v1/object/public/ph-images/'+fullName;
-      if(keep.has(url))continue;
-      try{var r=await fetch(SB_URL+'/storage/v1/object/ph-images/'+fullName,{method:'DELETE',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON}});if(r.ok)del++;else{fail++;console.warn('cleanup delete fail',fullName,r.status,await r.text().catch(function(){}));}}catch(e){fail++;console.warn('cleanup delete err',fullName,e);}
+      var url=SB_URL+'/storage/v1/object/public/ph-images/db/'+name;
+      if(isImg(name)){
+        if(keep.has(url))continue;
+        await delObj('db/'+name);
+        var ib=name.replace(/\.(jpe?g|png|gif|webp|bmp)$/i,'');
+        await delObj('db/'+ib+'.json'); // 删除对应旁挂元数据
+      }else if(isJson(name)){
+        var jb=name.replace(/\.json$/i,'');
+        if(!imgBases.has(jb))await delObj('db/'+name); // 孤儿旁挂，清掉
+      }
     }
     toast('云端清理完成：删除 '+del+' 张'+(fail?'（'+fail+' 张失败，可能是网络或授权）':''));
   }catch(e){toast('清理出错：'+(e.message||e));}
@@ -2583,14 +2596,36 @@ async function dbRestoreFromCloud(){
     if(!Array.isArray(objs)||!objs.length){toast('云端没有可恢复的图');return;}
     var base=SB_URL+'/storage/v1/object/public/ph-images/db/';
     var have=new Set((D.doubao||[]).map(function(x){return x.url;}).filter(Boolean));
+    // 只处理图片，跳过 .json 旁挂元数据
+    var imgObjs=objs.filter(function(o){return /\.(jpe?g|png|gif|webp|bmp)$/i.test(o.name||'');});
+    var items=new Array(imgObjs.length).fill(null);
     var added=0;
-    for(var i=0;i<objs.length;i++){
-      var url=base+objs[i].name;
+    for(var i=0;i<imgObjs.length;i++){
+      var url=base+imgObjs[i].name;
       if(have.has(url))continue;
-      var m=/^(\d+)_/.exec(objs[i].name||'');
-      var t=m?parseInt(m[1],10):(objs[i].created_at?Date.parse(objs[i].created_at):Date.now());
-      D.doubao.unshift({id:'d'+Date.now()+Math.random().toString(36).slice(2,5),url:url,prompt:'',t:t});
-      added++;
+      var m=/^(\d+)_/.exec(imgObjs[i].name||'');
+      var t=m?parseInt(m[1],10):(imgObjs[i].created_at?Date.parse(imgObjs[i].created_at):Date.now());
+      var item={id:'d'+Date.now()+Math.random().toString(36).slice(2,5),url:url,prompt:'',t:t};
+      D.doubao.unshift(item);items[i]=item;added++;
+    }
+    // 并发读取旁挂 prompt 元数据（限流 8，避免一次性打爆请求）
+    if(added){
+      var CONC=8,widx=0;
+      async function worker(){
+        while(widx<imgObjs.length){
+          var k=widx++;var o=imgObjs[k];var it=items[k];if(!it)continue;
+          try{
+            var sm=/\.(jpe?g|png|gif|webp|bmp)$/i.exec(o.name);
+            if(sm){
+              var jurl=base+o.name.slice(0,sm.index)+'.json';
+              var jr=await fetch(jurl);
+              if(jr.ok){var jd=await jr.json();if(jd&&jd.prompt!=null)it.prompt=jd.prompt;}
+            }
+          }catch(e){}
+        }
+      }
+      var ws=[];for(var w=0;w<CONC;w++)ws.push(worker());
+      try{await Promise.all(ws);}catch(e){}
     }
     if(added){saveLocalSafe();renderDoubaoGallery();}
     toast('已从云端恢复 '+added+' 张图'+(have.size?'（本地原有 '+have.size+' 张已跳过）':''));
@@ -2638,7 +2673,7 @@ function storeDoubao(dataUrl,prompt,persist){
   dbUpgradeImage(item);
   return item.id;
 }
-async function dbUploadImage(dataUrl){
+async function dbUploadImage(dataUrl,meta){
   try{
     if(!dataUrl||dataUrl.indexOf('data:')!==0)return null;
     // A) 上传前压缩：最长边 1280，统一 jpeg 0.82，单图体积降到 ~0.3-0.8MB，省存储配额
@@ -2653,27 +2688,39 @@ async function dbUploadImage(dataUrl){
       dataUrl=cv.toDataURL('image/jpeg',0.82);
     }catch(e){}
     var c=dataUrl.indexOf(','); if(c<0)return null;
-    var meta=dataUrl.slice(5,c);
-    var isPng=/png/i.test(meta);
+    var mime=dataUrl.slice(5,c);
+    var isPng=/png/i.test(mime);
     var b64=dataUrl.slice(c+1);
     var bin=atob(b64);
     var arr=new Uint8Array(bin.length);
     for(var i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);
     var blob=new Blob([arr],{type:isPng?'image/png':'image/jpeg'});
     var ext=isPng?'png':'jpg';
-    var path='db/'+Date.now()+'_'+Math.random().toString(36).slice(2,8)+'.'+ext;
+    var stamp=Date.now()+'_'+Math.random().toString(36).slice(2,8);
+    var path='db/'+stamp+'.'+ext;
     var r=await fetch(SB_URL+'/storage/v1/object/ph-images/'+path,{
       method:'POST',
       headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':(isPng?'image/png':'image/jpeg'),'x-upsert':'true','cache-control':'max-age=31536000'},
       body:blob
     });
     if(!r.ok)return null;
+    // 同步上传元数据旁挂文件（含 prompt），从云端恢复图库时可找回 prompt
+    if(meta){
+      try{
+        var jb=JSON.stringify({prompt:(meta.prompt||''),t:(meta.t||Date.now()),v:1});
+        await fetch(SB_URL+'/storage/v1/object/ph-images/db/'+stamp+'.json',{
+          method:'POST',
+          headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json','x-upsert':'true','cache-control':'max-age=31536000'},
+          body:jb
+        });
+      }catch(e){}
+    }
     return SB_URL+'/storage/v1/object/public/ph-images/'+path;
   }catch(e){return null;}
 }
 async function dbUpgradeImage(item){
   try{
-    var up=await dbUploadImage(item.url);
+    var up=await dbUploadImage(item.url,{prompt:item.prompt,t:item.t});
     if(!up)return;
     var rec=(D.doubao||[]).find(function(x){return x.id===item.id;});
     if(rec&&rec.url!==up){rec.url=up;try{saveLocal();}catch(e){}renderDoubaoGallery();}
@@ -2722,7 +2769,8 @@ async function copyImgLink(url){
   var target=url;
   if(url.indexOf('data:')===0){
     toast('正在生成可分享链接…');
-    var up=await dbUploadImage(url);
+    var rec=(D.doubao||[]).find(function(x){return x.url===url;});
+    var up=await dbUploadImage(url,rec?{prompt:rec.prompt,t:rec.t}:undefined);
     if(up)target=up;
   }
   var ok=await copyText(target);
@@ -3139,7 +3187,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260815r';
+var APP_VER='20260815s';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
