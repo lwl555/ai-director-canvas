@@ -673,9 +673,13 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
   <div style="display:flex;flex-direction:column;gap:8px">
     <textarea id="ill_text" placeholder="粘贴文章 / 文案，点「开始配图」后，AI 会自动联网搜索资料、核查真实性，并在合适位置配上网络图与 AI 生成图。" style="min-height:150px;width:100%;font-size:16px;padding:10px;border-radius:10px;border:1px solid #d9d9e3;box-sizing:border-box;resize:vertical"></textarea>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <label class="btn ghost sm" style="cursor:pointer"><input id="ill_file" type="file" accept=".txt,.md,text/plain" style="display:none" onchange="illLoadFile()">📄 上传 TXT/MD</label>
+      <label class="btn ghost sm" style="cursor:pointer"><input id="ill_file" type="file" accept=".txt,.md,text/plain" style="display:none" onchange="illLoadFile()">📄 上传 TXT/MD（电脑端）</label>
       <button class="btn pri" id="illBtn" onclick="illStart()">🪄 开始配图</button>
       <span id="illStatus" class="mut2" style="font-size:12px"></span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <input id="ill_link" class="f1" placeholder="或粘贴文章链接（.txt/.md/网页，App 内可用）" style="min-height:36px">
+      <button class="btn sm" onclick="illLoadLink()">🔗 导入链接</button>
     </div>
   </div>
 </div>
@@ -2728,6 +2732,19 @@ async function cloudSyncDoPush(){setIllSyncHint('同步中…');var ok=await clo
 async function cloudSyncDoPull(){setIllSyncHint('恢复中…');var ok=await cloudSyncPull();if(ok){setIllSyncHint('✅ 已从云端恢复密钥');illFillKeys();var dbk=$('db_key');if(dbk)dbk.value=doubaoKey();}else{setIllSyncHint('❌ 恢复失败（确认口令一致且有云端备份）');}}
 function setIllSyncHint(m){var el=$('illSyncHint');if(el)el.textContent=m;}
 function illLoadFile(){var f=$('ill_file');if(!f||!f.files||!f.files[0])return;var rd=new FileReader();rd.onload=function(){var ta=$('ill_text');if(ta)ta.value=rd.result;toast('已载入文件');};rd.readAsText(f.files[0]);}
+async function illLoadLink(){
+  var inp=$('ill_link');if(!inp)return;var u=inp.value.trim();if(!u){toast('先粘贴链接');return;}
+  try{
+    setIllStatus('正在从链接读取…');
+    var r=await fetch(u,{headers:{'Accept':'text/plain,text/markdown,text/*,*/*'}});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    var txt=await r.text();
+    if(/<html|<body|<\/p>|<\/div>|<\/article>/i.test(txt)){txt=txt.replace(/<script[\s\S]*?<\/script>/gi,'').replace(/<style[\s\S]*?<\/style>/gi,'').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim();}
+    var ta=$('ill_text');if(ta){ta.value=txt;ta.focus();}
+    setIllStatus('✅ 已从链接导入（'+txt.length+' 字）');
+    toast('已导入链接内容');
+  }catch(e){setIllStatus('导入失败：'+(e&&e.message||e)+'（链接需允许跨域访问）');}
+}
 function setIllStatus(m){var el=$('illStatus');if(el)el.textContent=m;}
 async function illChat(messages,maxTok){
   maxTok=maxTok||3000;
@@ -3035,7 +3052,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260815n';
+var APP_VER='20260815o';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
