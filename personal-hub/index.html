@@ -682,12 +682,11 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="card"><div class="hd"><h3>搜索源设置</h3><span class="sp mut2">免费 key · 仅存本机</span></div>
 <div class="bd">
   <div class="form" style="gap:8px;flex-wrap:wrap">
-    <input id="ill_brave" class="f1" placeholder="Brave Search API Key（网页搜索 / 事实核查）" style="min-height:38px">
-    <input id="ill_unsplash" class="f1" placeholder="Unsplash Access Key（网络配图）" style="min-height:38px">
+    <input id="ill_unsplash" class="f1" placeholder="Unsplash Access Key（可选 · 网络配图更精准；留空也能用 Wikimedia 自动配图）" style="min-height:38px">
     <button class="btn sm" onclick="illSaveKeys()">保存</button>
     <span id="illKeyHint" class="mut2" style="font-size:12px"></span>
   </div>
-  <div class="mut2" style="font-size:12px;margin-top:6px">① Brave：brave.com/search/api 免费注册拿 Key（约 2000 次/月）。② Unsplash：unsplash.com/developers 免费建 App 拿 Access Key。两者均免绑卡，Key 只存你本机不上传。不填则对应能力（搜索/网络图）不可用，AI 生图仍可用。</div>
+  <div class="mut2" style="font-size:12px;margin-top:6px">① 联网搜索 / 事实核查：已改为 <b>Wikipedia 官方 API</b>，<b>免 Key、免绑卡</b>，自动中英文检索。② 网络配图：默认走 <b>Wikimedia Commons</b>（免 Key、免绑卡）；若填了 Unsplash Key 则优先用它（更精准）。所有 Key 仅存本机，不上传。</div>
   <div style="border-top:1px dashed var(--line);margin-top:8px;padding-top:8px">
     <div class="hd" style="margin-bottom:6px"><h3 style="font-size:14px">🔁 密钥云同步</h3><span class="sp mut2">存你 Supabase，换设备不用重填</span></div>
     <div class="form" style="gap:8px;flex-wrap:wrap">
@@ -2708,8 +2707,8 @@ function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
 function illParseJSON(s){if(!s)return null;s=String(s).trim().replace(/^```(?:json)?/i,'').replace(/```$/,'');
   var a=s.indexOf('{'),b=s.lastIndexOf('}');if(a>=0&&b>a)s=s.slice(a,b+1);
   try{return JSON.parse(s);}catch(e){return null;}}
-function illFillKeys(){var b=$('ill_brave'),u=$('ill_unsplash');if(b&&!b.value)b.value=illGet('brave');if(u&&!u.value)u.value=illGet('unsplash');}
-function illSaveKeys(){illSet('brave',$('ill_brave').value.trim());illSet('unsplash',$('ill_unsplash').value.trim());var h=$('illKeyHint');if(h){h.style.color='#3aa655';h.textContent='已保存（仅本机）';}toast('搜索源 Key 已保存');cloudSyncPush();}
+function illFillKeys(){var u=$('ill_unsplash');if(u&&!u.value)u.value=illGet('unsplash');}
+function illSaveKeys(){illSet('unsplash',$('ill_unsplash').value.trim());var h=$('illKeyHint');if(h){h.style.color='#3aa655';h.textContent='已保存（仅本机）';}toast('搜索源 Key 已保存');cloudSyncPush();}
 /* ===== 密钥云同步（存 Supabase，换设备可恢复） ===== */
 function cloudSyncPwd(){try{return localStorage.getItem('wb_personal_hub_sync_pwd')||'personal-hub-default';}catch(e){return 'personal-hub-default';}}
 function cloudSyncXor(s,pwd){var o='';for(var i=0;i<s.length;i++){o+=String.fromCharCode(s.charCodeAt(i)^pwd.charCodeAt(i%pwd.length));}return o;}
@@ -2743,17 +2742,18 @@ async function illChat(messages,maxTok){
   }
   throw new Error('no-ai');
 }
-async function illBraveSearch(q,rounds){
-  rounds=rounds||3;var key=illGet('brave');if(!key)return [];
-  var out=[];
-  for(var off=0;off<rounds*20;off+=20){
+async function illWikiSearch(q,rounds){
+  rounds=rounds||2;var out=[];var langs=['zh','en'];
+  for(var li=0;li<langs.length && out.length<rounds*8;li++){
+    var lang=langs[li];
     try{
-      var u='https://api.search.brave.com/res/v1/web/search?q='+encodeURIComponent(q)+'&count=20&offset='+off;
-      var r=await fetch(u,{headers:{'X-Subscription-Token':key,'Accept':'application/json'}});
-      if(!r.ok)break;
-      var j=await r.json();var res=(j&&j.web&&j.web.results)||[];if(!res.length)break;
-      res.forEach(function(it){out.push({title:it.title||'',url:it.url||'',desc:it.description||''});});
-    }catch(e){break;}
+      var u='https://'+lang+'.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(q)+'&srlimit='+Math.min(20,rounds*5)+'&format=json&origin=*';
+      var r=await fetch(u,{headers:{'Accept':'application/json'}});
+      if(!r.ok)continue;
+      var j=await r.json();var res=(j&&j.query&&j.query.search)||[];
+      res.forEach(function(it){out.push({title:it.title||'',url:'https://'+lang+'.wikipedia.org/wiki/'+encodeURIComponent((it.title||'').replace(/ /g,'_')),desc:(it.snippet||'').replace(/<[^>]+>/g,'')});});
+      if(li===0 && out.length>=rounds*4)break;
+    }catch(e){}
   }
   return out;
 }
@@ -2768,8 +2768,22 @@ async function illUnsplash(q){
     return {url:pick.urls.regular,author:pick.user?pick.user.name:'',page:pick.links?pick.links.html:''};
   }catch(e){return null;}
 }
+async function illCommons(q){
+  try{
+    var u='https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent(q)+'+filetype:bitmap&gsrlimit=8&prop=imageinfo&iiprop=url|extmetadata|mime&iiurlwidth=1280&format=json&origin=*';
+    var r=await fetch(u,{headers:{'Accept':'application/json'}});
+    if(!r.ok)return null;
+    var j=await r.json();var pages=(j&&j.query&&j.query.pages)||{};
+    var arr=Object.keys(pages).map(function(k){return pages[k];}).filter(function(p){return p.imageinfo&&p.imageinfo[0]&&/^image\//.test(p.imageinfo[0].mime||'');});
+    if(!arr.length)return null;
+    var pick=arr[Math.floor(Math.random()*Math.min(arr.length,5))];
+    var ii=pick.imageinfo[0];var em=ii.extmetadata||{};
+    var author=(em.Artist&&em.Artist.value)?em.Artist.value.replace(/<[^>]+>/g,'').replace(/\[\[/g,'').replace(/\]\]/g,'').trim().slice(0,40):'Wikimedia Commons';
+    return {url:ii.thumburl||ii.url,author:author,page:'https://commons.wikimedia.org/wiki/File:'+encodeURIComponent((pick.title||'').replace(/^File:/,'').replace(/ /g,'_'))};
+  }catch(e){return null;}
+}
 async function illFactCheck(claim,q){
-  var res=await illBraveSearch(q,2);
+  var res=await illWikiSearch(q,2);
   var ctx=res.slice(0,8).map(function(x){return '- '+x.title+': '+x.desc;}).join('\n');
   var sys={role:'system',content:'你是事实核查员。根据提供的搜索资料判断陈述真实性。只输出 JSON：{"verdict":"真实|存疑|虚假|无法核实","reason":"一句话理由","sources":["来源url"]}。不要多余解释。'};
   var usr={role:'user',content:'陈述：'+claim+'\n\n搜索资料：\n'+(ctx||'（无搜索资料）')};
@@ -2847,7 +2861,7 @@ async function illStart(){
     var plan=await illAnalyze(art);
     if(!plan||!plan.paragraphs||!plan.paragraphs.length){setIllStatus('分析失败：AI 未返回有效结构（检查 Agnes Key）');return;}
     var need=(plan.paragraphs||[]).filter(function(p){return p.needsImage;}).length;
-    setIllStatus('② 深度联网搜索 + 事实核查（多轮，时间越长越准）…');
+    setIllStatus('② Wikipedia 联网检索 + 事实核查…');
     var facts=[];
     for(var fi=0;fi<(plan.facts||[]).length;fi++){
       setIllStatus('② 核查事实 '+(fi+1)+'/'+(plan.facts.length));
@@ -2860,7 +2874,7 @@ async function illStart(){
       var p=plan.paragraphs[i];if(!p.needsImage)continue;
       done++;setIllStatus('③ 配图 '+done+'/'+need);
       var type=p.imgType||'either',web=null,ai=null;
-      if(type==='web'||type==='either')web=await illUnsplash(p.query);
+      if(type==='web'||type==='either'){if(illGet('unsplash'))web=await illUnsplash(p.query);if(!web)web=await illCommons(p.query);}
       if(!web&&(type==='ai'||type==='either'))ai=await illGenImage(p.aiPrompt);
       if(web)imgs[i]={type:'web',url:web.url,author:web.author,page:web.page,prompt:p.aiPrompt,caption:p.caption};
       else if(ai)imgs[i]={type:'ai',url:ai,prompt:p.aiPrompt,caption:p.caption};
@@ -3021,7 +3035,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260815m';
+var APP_VER='20260815n';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
