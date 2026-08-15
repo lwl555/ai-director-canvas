@@ -91,7 +91,7 @@ header{padding:22px 0 10px}
 .trow.od .tx{color:var(--rust);font-weight:600}
 .trow.od .tg{background:var(--rust-l);color:var(--rust);border-color:var(--rust-l)}
 .empty{padding:22px 4px;color:var(--ink3);font-size:14px;text-align:center;font-style:italic}
-nav.tabs{display:flex;gap:7px;margin:18px 0 0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+nav.tabs{display:flex;gap:7px;margin:18px 0 0;flex-wrap:wrap;justify-content:center;padding-bottom:2px}
 nav.tabs::-webkit-scrollbar{display:none}
 nav.tabs button{display:inline-flex;align-items:center;gap:7px;min-height:42px;padding:0 14px;border:1.5px solid var(--line2);background:transparent;border-radius:11px;font-size:14px;font-weight:600;color:var(--ink2);cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap;flex:none}
 nav.tabs button:hover{background:var(--card);color:var(--ink)}
@@ -3342,7 +3342,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260815ad';
+var APP_VER='20260815ae';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
