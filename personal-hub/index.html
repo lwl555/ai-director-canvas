@@ -424,7 +424,7 @@ input.datepick{cursor:pointer;background:var(--card)}
 <div class="tip" id="tip"><svg class="ico" viewBox="0 0 24 24" style="flex:none"><path d="M12 8.5v5M12 16.6v.1"/><circle cx="12" cy="12" r="9"/></svg><div>数据已积累 <b id="tipN">0</b> 条，建议导出备份。</div><div class="x" onclick="hideTip()"><svg class="ico s" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div></div>
 <div class="today" id="todayBox" onclick="switchTab('top')" style="cursor:pointer"><div class="hd"><svg class="ico b" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.3M12 19.1v2.3M21.4 12h-2.3M4.9 12H2.6M18.6 5.4l-1.6 1.6M7 17l-1.6 1.6M18.6 18.6L17 17M7 7L5.4 5.4"/></svg><h2>今天要处理</h2><div class="cnt"><span id="todayCnt"></span><span class="mut2">点击查看今日详情 →</span></div></div><div class="bd" id="todayList"></div></div>
 <div class="card" id="dlBar" style="border:1.5px solid var(--clay)">
-  <div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.4"/><path d="M10.5 18.5h3"/></svg><h3>下载 APP（手机/电脑都可用）</h3><span class="mut2" style="margin-left:auto;cursor:pointer" onclick="document.getElementById('dlBar').style.display='none'">收起 ✕</span></div>
+  <div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.4"/><path d="M10.5 18.5h3"/></svg><h3>下载 APP（手机/电脑都可用）</h3><span class="mut2" style="margin-left:auto;cursor:pointer" onclick="closeDlBar()">收起 ✕</span></div>
   <div class="bd">
     <div class="form" style="gap:8px">
       <a class="btn pri" href="https://github.com/lwl555/ai-director-canvas/releases/download/app-latest/personal-hub.apk" download="松屿工作台.apk" target="_blank" rel="noopener" style="text-align:center">📱 安卓下载 APK</a>
@@ -450,6 +450,13 @@ input.datepick{cursor:pointer;background:var(--card)}
   <div class="set-card">
     <div class="set-hd"><b>⚙ 设置</b><button class="x" onclick="closeSettings()" title="关闭"><svg class="ico s" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div class="set-bd">
+      <div class="set-sec"><div class="set-t">界面显示</div>
+        <div class="form" style="gap:10px">
+          <button class="btn sm" id="set_showToolbar" onclick="toggleUiFlag('showToolbar')">工具条：开</button>
+          <button class="btn sm" id="set_showDlBar" onclick="toggleUiFlag('showDlBar')">下载APP：开</button>
+        </div>
+        <div class="mut2" style="font-size:12px">工具条在「今日」板块始终显示；在其他板块点击 × 收起后会全局隐藏，可在此重新打开。</div>
+      </div>
       <div class="set-sec"><div class="set-t">我的称呼</div>
         <div class="form"><input id="hub_name" class="f1" placeholder="如 松屿" style="min-height:38px"><button class="btn pri sm" onclick="saveHubName()">保存</button><span class="mut2" style="font-size:12px">保存后问候立即更新</span></div>
         <div class="mut2" style="font-size:12px">显示在「今日」问候里，如「晚上好，松屿」</div>
@@ -2046,6 +2053,19 @@ function publishToMedia(id){
   saveLocal();scheduleCloudSync();renderVideos();renderKanban();renderToday();
   toast('已推送到自媒体看板 ✅');
 }
+var UI_FLAGS_KEY='wb_ph_ui_flags';var uiFlags={showToolbar:true,showDlBar:true};
+function loadUiFlags(){try{var s=localStorage.getItem(UI_FLAGS_KEY);if(s){uiFlags=Object.assign(uiFlags,JSON.parse(s));}}catch(e){}return uiFlags;}
+function saveUiFlags(){try{localStorage.setItem(UI_FLAGS_KEY,JSON.stringify(uiFlags));}catch(e){}}
+function applyUiFlags(){loadUiFlags();updateToolbarVisibility(curTab);}
+function updateToolbarVisibility(t){
+  var tb=document.querySelector('.tools');var cb=$('toolsCloseBtn');var db=$('dlBar');
+  var isTop=(t==='top');
+  if(tb){tb.style.display=(isTop||uiFlags.showToolbar)?'':'none';}
+  if(cb){cb.style.display=(isTop||!uiFlags.showToolbar)?'none':'';}
+  if(db){db.style.display=uiFlags.showDlBar?'':'none';}
+}
+function toggleUiFlag(k){if(k!=='showToolbar'&&k!=='showDlBar')return;uiFlags[k]=!uiFlags[k];saveUiFlags();updateToolbarVisibility(curTab);renderUiFlagButtons();}
+function renderUiFlagButtons(){var a=$('set_showToolbar'),b=$('set_showDlBar');if(a)a.textContent='工具条：'+(uiFlags.showToolbar?'开':'关');if(b)b.textContent='下载APP：'+(uiFlags.showDlBar?'开':'关');}
 var toolsClosed=false;
 function switchTab(t){curTab=t;
 var AC={'top':'var(--ac-top)','media':'var(--ac-media)','video':'var(--ac-video)','ecom':'var(--ac-ecom)','hot':'var(--ac-hot)','life':'var(--ac-life)','ai':'var(--ac-ai)','doubao':'#B5732C','notes':'#d4a03d'};
@@ -2055,8 +2075,9 @@ document.documentElement.style.setProperty('--ac', AC[t]||'var(--ac-top)');
   document.querySelectorAll('section.panel').forEach(function(p){p.classList.toggle('on',p.id==='p-'+t);});
   if(t==='ai')setTimeout(function(){$('ai_input').focus();},200);
   if(t==='hot'&&!hotLoaded)loadHot('weibo');
-  if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video'){renderShotTimeline();loadActiveChat('vdir');}if(t==='ai')loadActiveChat('ai');if(t==='ecom'){renderEcomBoard();renderHotTabs();renderHotProducts();}if(t==='doubao')renderDoubaoGallery();if(t==='notes')renderNotesPanel();if(t==='illust')illFillKeys();var tb=document.querySelector('.tools');if(tb){if(t==='top'){toolsClosed=false;tb.style.display='';}else{tb.style.display=toolsClosed?'none':'';}}var closeBtn=$('toolsCloseBtn');if(closeBtn){closeBtn.style.display=t==='top'?'none':'';}}
-function closeTools(){toolsClosed=true;var tb=document.querySelector('.tools');if(tb)tb.style.display='none';}
+  if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video'){renderShotTimeline();loadActiveChat('vdir');}if(t==='ai')loadActiveChat('ai');if(t==='ecom'){renderEcomBoard();renderHotTabs();renderHotProducts();}if(t==='doubao')renderDoubaoGallery();if(t==='notes')renderNotesPanel();if(t==='illust')illFillKeys();updateToolbarVisibility(t);}
+function closeTools(){uiFlags.showToolbar=false;saveUiFlags();updateToolbarVisibility(curTab);}
+function closeDlBar(){uiFlags.showDlBar=false;saveUiFlags();updateToolbarVisibility(curTab);}
 
 // ===== RENDER ALL =====
 function renderAll(){switchCat();renderKanban();renderAssets();renderStats();renderShots();renderShotTimeline();renderPrompts();renderVideos();renderLedger();renderHabits();renderTodos();renderProducts();renderEcomBoard();renderHotProducts();renderTodayNotes();renderToday();renderTop();initHot();checkTip();renderNotesPanel();checkNoteReminders();var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;renderChatHistory();renderDoubaoGallery();/* agnes video panel init (D ready here) */try{vdirGallery();renderVdirChatHistory();}catch(e){console.warn('vdir init',e);}if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb=$('vdirKeyBar');if(kb)kb.style.display='block';}});}}
@@ -3185,7 +3206,7 @@ function addModel(){var n=$('nm_name').value.trim();var t=$('nm_type').value;if(
 function delModel(i){if(!window.__MODELS)return;window.__MODELS.splice(i,1);saveModels();renderModelSelects();}
 function fillParamsUI(){try{$('p_seed').value=GEN_PARAMS.seed||'';$('p_steps').value=GEN_PARAMS.steps||30;$('p_cfg').value=GEN_PARAMS.cfg||7.5;$('p_ratio').value=GEN_PARAMS.ratio||'16:9';$('p_w').value=GEN_PARAMS.width||1152;$('p_h').value=GEN_PARAMS.height||768;$('p_neg').value=GEN_PARAMS.negative||'';}catch(e){}}
 function saveParamsUI(){GEN_PARAMS={seed:$('p_seed').value.trim(),steps:parseInt($('p_steps').value)||30,cfg:parseFloat($('p_cfg').value)||7.5,width:parseInt($('p_w').value)||1152,height:parseInt($('p_h').value)||768,fps:videoFps(),ratio:$('p_ratio').value.trim()||'16:9',negative:$('p_neg').value.trim()};saveModels();var h=$('paramHint');if(h){h.style.color='#3aa655';h.textContent='已保存';}toast('参数已保存');}
-function openSettings(){try{fillParamsUI();}catch(e){}fillChatParamsUI();renderModelSelects();try{$('hub_name').value=localStorage.getItem('wb_personal_hub_name')||'';}catch(e){}try{$('qq_email').value=localStorage.getItem('wb_personal_hub_qq_email')||'';}catch(e){}var m=$('setModal');if(m)m.style.display='flex';}
+function openSettings(){try{fillParamsUI();}catch(e){}fillChatParamsUI();renderModelSelects();try{$('hub_name').value=localStorage.getItem('wb_personal_hub_name')||'';}catch(e){}try{$('qq_email').value=localStorage.getItem('wb_personal_hub_qq_email')||'';}catch(e){}renderUiFlagButtons();var m=$('setModal');if(m)m.style.display='flex';}
 function closeSettings(){var m=$('setModal');if(m)m.style.display='none';}
 function fillChatParamsUI(){try{var cp=CHAT_PARAMS||{temperature:0.8,max_tokens:1024};var t=$('c_temp');if(t)t.value=cp.temperature;var tv=$('c_temp_v');if(tv)tv.textContent=cp.temperature;$('c_maxtok').value=cp.max_tokens;segInit('c_maxtok','c_maxtok_btns');}catch(e){}}
 function saveChatParams(){CHAT_PARAMS={temperature:parseFloat($('c_temp').value)||0.8,max_tokens:parseInt($('c_maxtok').value)||1024};try{localStorage.setItem('ph_chat_params',JSON.stringify(CHAT_PARAMS));}catch(e){}var h=$('chatParamHint');if(h){h.style.color='#3aa655';h.textContent='已保存';}toast('对话参数已保存');}
@@ -3321,7 +3342,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260815ac';
+var APP_VER='20260815ad';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -3505,6 +3526,7 @@ window.addEventListener('DOMContentLoaded',function(){
       if(!window.__swReloaded){ window.__swReloaded=true; location.reload(); }
     });
   }
+  applyUiFlags();
 });
 </script>
 </body>
