@@ -2563,7 +2563,7 @@ async function dbUploadAll(){
         if(!sm)continue;
         var jn=nm.slice(0,sm.index)+'.json';
         var jb=JSON.stringify({prompt:it.prompt,t:it.t||Date.now(),v:1});
-        var rr=await fetch(SB_URL+'/storage/v1/object/ph-images/'+jn,{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json','x-upsert':'true','cache-control':'max-age=31536000'},body:jb});
+        var rr=await fetch(SB_URL+'/storage/v1/object/ph-images/'+jn,{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'image/jpeg','x-upsert':'true','cache-control':'max-age=31536000'},body:jb});
         if(rr.ok)sOk++;else sFail++;
       }catch(e){sFail++;}
     }
@@ -2730,7 +2730,7 @@ async function dbUploadImage(dataUrl,meta){
         var jb=JSON.stringify({prompt:(meta.prompt||''),t:(meta.t||Date.now()),v:1});
         await fetch(SB_URL+'/storage/v1/object/ph-images/db/'+stamp+'.json',{
           method:'POST',
-          headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json','x-upsert':'true','cache-control':'max-age=31536000'},
+          headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'image/jpeg','x-upsert':'true','cache-control':'max-age=31536000'},
           body:jb
         });
       }catch(e){}
@@ -3207,7 +3207,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260815t';
+var APP_VER='20260815u';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
