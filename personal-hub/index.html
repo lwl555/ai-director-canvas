@@ -617,17 +617,10 @@ input.datepick{cursor:pointer;background:var(--card)}
 </div>
 </div></section>
 <section class="panel" id="p-hot"><div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>今日热度榜</h3><div class="sp"><span class="mut2" id="hotUpd"></span></div></div><div class="bd">
-<div class="hot-src" id="hotSrc">
-<button type="button" data-h="weibo" class="on" onclick="loadHot('weibo')">微博热搜</button>
-<button type="button" data-h="zhihu" onclick="loadHot('zhihu')">知乎热榜</button>
-<button type="button" data-h="douyin" onclick="loadHot('douyin')">抖音热点</button>
-<button type="button" data-h="toutiao" onclick="loadHot('toutiao')">头条热榜</button>
-<button type="button" data-h="bilibili" onclick="loadHot('bilibili')">B站热榜</button>
-<button type="button" data-h="baidu" onclick="loadHot('baidu')">百度热搜</button>
-</div>
+<div class="hot-src" id="hotTabs"></div>
 <div class="form"><input class="fw" id="hotSearch" placeholder="搜索榜单内容…" oninput="searchHot()"></div>
 <div class="stats" id="hotStats" style="display:none"></div>
-<div id="hotList"><div class="empty">选择上方平台查看实时热榜</div></div>
+<div id="hotProducts"></div>
 </div></div></section>
 <!-- 数据参谋面板已合并进「AI视频制作」标签页的「数据参谋」模式 -->
 <section class="panel" id="p-ai"><div class="grid">
@@ -1934,8 +1927,9 @@ function hotRecScore(x){var h=Number(x.h)||0;var m=String(x.sales||'').match(/([
 function hotRecLabel(s){if(s>=80)return ['强烈推荐','#E0533D'];if(s>=65)return ['可尝试','#E8A23D'];return ['观望','#7C8A92'];}
 function renderHotTabs(){var box=$('hotTabs');if(!box)return;box.innerHTML=Object.keys(HOT_SEED).map(function(p){return '<button type="button" data-h="'+p+'" class="'+(p===hotPlat?'on':'')+'" onclick="selectHotPlat(\''+p+'\')">'+esc(p)+'</button>';}).join('');}
 function selectHotPlat(p){hotPlat=p;renderHotTabs();renderHotProducts();}
-function renderHotProducts(){var box=$('hotProducts');if(!box)return;renderHotTabs();
+function renderHotProducts(q){var box=$('hotProducts');if(!box)return;renderHotTabs();
   var arr=(HOT_SEED[hotPlat]||[]).slice().sort(function(a,b){return b.h-a.h;});
+  if(q&&q.trim()){var qq=q.trim().toLowerCase();arr=arr.filter(function(x){return (x.n||'').toLowerCase().indexOf(qq)>=0||(x.tag||'').toLowerCase().indexOf(qq)>=0||(x.price||'').toLowerCase().indexOf(qq)>=0;});}
   var maxH=Math.max.apply(null,arr.map(function(x){return x.h}).concat([1]));
   var html='<div class="mut2" style="margin-bottom:8px">⚠ 以下为<strong>'+esc(hotPlat)+'</strong>参考样例热点（非实时抓取，用于选题灵感）。</div>';
   html+=arr.map(function(x,i){var gi=hotPlat+'|'+HOT_SEED[hotPlat].indexOf(x);
@@ -2172,7 +2166,7 @@ var HOT_LIST=[['weibo','微博热搜'],['zhihu','知乎热榜'],['douyin','抖�
 var HOT_DIRECT={weibo:'https://60s.viki.moe/v2/weibo?cache=true',zhihu:'https://60s.viki.moe/v2/zhihu?cache=true',douyin:'https://60s.viki.moe/v2/douyin?cache=true',toutiao:'https://60s.viki.moe/v2/toutiao?cache=true'};
 function map60(d){var arr=Array.isArray(d&&d.data)?d.data:[];return arr.slice(0,50).map(function(x,i){return {rank:i+1,title:String(x.title||'').trim(),desc:String(x.detail||x.desc||'').slice(0,120),hot:Number(x.hot_value)||Number(x.hot)||0,url:x.link||x.url||''};}).filter(function(x){return x.title;});}
 var hotCur='weibo',hotCache=null,hotLoaded=false;
-function initHot(){$('hotSrc').querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.dataset.h===hotCur);});}
+function initHot(){var b=$('hotTabs');if(!b)return;b.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.h===hotPlat);});}
 function fmtHot(n){if(!n)return'';if(n>=1e8)return (n/1e8).toFixed(1)+'亿';if(n>=1e4)return (n/1e4).toFixed(1)+'万';return String(n);}
 function highlight(text,q){if(!text)return'';var idx=text.toLowerCase().indexOf(q.toLowerCase());if(idx<0)return esc(text);return esc(text.slice(0,idx))+'<mark>'+esc(text.slice(idx,idx+q.length))+'</mark>'+esc(text.slice(idx+q.length));}
 function hotRowHtml(it,q){var t=q?highlight(it.title,q):esc(it.title);var d=q?highlight(it.desc,q):esc(it.desc||'');var rk=it.rank<=3?' t'+it.rank:'';var v=it.hot?fmtHot(it.hot):'';
@@ -2204,7 +2198,7 @@ async function loadHot(source){if(isOffline||!session){toast('请登录后查看
   }catch(e){$('hotList').innerHTML='<div class="ec-skel" style="border-color:#E4C3BD;background:var(--rust-l);color:var(--rust)">获取失败：'+esc(e.message)+'</div>';$('hotStats').style.display='none';}
 }
 function renderHotList(q){if(!hotCache){$('hotList').innerHTML='<div class="empty">选择上方平台查看实时热榜</div>';return;}var items=hotCache.items||[];if(q){q=q.trim().toLowerCase();items=items.filter(function(x){return (x.title||'').toLowerCase().indexOf(q)>=0||(x.desc||'').toLowerCase().indexOf(q)>=0;});}$('hotList').innerHTML=items.length?items.map(function(it){return hotRowHtml(it,q);}).join(''):'<div class="empty">没有匹配的结果</div>';}
-function searchHot(){renderHotList($('hotSearch').value);}
+function searchHot(){renderHotProducts(($('hotSearch')||{}).value||'');}
 
 // ===== TAB NAV =====
 // setVdirRole 已废弃（合并撤销：小林为纯通用创作助手，数据参谋恢复独立 tab）
@@ -2241,7 +2235,7 @@ document.documentElement.style.setProperty('--ac', AC[t]||'var(--ac-top)');
   document.querySelectorAll('.mbar button').forEach(function(b){b.classList.toggle('on',b.dataset.t===t);});
   document.querySelectorAll('section.panel').forEach(function(p){p.classList.toggle('on',p.id==='p-'+t);});
   if(t==='ai')setTimeout(function(){$('ai_input').focus();},200);
-  if(t==='hot'&&!hotLoaded)loadHot('weibo');
+  if(t==='hot'){renderHotProducts();}
   if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video'){renderShotTimeline();loadActiveChat('vdir');}if(t==='ai')loadActiveChat('ai');if(t==='ecom'){renderEcomBoard();renderHotTabs();renderHotProducts();}if(t==='doubao')renderDoubaoGallery();if(t==='notes')renderNotesPanel();if(t==='illust')illFillKeys();updateToolbarVisibility(t);}
 function closeTools(){uiFlags.showToolbar=false;saveUiFlags();updateToolbarVisibility(curTab);}
 function closeDlBar(){uiFlags.showDlBar=false;saveUiFlags();updateToolbarVisibility(curTab);}
@@ -3509,7 +3503,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260816ag';
+var APP_VER='20260816ah';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
