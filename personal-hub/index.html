@@ -688,6 +688,16 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
     <span id="illKeyHint" class="mut2" style="font-size:12px"></span>
   </div>
   <div class="mut2" style="font-size:12px;margin-top:6px">① Brave：brave.com/search/api 免费注册拿 Key（约 2000 次/月）。② Unsplash：unsplash.com/developers 免费建 App 拿 Access Key。两者均免绑卡，Key 只存你本机不上传。不填则对应能力（搜索/网络图）不可用，AI 生图仍可用。</div>
+  <div style="border-top:1px dashed var(--line);margin-top:8px;padding-top:8px">
+    <div class="hd" style="margin-bottom:6px"><h3 style="font-size:14px">🔁 密钥云同步</h3><span class="sp mut2">存你 Supabase，换设备不用重填</span></div>
+    <div class="form" style="gap:8px;flex-wrap:wrap">
+      <input id="ill_sync_pwd" class="f1" placeholder="云同步口令（任意字符串，跨设备需一致）" style="min-height:38px">
+      <button class="btn sm" onclick="cloudSyncSetPwd()">设口令</button>
+      <button class="btn pri sm" onclick="cloudSyncDoPush()">☁️ 同步到云端</button>
+      <button class="btn sm ghost" onclick="cloudSyncDoPull()">⬇️ 从云端恢复</button>
+    </div>
+    <div id="illSyncHint" class="mut2" style="font-size:12px;margin-top:6px">首次：设一个口令 → 填好各 Key 后点「同步到云端」。换设备时填同一口令 → 点「从云端恢复」。</div>
+  </div>
 </div></div>
 <div class="card"><div class="hd"><h3>配图预览</h3><div class="sp" style="display:flex;gap:8px">
   <button class="btn ghost sm" onclick="illExportHTML()">导出 HTML</button>
@@ -2280,7 +2290,7 @@ function doubaoKey(){
   var el=document.getElementById('db_key');if(el&&el.value&&el.value.trim())return el.value.trim();
   return '';
 }
-function doubaoSetKey(v){D.dbKey=(v||'').trim();try{localStorage.setItem('wb_personal_hub_doubao_key',D.dbKey);}catch(e){}saveLocalSafe();}
+function doubaoSetKey(v){D.dbKey=(v||'').trim();try{localStorage.setItem('wb_personal_hub_doubao_key',D.dbKey);}catch(e){}saveLocalSafe();cloudSyncPush();}
 function doubaoGet(k){
   if(k==='ep'){
     if(D.dbEp)return D.dbEp;
@@ -2699,7 +2709,25 @@ function illParseJSON(s){if(!s)return null;s=String(s).trim().replace(/^```(?:js
   var a=s.indexOf('{'),b=s.lastIndexOf('}');if(a>=0&&b>a)s=s.slice(a,b+1);
   try{return JSON.parse(s);}catch(e){return null;}}
 function illFillKeys(){var b=$('ill_brave'),u=$('ill_unsplash');if(b&&!b.value)b.value=illGet('brave');if(u&&!u.value)u.value=illGet('unsplash');}
-function illSaveKeys(){illSet('brave',$('ill_brave').value.trim());illSet('unsplash',$('ill_unsplash').value.trim());var h=$('illKeyHint');if(h){h.style.color='#3aa655';h.textContent='已保存（仅本机）';}toast('搜索源 Key 已保存');}
+function illSaveKeys(){illSet('brave',$('ill_brave').value.trim());illSet('unsplash',$('ill_unsplash').value.trim());var h=$('illKeyHint');if(h){h.style.color='#3aa655';h.textContent='已保存（仅本机）';}toast('搜索源 Key 已保存');cloudSyncPush();}
+/* ===== 密钥云同步（存 Supabase，换设备可恢复） ===== */
+function cloudSyncPwd(){try{return localStorage.getItem('wb_personal_hub_sync_pwd')||'personal-hub-default';}catch(e){return 'personal-hub-default';}}
+function cloudSyncXor(s,pwd){var o='';for(var i=0;i<s.length;i++){o+=String.fromCharCode(s.charCodeAt(i)^pwd.charCodeAt(i%pwd.length));}return o;}
+function cloudSyncEnc(obj){try{var j=JSON.stringify(obj);var x=cloudSyncXor(j,cloudSyncPwd());return btoa(unescape(encodeURIComponent(x)));}catch(e){return '';}}
+function cloudSyncDec(str){try{var x=decodeURIComponent(escape(atob(str)));var j=cloudSyncXor(x,cloudSyncPwd());return JSON.parse(j);}catch(e){return null;}}
+function cloudSyncCollect(){var o={};try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('wb_personal_hub_')===0)o[k]=localStorage.getItem(k);}}catch(e){}return o;}
+function cloudSyncApply(o){if(!o)return;Object.keys(o).forEach(function(k){try{localStorage.setItem(k,o[k]);}catch(e){}});}
+async function cloudSyncPush(){
+  var payload=cloudSyncEnc(cloudSyncCollect());if(!payload)return false;
+  try{var r=await fetch(SB_URL+'/rest/v1/app_secrets',{method:'POST',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},body:JSON.stringify({id:'shared',payload:payload,updated_at:new Date().toISOString()})});return r.ok;}catch(e){return false;}
+}
+async function cloudSyncPull(){
+  try{var r=await fetch(SB_URL+'/rest/v1/app_secrets?id=eq.shared&select=payload',{headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON}});if(!r.ok)return false;var a=await r.json();if(a&&a.length&&a[0].payload){var o=cloudSyncDec(a[0].payload);if(o){cloudSyncApply(o);return true;}}return false;}catch(e){return false;}
+}
+function cloudSyncSetPwd(){var p=$('ill_sync_pwd');if(!p)return;var v=p.value.trim();if(!v){toast('口令不能为空');return;}try{localStorage.setItem('wb_personal_hub_sync_pwd',v);}catch(e){}toast('已设置云同步口令（请牢记，跨设备需一致）');}
+async function cloudSyncDoPush(){setIllSyncHint('同步中…');var ok=await cloudSyncPush();setIllSyncHint(ok?'✅ 已同步到云端':'❌ 同步失败（检查网络/Supabase）');}
+async function cloudSyncDoPull(){setIllSyncHint('恢复中…');var ok=await cloudSyncPull();if(ok){setIllSyncHint('✅ 已从云端恢复密钥');illFillKeys();var dbk=$('db_key');if(dbk)dbk.value=doubaoKey();}else{setIllSyncHint('❌ 恢复失败（确认口令一致且有云端备份）');}}
+function setIllSyncHint(m){var el=$('illSyncHint');if(el)el.textContent=m;}
 function illLoadFile(){var f=$('ill_file');if(!f||!f.files||!f.files[0])return;var rd=new FileReader();rd.onload=function(){var ta=$('ill_text');if(ta)ta.value=rd.result;toast('已载入文件');};rd.readAsText(f.files[0]);}
 function setIllStatus(m){var el=$('illStatus');if(el)el.textContent=m;}
 async function illChat(messages,maxTok){
@@ -2847,7 +2875,7 @@ async function illStart(){
   finally{if(b)b.disabled=false;}
 }
 function saveHubName(){var nm=$('hub_name');if(!nm)return;var v=nm.value.trim();try{localStorage.setItem('wb_personal_hub_name',v);}catch(e){}var hint=$('wsrcHint');if(hint){hint.style.color='#3aa655';hint.textContent=v?('已保存称呼「'+v+'」，问候已更新'):'已清除称呼';}$('greetTx').textContent=getGreeting();}
-function saveAgnesKey(){var ak=$('agnes_key');if(!ak)return;var v=ak.value.trim();agnesSetKey(v);var hint=$('agnesKeyHint');if(hint){hint.style.color='#3aa655';hint.textContent=v?'已保存 Key，AI 导演可真实生成':'已清除';}var kb=$('vdirKeyBar');if(kb&&v)kb.style.display='none';vdirGallery();}
+function saveAgnesKey(){var ak=$('agnes_key');if(!ak)return;var v=ak.value.trim();agnesSetKey(v);var hint=$('agnesKeyHint');if(hint){hint.style.color='#3aa655';hint.textContent=v?'已保存 Key，AI 导演可真实生成':'已清除';}var kb=$('vdirKeyBar');if(kb&&v)kb.style.display='none';vdirGallery();cloudSyncPush();}
 // ===== 模型/参数 UI =====
 function renderModelSelects(){['chat','img','video'].forEach(function(t){var sel=$('m_'+t);if(!sel)return;sel.innerHTML=(window.__MODELS||DEFAULT_MODELS).filter(function(x){return x.type===t;}).map(function(x){return '<option value="'+esc(x.name)+'"'+(SEL[t]===x.name?' selected':'')+'>'+esc(x.label||x.name)+'</option>';}).join('');});renderModelList();}
 function onModelSel(t,v){SEL[t]=v;saveModels();applyModels();if(t==='video')toast('视频模型：'+v+'（单镜上限 '+videoMaxFrames()+' 帧 / '+videoFps()+'fps）');}
@@ -2993,7 +3021,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260815l';
+var APP_VER='20260815m';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -3155,7 +3183,7 @@ window.addEventListener('DOMContentLoaded',function(){
   initStatPlat();switchCat();
   var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;
   if(restoreSession()){if(!isTokenExpired()){enterApp();}else{refreshToken().then(function(ok){if(ok)enterApp();else showAuth();});}}
-  else{showAuth();loadLocal();try{vdirGallery();}catch(e){console.warn('vdir init2',e);}}loadModels();try{var dbk=$('db_key');if(dbk)dbk.value=doubaoKey();var dbm=$('db_model');if(dbm)dbm.value=doubaoGet('ep');var dbp=$('db_prompt');if(dbp)dbp.value=doubaoGet('prompt');var dbs=$('db_size');if(dbs)dbs.value=doubaoGet('size')||'1024x1024';var dbn=$('db_n');if(dbn)dbn.value=doubaoGet('n')||'1';renderDoubaoGallery();dbI2iUpdateSizeUI($('db_i2i_size')?$('db_i2i_size').value:'2048x2048');dbT2iUpdateSizeUI($('db_size')?$('db_size').value:'2048x2048');dbI2iUpdateNUI($('db_i2i_n')?$('db_i2i_n').value:'1');dbT2iUpdateNUI($('db_n')?$('db_n').value:'1');}catch(e){console.warn('doubao init',e);}/* one-time proxy detection for the video panel */if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb2=$('vdirKeyBar');if(kb2)kb2.style.display='block';}});}
+  else{showAuth();loadLocal();try{vdirGallery();}catch(e){console.warn('vdir init2',e);}}loadModels();try{var dbk=$('db_key');if(dbk)dbk.value=doubaoKey();var dbm=$('db_model');if(dbm)dbm.value=doubaoGet('ep');var dbp=$('db_prompt');if(dbp)dbp.value=doubaoGet('prompt');var dbs=$('db_size');if(dbs)dbs.value=doubaoGet('size')||'1024x1024';var dbn=$('db_n');if(dbn)dbn.value=doubaoGet('n')||'1';renderDoubaoGallery();dbI2iUpdateSizeUI($('db_i2i_size')?$('db_i2i_size').value:'2048x2048');dbT2iUpdateSizeUI($('db_size')?$('db_size').value:'2048x2048');dbI2iUpdateNUI($('db_i2i_n')?$('db_i2i_n').value:'1');dbT2iUpdateNUI($('db_n')?$('db_n').value:'1');}catch(e){console.warn('doubao init',e);}cloudSyncPull().then(function(ok){if(ok){var dbk2=$('db_key');if(dbk2)dbk2.value=doubaoKey();illFillKeys();}}).catch(function(){});/* one-time proxy detection for the video panel */if(typeof agnesProxyOk!=='undefined'&&agnesProxyOk===null){agnesCheckProxy().then(function(ok){if(!ok&&!agnesKey()){var kb2=$('vdirKeyBar');if(kb2)kb2.style.display='block';}});}
   try{var __sr=getSharedRef();if(__sr){var __ip2=$('ai_refprev');if(__ip2){__ip2.src=__sr;__ip2.style.display='block';}}var __rv=getRefViews();if(__rv){['front','side','back'].forEach(function(s){if(__rv[s]){var im=$('ref_'+s);if(im){im.src=__rv[s];im.style.display='block';}}});var __h=$('refViewsHint');if(__h){var __n=['front','side','back'].filter(function(s){return __rv[s];}).length;__h.textContent='已上传 '+__n+'/3 视图';}}}catch(e){}
   // 注册 Service Worker（仅 https 环境；让手机端可"安装到主屏幕"）
   // 关键：新版本自动激活 + 刷新一次，确保用户不会一直看到旧的缓存页面
