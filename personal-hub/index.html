@@ -2672,7 +2672,7 @@ async function dbCallChat(messages,temperature){
   throw new Error('no-ai');
 }
 function dbLocalEnhance(raw,ta,hint){
-  var t=raw+'，电影级质感，8K 超高清，极致细节，自然光影，氛围感强，构图平衡，主体突出，专业摄影，风格统一，色彩细腻，大师级作品，锐利对焦，丰富层次，体积光，胶片感';
+  var t=raw+'，细节清晰，光影自然，构图协调，色调统一，质感真实';
   ta.value=t;doubaoSet('prompt',t);
   if(hint){hint.style.color='#b8860b';hint.textContent='已本地增强（未联网 AI）';}
   toast('已本地增强提示词');
@@ -2682,7 +2682,7 @@ async function dbOptimizePrompt(targetId){
   if(!raw){toast('先写点画面描述再优化');return;}
   var isI2i=(targetId==='db_i2i_prompt');var btn=$(isI2i?'dbI2iOptBtn':'dbOptBtn'),hint=$(isI2i?'dbI2iOptHint':'dbOptHint');
   if(btn)btn.disabled=true;if(hint){hint.style.color='';hint.textContent='优化中…';}
-  var sys={role:'system',content:'你是 AI 绘画提示词润色助手。任务：在【不改动用户原意】的前提下，仅做“增强”，绝不“重写”。\n必须严格遵守：\n1) 严格保留用户描述中的主体、人物、场景、动作、时代、画风、风格、情绪——一字不改、不删、不替换。\n2) 只在原句基础上【追加】画质与表现力修饰词，如：细节更丰富、光影更自然、构图更舒服、质感更真实、镜头感、氛围感、8K、超清、电影级。\n3) 绝对禁止：新增任何用户没提到的主体/人物/物体；禁止把写实改成动漫、把国风改成赛博朋克等任何风格切换；禁止凭空编造新元素或新场景。\n4) 若用户已写明风格，沿用其风格，不得另起炉灶。\n5) 输出【一段】文字，不加解释、不加序号、不加代码块，不重复无关内容。\n中文为主，可点缀英文画质标签（cinematic, ultra-detailed, 8k）。'};
+  var sys={role:'system',content:'你是 AI 绘画（Seedream/豆包）提示词润色助手。任务：在【不改动用户原意、不替换主体/场景/风格】的前提下，把提示词写得更具体、更出片。\n必须严格遵守：\n1) 用户描述中的主体、人物、场景、动作、时代、画风、风格、情绪——逐字保留，不删不改不替换。\n2) 只做【补充】，不重写。在保留原句基础上，补充具体可落地的视觉要素：光线（如侧逆光、柔光、晨光、暖色夕照、霓虹冷光）；镜头与景别（如中景、特写、广角、35mm 人像镜头、低角度）；构图（如三分法、居中对称、前景虚化、纵深感）；色调与氛围（如低饱和莫兰迪色、高对比、梦幻朦胧、清冷）；材质与细节（如丝绸质感、湿润反光、毛发分明）。\n3) 严禁凭空新增用户没提的主体/物体/场景；严禁切换风格（写实≠动漫、国风≠赛博朋克）。\n4) 若用户已写得很详细，只补 1-2 个最贴合的具体视觉点，不要堆砌“8K/电影级”等空洞词。\n5) 输出【一段】中文文字，不加解释、不加序号、不加代码块。'};
   try{
     var t=await dbCallChat([sys,{role:'user',content:raw}],0.4);
     if(t&&t.trim()){ta.value=t.trim();doubaoSet('prompt',t.trim());if(hint){hint.style.color='#3aa655';hint.textContent='已优化 ✓';}toast('提示词已优化');}
@@ -2993,7 +2993,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260815k';
+var APP_VER='20260815l';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
