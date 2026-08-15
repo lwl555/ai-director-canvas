@@ -320,6 +320,12 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 @media(max-width:640px){.today-notes-list{grid-template-columns:1fr}.notes-grid{grid-template-columns:1fr}}
 /* 自定义日期选择（替代原生 type=date，兼容 App WebView 点不开原生日期控件的问题） */
 input.datepick{cursor:pointer;background:var(--card)}
+/* 统一文件上传：label 包裹隐藏原生 input，App WebView 友好（避免原生 file / 程序式 .click() 在 App 点不开） */
+.filepick{display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:1px solid var(--ac);background:var(--sand2);color:var(--ac);border-radius:999px;padding:7px 14px;font-size:14px;font-weight:600;line-height:1;transition:.15s;user-select:none;max-width:100%}
+.filepick:hover{background:#fff0e6}
+.filepick .fp-btn{white-space:nowrap}
+.filepick .fp-name{font-weight:400;color:var(--mut);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filepick input[type=file]{display:none}
 .dp{position:fixed;z-index:9999;width:284px;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 14px 38px rgba(214,143,178,.30);padding:14px;display:none;font-size:13px;color:var(--ink)}
 .dp-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:5px}
 .dp-nav{border:1px solid var(--line);background:var(--sand2);border-radius:10px;width:32px;height:32px;cursor:pointer;color:var(--ink);font-size:16px;line-height:1}
@@ -399,6 +405,18 @@ input.datepick{cursor:pointer;background:var(--card)}
 <button class="btn" onclick="openAppDownload()"><svg class="ico" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.4"/><path d="M10.5 18.5h3"/></svg>下载APP</button>
   <button class="btn ghost" onclick="openSettings()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14 2h-4l-.5 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2L10 22h4l.5-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z"/></svg>设置</button>
 <input type="file" id="fileIn" accept=".json,application/json" style="display:none" onchange="doImport(this)">
+<button class="btn ghost sm" type="button" onclick="togglePasteImport()">💾 粘贴导入</button>
+<div id="pasteImportBox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)togglePasteImport(false)">
+  <div style="background:#fff;color:#333;border-radius:16px;padding:18px;max-width:460px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.25)">
+    <div style="font-weight:700;font-size:15px;margin-bottom:6px">粘贴备份 JSON 导入</div>
+    <div style="font-size:12px;color:#888;margin-bottom:8px">App 内无法选文件时使用：把电脑端导出的 personal-hub-日期.json 内容粘贴进来即可恢复。</div>
+    <textarea id="pasteImportText" style="width:100%;min-height:150px;box-sizing:border-box;border-radius:10px;border:1px solid #e7d9e3;padding:10px;font-size:14px;resize:vertical"></textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+      <button class="btn ghost sm" type="button" onclick="togglePasteImport(false)">取消</button>
+      <button class="btn pri sm" type="button" onclick="doImportText(document.getElementById('pasteImportText').value)">导入</button>
+    </div>
+  </div>
+</div>
 <button class="btn" id="themeBtn" onclick="toggleTheme()" title="切换深色 / 浅色"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.6 6.6 0 0 0 21 12.8z"/></svg><span id="themeTx">深色</span></button>
 <div class="sync-info" id="syncInfo"><span class="sync-dot off" id="syncDot"></span><span id="syncTx">未连接</span></div>
 <button class="btn ghost x tools-close" id="toolsCloseBtn" onclick="closeTools()" title="收起工具条" style="display:none"><svg class="ico s" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
@@ -1261,6 +1279,25 @@ function dpOpen(input){dpEnsure();DP.input=input;var v=input.value;if(v&&/^\d{4}
 function dpSelect(ds){if(DP.input){DP.input.value=ds;DP.input.dispatchEvent(new Event('change'));}dpClose();}
 function dpClose(){if(DP.el)DP.el.style.display='none';DP.input=null;}
 function initDatePickers(){document.querySelectorAll('input.datepick').forEach(function(inp){inp.addEventListener('click',function(){dpOpen(inp);});inp.addEventListener('focus',function(){dpOpen(inp);});});}
+// 统一所有 <input type=file> 为「美观按钮 + 文件名回显」：隐藏原生 input，外套 label 触发（标准且 App WebView 兼容优于裸 input / 程序式 .click()）
+function initFilePickers(){
+  document.querySelectorAll('input[type=file]').forEach(function(inp){
+    if(inp.dataset.fpw)return; inp.dataset.fpw='1';
+    inp.style.display='none';
+    var name=document.createElement('span'); name.className='fp-name'; name.style.display='none';
+    inp.addEventListener('change',function(){var f=inp.files&&inp.files[0];if(f){name.textContent=f.name;name.style.display='';}else{name.style.display='none';}});
+    var host=inp.parentNode;
+    if(host&&host.tagName==='LABEL'){ host.classList.add('filepick'); host.insertBefore(name, inp); }
+    else{
+      var label=document.createElement('label'); label.className='filepick';
+      var acc=(inp.getAttribute('accept')||'').toLowerCase();
+      var btn=document.createElement('span'); btn.className='fp-btn';
+      btn.textContent= acc.indexOf('image')>=0 ? '🖼️ 选择图片' : (acc.indexOf('json')>=0 ? '📄 选择 JSON' : '📎 选择文件');
+      label.appendChild(btn); label.appendChild(name);
+      host.insertBefore(label, inp); label.appendChild(inp);
+    }
+  });
+}
 var __saveTimer=null;
 function saveLocalSoon(){if(__saveTimer)return;__saveTimer=setTimeout(function(){__saveTimer=null;try{saveLocal();}catch(e){}},400);}
 window.addEventListener('beforeunload',function(){if(__saveTimer){clearTimeout(__saveTimer);__saveTimer=null;try{saveLocal();}catch(e){}}});
@@ -1382,6 +1419,9 @@ async function manualSync(){if(isOffline){toast('离线模式无法同步');retu
 // ===== EXPORT / IMPORT =====
 function doExport(){var blob=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='personal-hub-'+todayStr()+'.json';a.click();toast('已导出 JSON 备份');}
 function doImport(input){var f=input.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var d=JSON.parse(r.result);D=Object.assign(defaultD(),d);saveLocal();scheduleCloudSync();renderAll();toast('导入成功');}catch(e){toast('导入失败：文件格式错误')}};r.readAsText(f);input.value='';}
+// App 内无法选文件时的备选：直接粘贴备份 JSON 导入（绕开 <input type=file>）
+function doImportText(text){if(!text||!text.trim()){toast('请先粘贴备份 JSON');return;}try{var d=JSON.parse(text);D=Object.assign(defaultD(),d);saveLocal();scheduleCloudSync();renderAll();toast('已通过粘贴导入成功');togglePasteImport(false);}catch(e){toast('导入失败：JSON 格式错误');}}
+function togglePasteImport(force){var box=$('pasteImportBox');if(!box)return;var show=(typeof force==='boolean')?force:(box.style.display!=='flex');box.style.display=show?'flex':'none';if(show){var t=$('pasteImportText');if(t)t.focus();}}
 function exportCSV(){if(!D.ledger.length){toast('暂无账单数据');return;}var csv='\ufeff日期,类型,分类,金额,备注\n';D.ledger.forEach(function(r){csv+=[r.d,r.t==='out'?'支出':'收入',r.c,r.a,'"'+(r.n||'').replace(/"/g,'""')+'"'].join(',')+'\n';});var blob=new Blob([csv],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='账单-'+todayStr()+'.csv';a.click();toast('已导出 CSV');}
 function askClear(){dlgConfirm('清空所有数据','确认清空所有本地数据？此操作不可恢复，建议先导出备份。',function(){
   var del=defaultDel();
@@ -2963,7 +3003,7 @@ async function illLoadLink(){
   }catch(e){setIllStatus('导入失败：'+(e&&e.message||e)+'（链接需允许跨域访问）');}
 }
 function isAppMode(){try{var ua=navigator.userAgent||'';var f=new URLSearchParams(location.search).get('app');if(f==='1')return true;if(/wv|WebView|; wv\)/i.test(ua))return true;if(localStorage.getItem('wb_personal_hub_appmode')==='1')return true;return false;}catch(e){return false;}}
-function applyAppMode(){var lbl=$('ill_file_label');if(lbl)lbl.style.display=isAppMode()?'none':'';}
+function applyAppMode(){var isApp=isAppMode();document.querySelectorAll('input[type=file]').forEach(function(inp){var acc=(inp.getAttribute('accept')||'').toLowerCase();var isText=/txt|md|text|json|application\/json/.test(acc);var fp=(inp.closest&&inp.closest('.filepick'))||(inp.parentNode&&inp.parentNode.classList&&inp.parentNode.classList.contains('filepick')?inp.parentNode:null);if(fp)fp.style.display=(isApp&&isText)?'none':'';});}
 function illPasteLink(){
   try{
     if(navigator.clipboard&&navigator.clipboard.readText){
@@ -3281,7 +3321,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260815ab';
+var APP_VER='20260815ac';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -3440,7 +3480,7 @@ async function dbGenImg2ImgUI(){
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded',function(){
   document.querySelectorAll('nav.tabs button,.mbar button').forEach(function(b){b.addEventListener('click',function(){switchTab(this.dataset.t);});});
-  applyAppMode();renderAppModeToggle();pddInit();
+  initFilePickers();applyAppMode();renderAppModeToggle();pddInit();
   // 统一把隐藏 select 渲染成美观按钮组（App WebView 友好）
   ['ec_pf','opt_pf','po_p','as_s','sd_p','pr_m','pr_s','vd_s','lg_t','td_p','nm_type','c_maxtok'].forEach(function(k){segAuto(k,k+'_btns');});
   initStatPlat();switchCat();
