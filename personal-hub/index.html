@@ -531,7 +531,9 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <section class="panel" id="p-ecom"><div class="grid">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M13.5 6.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0z"/><path d="M17 21a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9z"/><path d="M18.5 4.5h3M20 3v3"/></svg><h3>链接解析</h3><div class="sp"><span class="mut2">粘贴淘宝/京东/拼多多/抖音/小红书链接</span></div></div><div class="bd"><div class="form"><input class="fw" id="ec_url" placeholder="粘贴商品链接（如 https://item.jd.com/...）"><button class="btn pri" onclick="parseProductLink()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>解析商品</button></div><div id="ecParse"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6h15l-1.5 9H7.5z"/><path d="M6 6L5 3H2.5M9 20.5a1 1 0 1 0 0-.1M18 20.5a1 1 0 1 0 0-.1"/></svg><h3>电商文案仿写</h3><div class="sp"><span class="mut2">粘贴爆款 → AI 仿写 + 配图</span></div></div><div class="bd">
-<div class="form"><select class="w150 half" id="ec_pf"><option>小红书</option><option>抖音</option><option>淘宝天猫</option><option>拼多多</option><option>京东</option><option>视频号</option><option>公众号</option><option>亚马逊</option></select><input class="w110 half" id="ec_cnt" type="number" inputmode="numeric" value="3" min="1" max="5" title="生成版本数"></div>
+<select id="ec_pf" style="display:none"><option>小红书</option><option>抖音</option><option>淘宝天猫</option><option>拼多多</option><option>京东</option><option>视频号</option><option>公众号</option><option>亚马逊</option></select>
+<div id="ec_pf_btns" style="display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px"><button type="button" class="btn ghost sm" data-v="小红书" onclick="segPick('ec_pf','ec_pf_btns',this.dataset.v)">小红书</button><button type="button" class="btn ghost sm" data-v="抖音" onclick="segPick('ec_pf','ec_pf_btns',this.dataset.v)">抖音</button><button type="button" class="btn ghost sm" data-v="淘宝天猫" onclick="segPick('ec_pf','ec_pf_btns',this.dataset.v)">淘宝天猫</button><button type="button" class="btn ghost sm" data-v="拼多多" onclick="segPick('ec_pf','ec_pf_btns',this.dataset.v)">拼多多</button><button type="button" class="btn ghost sm" data-v="京东" onclick="segPick('ec_pf','ec_pf_btns',this.dataset.v)">京东</button><button type="button" class="btn ghost sm" data-v="视频号" onclick="segPick('ec_pf','ec_pf_btns',this.dataset.v)">视频号</button><button type="button" class="btn ghost sm" data-v="公众号" onclick="segPick('ec_pf','ec_pf_btns',this.dataset.v)">公众号</button><button type="button" class="btn ghost sm" data-v="亚马逊" onclick="segPick('ec_pf','ec_pf_btns',this.dataset.v)">亚马逊</button></div>
+<div class="form"><input class="w110 half" id="ec_cnt" type="number" inputmode="numeric" value="3" min="1" max="5" title="生成版本数"></div>
 <textarea id="ec_ref" class="fw" placeholder="粘贴一段参考文案（任意平台均可），AI 会拆解出其结构套路，并仿写成目标平台风格"></textarea>
 <input class="fw" id="ec_prod" placeholder="要推广的商品名（选填，不填则按同品类推断）" style="margin-top:8px">
 <input class="fw" id="ec_sell" placeholder="核心卖点（选填，如：纯棉 / 39元 / 包邮）" style="margin-top:8px">
@@ -539,7 +541,9 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div id="ec_skel" class="ec-skel" style="display:none"></div>
 <div id="ec_result"></div>
 </div></div>
-<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M13.5 6.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0z"/><path d="M17 21a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9z"/><path d="M18.5 4.5h3M20 3v3"/></svg><h3>电商文案优化</h3><div class="sp"><span class="mut2">粘贴文案 → AI 诊断 + 优化（钩子/卖点/转化/合规）</span></div></div><div class="bd"><div class="form"><select class="w150 half" id="opt_pf"><option>拼多多</option><option>淘宝天猫</option><option>抖音</option><option>小红书</option><option>京东</option><option>视频号</option><option>公众号</option><option>亚马逊</option></select><input class="w150 half" id="opt_tone" placeholder="风格(选填，如:口语化/高级感)"></div><textarea id="opt_src" class="fw" placeholder="粘贴你现有的商品文案 / 标题 / 详情，AI 会诊断问题并给出优化版（保留原意，强化卖点与转化）" style="min-height:96px;margin-top:8px"></textarea><button class="btn pri" style="margin-top:10px" onclick="optEcomCopy()">⚡ 诊断并优化文案</button><div id="opt_skel" class="ec-skel" style="display:none"></div><div id="opt_result"></div></div></div>
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M13.5 6.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0z"/><path d="M17 21a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9z"/><path d="M18.5 4.5h3M20 3v3"/></svg><h3>电商文案优化</h3><div class="sp"><span class="mut2">粘贴文案 → AI 诊断 + 优化（钩子/卖点/转化/合规）</span></div></div><div class="bd"><select id="opt_pf" style="display:none"><option>拼多多</option><option>淘宝天猫</option><option>抖音</option><option>小红书</option><option>京东</option><option>视频号</option><option>公众号</option><option>亚马逊</option></select>
+<div id="opt_pf_btns" style="display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px"><button type="button" class="btn ghost sm" data-v="拼多多" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">拼多多</button><button type="button" class="btn ghost sm" data-v="淘宝天猫" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">淘宝天猫</button><button type="button" class="btn ghost sm" data-v="抖音" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">抖音</button><button type="button" class="btn ghost sm" data-v="小红书" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">小红书</button><button type="button" class="btn ghost sm" data-v="京东" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">京东</button><button type="button" class="btn ghost sm" data-v="视频号" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">视频号</button><button type="button" class="btn ghost sm" data-v="公众号" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">公众号</button><button type="button" class="btn ghost sm" data-v="亚马逊" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">亚马逊</button></div>
+<div class="form"><input class="w150 half" id="opt_tone" placeholder="风格(选填，如:口语化/高级感)"></div><textarea id="opt_src" class="fw" placeholder="粘贴你现有的商品文案 / 标题 / 详情，AI 会诊断问题并给出优化版（保留原意，强化卖点与转化）" style="min-height:96px;margin-top:8px"></textarea><button class="btn pri" style="margin-top:10px" onclick="optEcomCopy()">⚡ 诊断并优化文案</button><div id="opt_skel" class="ec-skel" style="display:none"></div><div id="opt_result"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg><h3>商品库</h3><div class="sp"><span class="mut2" id="ecCnt"></span></div></div><div class="bd"><div class="form"><input class="f2" id="pd_n" placeholder="商品名"><input class="w110 half" id="pd_p" type="number" inputmode="decimal" step="0.01" placeholder="价格¥"><input class="w150 half" id="pd_c" placeholder="分类"><input class="fw" id="pd_f" placeholder="卖点"><button class="btn pri" onclick="addProduct()">加入</button></div><div id="ecProducts"></div></div></div>
 <div class="grid g2">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 14l3-4 3 3 4-6"/></svg><h3>电商运营看板</h3><div class="sp"><span class="mut2" id="ecBoardSub"></span></div></div><div class="bd ec-board"><div class="stats" id="ecStats"></div><div id="ecBoard"></div></div></div>
@@ -2503,6 +2507,18 @@ function dbT2iUpdateNUI(v){
 function dbI2iUpdateNUI(v){
   var wrap=$('db_i2i_n_btns');if(wrap)wrap.querySelectorAll('button').forEach(function(b){b.classList.toggle('pri',b.dataset.v===v);b.classList.toggle('ghost',b.dataset.v!==v);});
 }
+// 通用 App 友好按钮组：原生 <select> 在 App(WebView) 中点不开，改为隐藏 select(当值容器)+按钮组。点击设 select.value 并高亮，读取逻辑无需改动。
+function segPick(selId,wrapId,v){
+  var sel=$(selId);if(!sel)return;
+  sel.value=v;
+  var wrap=$(wrapId);
+  if(wrap)wrap.querySelectorAll('button').forEach(function(b){var on=b.dataset.v===v;b.classList.toggle('pri',on);b.classList.toggle('ghost',!on);});
+}
+function segInit(selId,wrapId){
+  var sel=$(selId);if(!sel)return;
+  var v=sel.value||(sel.options[0]&&(sel.options[0].value||sel.options[0].text));
+  segPick(selId,wrapId,v);
+}
 function dbThumbGrid(urls){
   if(!urls||!urls.length)return '';
   return '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-top:10px">'+
@@ -3207,7 +3223,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260815u';
+var APP_VER='20260815v';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -3366,7 +3382,7 @@ async function dbGenImg2ImgUI(){
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded',function(){
   document.querySelectorAll('nav.tabs button,.mbar button').forEach(function(b){b.addEventListener('click',function(){switchTab(this.dataset.t);});});
-  applyAppMode();renderAppModeToggle();pddInit();
+  applyAppMode();renderAppModeToggle();pddInit();segInit('ec_pf','ec_pf_btns');segInit('opt_pf','opt_pf_btns');
   initStatPlat();switchCat();
   var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;
   if(restoreSession()){if(!isTokenExpired()){enterApp();}else{refreshToken().then(function(ok){if(ok)enterApp();else showAuth();});}}
