@@ -2637,9 +2637,10 @@ async function dbUploadAll(){
       }catch(e){sFail++;}
     }
     saveLocalSafe();renderDoubaoGallery();
-    var msg='本地图上传：成功 '+ok+' 张'+(fail?'（'+fail+' 失败）':'');
-    if(sOk||sFail)msg+='；老图补回 prompt：'+sOk+' 张'+(sFail?'（'+sFail+' 失败）':'');
-    if(!ok&&!fail)msg='没有需要上传的本地图（都已为网络链接）';
+    var msg='';
+    if(ok||fail)msg='本地图上传：成功 '+ok+' 张'+(fail?'（'+fail+' 失败）':'');
+    if(sOk||sFail)msg+=(msg?'；':'')+'老图补回 prompt：'+sOk+' 张'+(sFail?'（'+sFail+' 失败）':'');
+    if(!msg)msg='没有需要上传的本地图（都已为网络链接）';
     toast(msg);
   }catch(e){toast('上传出错：'+(e.message||e));}
   finally{if(btn){btn.disabled=false;btn.textContent='☁️ 全部上传到云端';}}
@@ -2656,14 +2657,18 @@ async function dbCleanupCloud(){
     var isImg=function(n){return /\.(jpe?g|png|gif|webp|bmp)$/i.test(n||'');};
     var isJson=function(n){return /\.json$/i.test(n||'');};
     var imgBases=new Set(objs.filter(function(o){return isImg(o.name);}).map(function(o){return o.name.replace(/\.(jpe?g|png|gif|webp|bmp)$/i,'');}));
+    var imgObjs=objs.filter(function(o){return isImg(o.name);});
+    var localCloudCnt=0;keep.forEach(function(u){if(u.indexOf(SB_URL+'/storage/v1/object/public/ph-images/')===0)localCloudCnt++;});
+    if(localCloudCnt===0&&imgObjs.length>0){toast('本地没有云端图索引（可能换设备/清缓存）。为防止误删云端永久存档，清理已中止——请先点「☁️ 从云端恢复图库」再清理。');return;}
     var del=0,fail=0;
     function delObj(fullName){return fetch(SB_URL+'/storage/v1/object/ph-images/'+fullName,{method:'DELETE',headers:{'apikey':SB_ANON,'Authorization':'Bearer '+SB_ANON}}).then(function(rr){if(rr.ok)del++;else if(rr.status!==404){fail++;console.warn('cleanup delete fail',fullName,rr.status);}}).catch(function(e){fail++;console.warn('cleanup delete err',fullName,e);});}
+    var delImg=0,keptImg=0;
     for(var i=0;i<objs.length;i++){
       var name=objs[i].name;
       var url=SB_URL+'/storage/v1/object/public/ph-images/db/'+name;
       if(isImg(name)){
-        if(keep.has(url))continue;
-        await delObj('db/'+name);
+        if(keep.has(url)){keptImg++;continue;}
+        await delObj('db/'+name);delImg++;
         var ib=name.replace(/\.(jpe?g|png|gif|webp|bmp)$/i,'');
         await delObj('db/'+ib+'.json'); // 删除对应旁挂元数据
       }else if(isJson(name)){
@@ -2671,7 +2676,7 @@ async function dbCleanupCloud(){
         if(!imgBases.has(jb))await delObj('db/'+name); // 孤儿旁挂，清掉
       }
     }
-    toast('云端清理完成：删除 '+del+' 张'+(fail?'（'+fail+' 张失败，可能是网络或授权）':''));
+    toast('云端清理完成：删除 '+delImg+' 张图，保留 '+keptImg+' 张'+(fail?'（'+fail+' 项失败）':''));
   }catch(e){toast('清理出错：'+(e.message||e));}
   finally{if(btn){btn.disabled=false;btn.textContent='🧹 清理云端旧图';}}
 }
@@ -3276,7 +3281,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260815aa';
+var APP_VER='20260815ab';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
