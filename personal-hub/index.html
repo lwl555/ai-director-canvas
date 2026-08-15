@@ -2121,7 +2121,8 @@ async function ecAiCompressIfNeeded(){
   var rest=arr.slice(arr.length-16);
   var text=toSum.map(function(c){return (c.role==='user'?'用户':'助手')+'：'+(c.content||'');}).join('\n');
   var prompt=(D.ecomChat.__summary?('此前摘要：\n'+D.ecomChat.__summary+'\n\n'):'')+'请将以下电商助手对话压缩为简明要点摘要（保留关键结论、用户店铺背景、待办、重要数字），用于后续对话记忆：\n'+text;
-  try{var s=await vdirChatSend([{role:'system',content:'你是记忆压缩器，只输出摘要要点，不要解释。'},{role:'user',content:prompt}],null,null);D.ecomChat.__summary=(D.ecomChat.__summary?D.ecomChat.__summary+'\n':'')+(s||'');D.ecomChat=rest;}catch(e){D.ecomChat=rest;}
+  var prev=D.ecomChat.__summary||'';
+  try{var s=await vdirChatSend([{role:'system',content:'你是记忆压缩器，只输出摘要要点，不要解释。'},{role:'user',content:prompt}],null,null);D.ecomChat=rest;D.ecomChat.__summary=(prev?prev+'\n':'')+(s||'');}catch(e){D.ecomChat=rest;}
 }
 function ecAiClear(){D.ecomChat=[];saveLocal();ecAiRender();toast('已清空电商助手对话');}
 function ecAiOpenAdd(){var m=$('ecAddMask');if(m)m.style.display='flex';}
@@ -2139,7 +2140,7 @@ function ecAiSaveAdd(){
 }
 function ecAiSaveAsKb(){
   var arr=D.ecomChat||[];var lastU=null,lastA=null;
-  for(var i=arr.length-1;i>=0;i--){if(arr[i].role==='user'&&!lastU)lastU=arr[i].content;if(arr[i].role==='assistant'&&!lastA){lastA=arr[i].content;break;}}
+  for(var i=arr.length-1;i>=0;i--){if(arr[i].role==='user'&&!lastU)lastU=arr[i].content;else if(arr[i].role==='assistant'&&!lastA)lastA=arr[i].content;if(lastU&&lastA)break;}
   if(!lastU||!lastA){toast('先和助手聊一轮再存');return;}
   var extra=loadPddExtra();extra.push({cat:'补充资料',t:lastU.slice(0,40),a:lastA,kw:lastU.split(/[\s，,。？?！!；;]/).filter(function(w){return w.length>=2;}).slice(0,10)});savePddExtra(extra);toast('已把本轮问答存为知识库条目');
 }
@@ -3508,7 +3509,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260816af';
+var APP_VER='20260816ag';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
