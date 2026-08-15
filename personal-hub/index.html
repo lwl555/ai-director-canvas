@@ -539,10 +539,11 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div id="ec_skel" class="ec-skel" style="display:none"></div>
 <div id="ec_result"></div>
 </div></div>
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M13.5 6.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0z"/><path d="M17 21a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9z"/><path d="M18.5 4.5h3M20 3v3"/></svg><h3>电商文案优化</h3><div class="sp"><span class="mut2">粘贴文案 → AI 诊断 + 优化（钩子/卖点/转化/合规）</span></div></div><div class="bd"><div class="form"><select class="w150 half" id="opt_pf"><option>拼多多</option><option>淘宝天猫</option><option>抖音</option><option>小红书</option><option>京东</option><option>视频号</option><option>公众号</option><option>亚马逊</option></select><input class="w150 half" id="opt_tone" placeholder="风格(选填，如:口语化/高级感)"></div><textarea id="opt_src" class="fw" placeholder="粘贴你现有的商品文案 / 标题 / 详情，AI 会诊断问题并给出优化版（保留原意，强化卖点与转化）" style="min-height:96px;margin-top:8px"></textarea><button class="btn pri" style="margin-top:10px" onclick="optEcomCopy()">⚡ 诊断并优化文案</button><div id="opt_skel" class="ec-skel" style="display:none"></div><div id="opt_result"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg><h3>商品库</h3><div class="sp"><span class="mut2" id="ecCnt"></span></div></div><div class="bd"><div class="form"><input class="f2" id="pd_n" placeholder="商品名"><input class="w110 half" id="pd_p" type="number" inputmode="decimal" step="0.01" placeholder="价格¥"><input class="w150 half" id="pd_c" placeholder="分类"><input class="fw" id="pd_f" placeholder="卖点"><button class="btn pri" onclick="addProduct()">加入</button></div><div id="ecProducts"></div></div></div>
 <div class="grid g2">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 14l3-4 3 3 4-6"/></svg><h3>电商运营看板</h3><div class="sp"><span class="mut2" id="ecBoardSub"></span></div></div><div class="bd ec-board"><div class="stats" id="ecStats"></div><div id="ecBoard"></div></div></div>
-<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>热点灵感 · 示例</h3><div class="sp"><span class="mut2">示例数据 · 非实时抓取 · 仅供选题灵感</span></div></div><div class="bd"><div class="hot-src" id="hotTabs" style="margin-bottom:10px"></div><div id="hotProducts"></div></div></div>
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>拼多多开店知识库</h3><div class="sp"><span class="mut2">开店流程 · 养护运营 · 资料清单 · 常见问题（联网整理，本地搜索）</span></div></div><div class="bd"><div class="form"><input class="fw" id="pddSearch" placeholder="输入问题，如：个人店怎么开？保证金能退吗？发货超时怎么办？" oninput="pddSearch()"></div><div class="hot-src" id="pddCats" style="margin:8px 0"></div><div id="pddResults"></div></div></div>
 </div>
 </div></section>
 <section class="panel" id="p-hot"><div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>今日热度榜</h3><div class="sp"><span class="mut2" id="hotUpd"></span></div></div><div class="bd">
@@ -570,9 +571,14 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 <div class="ai-hist" id="aiHist" style="display:none"></div>
 <div class="ai-chips"><button class="ai-chip" onclick="aiQuick('总结一下今天要处理的事')">总结今天</button><button class="ai-chip" onclick="aiQuick('分析我这个月的支出情况，哪些可以省')">分析支出</button><button class="ai-chip" onclick="aiQuick('看看我的选题库，给我几个新选题建议')">选题建议</button><button class="ai-chip" onclick="aiQuick('帮我回顾一下最近的自媒体数据趋势')">数据复盘</button><button class="ai-chip" onclick="aiQuick('我有哪些逾期的任务？帮我排个优先级')">逾期处理</button><button class="ai-chip" onclick="aiQuick('分析我的分镜脚本和导演成片进度，哪些镜头还没拍、建议怎么排期')">🎬 分镜/成片</button></div>
 <div class="ai-ctx" id="ai_ctx"><svg class="ico s" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.1"/></svg><span>AI助手可以查看你的待办、记账、选题、分镜、成片和习惯数据，给出针对性建议；可附图片让它<b>看图分析</b>，用 🎨 <b>生成图片</b>（文生图），或用 🖼️ <b>按你的要求改图</b>（都借用豆包 Seedream 模型）。附图后写「改成…」会自动走改图，写「分析/这是什么」会走看图分析。</span></div>
-<div class="ai-chat" id="ai_chat"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>和你的AI助手聊聊吧<br>它能看图、能改图、也懂你工作台上的所有数据</div></div></div>
+<div class="ai-chat" id="ai_chat" style="min-height:220px;height:52vh;overflow:auto"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>和你的AI助手聊聊吧<br>它能看图、能改图、也懂你工作台上的所有数据</div></div></div>
 <div class="ai-atts" id="ai_atts" style="display:none"></div>
-<div class="ai-input"><button class="ai-attbtn" type="button" onclick="aiPickImage()" title="附图片（让 AI 看图 / 用于图生图）"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="2"/><path d="M21 15l-5-5L5 21"/></svg></button><textarea id="ai_input" placeholder="输入消息…（Shift+Enter换行；附图后写要求可让 AI 看图；要点「🖼️图生图」按图改图）" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSendFromInput()}" oninput="aiAutoResize(this)"></textarea><button class="btn ghost ai-send" type="button" onclick="aiGenImageT2I()" title="用豆包模型生成图片（文生图）" style="padding:0 10px;font-size:16px">🎨</button><button class="btn ghost ai-send" type="button" onclick="aiImg2Img()" title="用附图的图生图修改（借用豆包模型）" style="padding:0 10px;font-size:18px">🖼️</button><button class="btn pri ai-send" onclick="aiSendFromInput()"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button></div>
+<div class="ai-toolbar" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><button class="btn xs ghost" type="button" onclick="aiGenImageT2I()" title="文生图">🎨 文生图</button><button class="btn xs ghost" type="button" onclick="aiImg2Img()" title="图生图改图">🖼️ 图生图</button></div>
+<div class="ai-input" style="display:flex;align-items:flex-end;gap:8px;margin-top:8px;padding:8px;background:var(--sand2);border:1px solid var(--line);border-radius:12px">
+  <button class="ai-attbtn" type="button" onclick="aiPickImage()" title="附图片（让 AI 看图 / 用于图生图）" style="flex:none"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="2"/><path d="M21 15l-5-5L5 21"/></svg></button>
+  <textarea id="ai_input" placeholder="输入消息…（Enter 发送，Shift+Enter 换行；附图后写要求可让 AI 看图；🎨/🖼️ 在上方工具条）" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSendFromInput()}" oninput="aiAutoResize(this)" style="flex:1;min-height:52px;max-height:180px;resize:none;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:15px;line-height:1.5;box-sizing:border-box"></textarea>
+  <button class="btn pri ai-send" onclick="aiSendFromInput()" style="flex:none;align-self:flex-end;padding:12px 16px"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+</div>
 <div class="vdir-gallery" id="aiGallery" style="margin-top:10px"></div>
 <input type="file" id="ai_file" accept="image/*" multiple style="display:none" onchange="aiOnImage(event)">
 </div></div></div>
@@ -1552,7 +1558,7 @@ async function aiMGenerateInline(mode,p){AGNES_SCOPE='ai';if(!p){toast('先写�
  return vdirGenVideo(p,body,ref,0);}
 // ===== AI ASSISTANT =====
 function aiKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();aiSendFromInput();}}
-function aiAutoResize(el){el.style.height='auto';el.style.height=Math.min(140,el.scrollHeight)+'px';}
+function aiAutoResize(el){el.style.height='auto';el.style.height=Math.min(180,el.scrollHeight)+'px';}
 function aiAddMsg(role,content,ts,images){var chat=$('ai_chat');var empty=chat.querySelector('.ai-empty');if(empty)empty.remove();
   var div=document.createElement('div');div.className='ai-msg '+role;
   var av=role==='user'?'<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>':'<svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>';
@@ -1744,6 +1750,24 @@ async function genEcomImage(prompt){try{
 function ecCopyText(i){if(ecLast.variants[i]&&ecLast.variants[i].body){navigator.clipboard.writeText(ecLast.variants[i].body).then(function(){toast('已复制')},function(){toast('复制失败')});}}
 function ecSaveProduct(i){var v=ecLast.variants[i];if(!v)return;var name=v.title||$('ec_prod').value.trim()||v.angle||'未命名商品';D.products.push({id:uid(),n:name,p:0,c:'',f:(v.tags||[]).join('、'),ct:todayStr()});saveLocal();scheduleCloudSync();renderProducts();toast('已存为商品');}
 function ecCopyImg(){if(ecLastImg)navigator.clipboard.writeText(ecLastImg).then(function(){toast('已复制图片链接')},function(){toast('复制失败')});}
+var optLast='';
+async function optEcomCopy(){
+  var src=$('opt_src').value.trim();if(!src){toast('请先粘贴要优化的文案');return;}
+  if(isOffline||!session){toast('请登录后使用电商文案优化');return;}
+  var platform=$('opt_pf').value;var tone=$('opt_tone').value.trim();
+  $('opt_skel').style.display='block';$('opt_skel').textContent='AI 正在诊断并优化文案…';$('opt_result').innerHTML='';
+  try{
+    var headers={'Content-Type':'application/json'};if(session&&session.access_token)headers['Authorization']='Bearer '+session.access_token;
+    var sys='你是资深电商文案优化师。任务：诊断用户给出的'+platform+'平台文案，并给出优化版。\n严格按以下 Markdown 结构输出：\n## 诊断\n用 3-5 条 bullet 指出原文问题（如：缺钩子/卖点不清晰/无转化引导/平台调性不符/违规风险/无信任背书）。\n## 优化版文案\n给出可直接使用的优化版（标题+正文），保留原意、强化核心卖点、增加开头钩子与结尾转化引导（限时/稀缺/保障），语言贴合'+platform+'风格。\n## 优化要点\n3 条为什么这样改。\n## 合规提醒\n1-2 条该平台注意事项。'+(tone?('\n用户指定风格：'+tone+'。'):'');
+    var body={message:'请优化以下'+platform+'文案：\n\n'+src,system:sys,today:todayStr()};
+    var r=await fetch(AI_URL,{method:'POST',headers:headers,body:JSON.stringify(body)});
+    var d=await r.json();if(!r.ok)throw new Error(d.error||'优化失败');
+    var reply=(d.reply||'暂无结果').replace(/^#+\s*/,'');optLast=reply;
+    $('opt_result').innerHTML='<div class="ec-var"><div class="bodytx" style="line-height:1.7">'+mdLite(reply)+'</div><div style="margin-top:8px"><button class="btn xs" onclick="optCopy()">复制优化文案</button></div></div>';
+    $('opt_skel').style.display='none';
+  }catch(e){$('opt_skel').style.display='none';$('opt_result').innerHTML='<div class="ec-skel" style="border-color:#E4C3BD;background:var(--rust-l);color:var(--rust)">优化失败：'+esc(e.message)+'</div>';}
+}
+function optCopy(){if(optLast)navigator.clipboard.writeText(optLast).then(function(){toast('已复制')},function(){toast('复制失败')});}
 var ecParseLast=null;
 async function parseProductLink(){var raw=$('ec_url').value.trim();if(!raw){toast('请输入商品链接');return;}var m=raw.match(/https?:\/\/[^\s"'<>]+/i);var url=m?m[0]:raw;if(!/^https?:\/\//i.test(url)){toast('请粘贴有效的商品链接');return;}if(isOffline||!session){toast('请登录后使用（也可在下方商品库手动补录）');return;}
   $('ecParse').innerHTML='<div class="ec-load"><span class="spin"></span>正在解析链接…</div>';
@@ -1838,6 +1862,52 @@ function renderHotChat(key){var box=$('hotAi_'+key);if(!box)return;var ch=hotCha
 async function sendHotFollow(key){var inp=$('hotFollow_'+key);if(!inp)return;var v=inp.value.trim();if(!v){toast('请输入追问内容');return;}inp.value='';await aiAnalyzeHot(key,v);}
 function hotPickImg(key){if(!hotImgInput){hotImgInput=document.createElement('input');hotImgInput.type='file';hotImgInput.accept='image/*';hotImgInput.onchange=function(){var f=hotImgInput.files&&hotImgInput.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){aiAnalyzeHot(key,'',rd.result);};rd.readAsDataURL(f);};}hotImgInput._key=key;hotImgInput.click();}
 
+// ===== 拼多多开店知识库（联网整理，本地搜索，无需运行时联网）=====
+var PDD_KB=[
+ {cat:'开店流程',q:'个人店怎么开？需要什么资料？',a:'拼多多支持个人店，只需中国大陆居民身份证+手机号+人脸核验，门槛最低、审核最快（约1-2个工作日）。在「拼多多商家版」App 或商家后台点「0元开店/立即入驻」，选个人店，填店铺名（禁用「旗舰/官方」等词）、上传身份证、人脸认证，审核通过即可上架。',kw:['个人店','个人','身份证','开店','入驻','0元开店','怎么开']},
+ {cat:'开店流程',q:'企业店/公司店怎么开？',a:'企业店需营业执照（三证合一）+法人身份证+对公账户。流程：选「企业店」→填店铺信息→上传营业执照高清扫描件→对公账户小额打款验证或法人授权核验→审核（普通2个工作日，旗舰/专卖/专营店3个工作日）→签署协议+缴保证金→上架。',kw:['企业店','公司店','营业执照','对公账户','企业','法人','怎么开']},
+ {cat:'开店流程',q:'个体工商户店怎么开？',a:'个体店需营业执照+身份证（可用法人私人银行卡）。比个人店类目更全、营销工具更多，适合本地实体商家转线上。',kw:['个体','个体工商户','个体户','营业执照']},
+ {cat:'开店流程',q:'开店要多少钱？保证金多少？',a:'无加盟费、无扣点。保证金可退：个人/企业普通类目约500元起（2026新政下调），特殊类目1000–10000元（食品、数码、美妆等）。支持「0元入驻」，先上架运营、提现时补缴。技术服务费成交后扣：普通订单0.6%，先用后付1%。',kw:['费用','保证金','多少钱','0元','扣点','技术服务费','成本','收费']},
+ {cat:'开店流程',q:'保证金能退吗？怎么退？',a:'可以退。闭店且无未完结纠纷、违规欠款、未发货订单后，在商家后台申请退还，通常全额退。建议确认店铺无售后纠纷再申请。',kw:['保证金','退还','退保证金','退钱','退款','退']},
+ {cat:'开店流程',q:'开店审核要多久？',a:'个人店/普通企业店约1-2个工作日；旗舰店/专卖店/专营店约3个工作日。资料清晰无反光、四角完整可避免驳回。',kw:['审核','多久','时间','通过','几天']},
+ {cat:'开店流程',q:'店铺类型怎么选？',a:'新手试水选个人店（权重也不低）；有营业执照、想长期做选企业店（活动提报优先、流量权重更高）；品牌方/授权经销商选旗舰/专卖/专营店（需商标或授权）。',kw:['店铺类型','选哪种','类型','个人店','企业店','旗舰店','选']},
+ {cat:'开店流程',q:'特殊类目（食品/美妆/数码/医疗器械）要什么资质？',a:'食品需《食品经营许可证》；美妆需备案/化妆品生产或经营许可证；数码需质检报告；医疗器械需备案或许可证；图书音像需出版物经营许可证。缺资质会被下架扣分。',kw:['特殊类目','食品','美妆','数码','医疗器械','资质','许可证','备案','类目']},
+ {cat:'开店流程',q:'0元入驻是真的吗？',a:'是真的。拼多多支持「0元开店/0元入驻」，前期先上架运营，发布特定类目或提现前再补缴保证金，闭店可退。',kw:['0元入驻','0元开店','真的吗','免费']},
+ {cat:'养护运营',q:'新店怎么运营/起步？',a:'五大思路：1)选款——刚需高频低客单低售后（百货/收纳/清洁最稳）；2)推广——先报无门槛「新品活动」，再开搜索推广测款；3)测款——看点击率/转化率；4)优化——主图/详情页/关键词持续迭代（勿频繁改价）；5)售后——客服及时回复、差评第一时间处理。',kw:['新店','运营','起步','怎么做','新手','思路','怎么弄']},
+ {cat:'养护运营',q:'选品有什么建议？',a:'刚需、高频、低客单、低售后的百货/收纳/清洁最稳；引流款对标同行TOP略低价拿搜索加权，利润款赚钱；做组合装避免直接比价；标题60字符写满=核心词+属性词+营销词。',kw:['选品','选款','什么好卖','品类','卖什么']},
+ {cat:'养护运营',q:'怎么定价？引流款和利润款怎么搭？',a:'采用「引流款+利润款+搭配款」矩阵。引流款略低于市场均价获取搜索加权（限制购买数量防亏损）；利润款赚钱；组合装提升客单。严禁低价SKU作弊、虚标原价（比价系统会降权）。',kw:['定价','价格','引流款','利润款','sku','定价策略','怎么定价']},
+ {cat:'养护运营',q:'流量怎么来？推广怎么开？',a:'自然流量靠搜索SEO+活动；付费先开「多多搜索」测关键词，稳定后切「多多场景/全站推广」放大；积极报「9.9特卖/限时秒杀/百亿补贴/领券中心」。ROI达标再加预算。',kw:['流量','推广','搜索推广','场景推广','全站推广','多多进宝','活动','没流量']},
+ {cat:'养护运营',q:'要报哪些活动？',a:'新手必做：9.9特卖、限时秒杀、领券中心；冲量可报百亿补贴。报名前备足库存、保证发货时效，避免缺货/DSR下滑导致资格取消。',kw:['活动','9.9','秒杀','百亿补贴','领券中心','报名','大促']},
+ {cat:'养护运营',q:'发货有什么要求和底线？',a:'普通订单须48小时内揽收，超时触发自动赔付+限流；必须用拼多多电子面单（否则无权重）；不引导买家去微信/QQ交易；设置合理发货时间（新手建议48小时内）。',kw:['发货','48小时','电子面单','时效','超时','物流','发货慢']},
+ {cat:'养护运营',q:'DSR评分是什么？怎么维护？',a:'DSR=描述相符+物流服务+服务态度三项评分，直接决定活动资格与自然流量权重。综合健康分≥4.6、买家售后打分≥4.7较安全。每日监控，任一项飘绿立即排查整改。',kw:['DSR','评分','评分低','健康分','描述相符','评分']},
+ {cat:'养护运营',q:'客服回复率有什么要求？',a:'拼多多考核严格：5分钟回复率需>90%（部分场景要求3分钟回复率达标），低于标准会限制推广、影响权重与活动报名。配置自动回复+快捷短语，人工保持在线。',kw:['客服','回复率','5分钟','3分钟','自动回复','响应']},
+ {cat:'养护运营',q:'评价怎么维护？怎么处理差评？',a:'从第一单起抓质量/包装/物流；用合规方式（如「扫码联系客服领福利」而非直接「好评返现」）引导好评。差评第一时间联系买家真诚解决（补发/退款）争取修改，并在差评下诚恳回复展示方案。监控DSR。',kw:['评价','差评','好评','好评返现','评价维护','评分']},
+ {cat:'养护运营',q:'爆款30天节奏怎么排？',a:'0-7天：破零、测款、做基础评价；8-30天：报活动、开推广、冲销量提权重；30天+：稳转化、做复购、布局多爆款。大促前7-15天测款备素材。',kw:['爆款','30天','节奏','破零','冲销量','起量']},
+ {cat:'养护运营',q:'被限流/降权了怎么办？',a:'常见原因：改标题/主图、发货慢、客服回复低、退款率高。应对：停止改标题主图、稳定发货、提升客服回复、降低退款率，通常7-14天可恢复。',kw:['限流','降权','恢复','没流量','权重下降','没曝光']},
+ {cat:'养护运营',q:'没有流量怎么办？',a:'检查主图点击率、标题精准度、发货速度、评分。优化主图+标题+保证48小时发货；报活动拉曝光；用搜索推广测款。',kw:['没流量','流量少','曝光低','没访客']},
+ {cat:'养护运营',q:'有流量不转化怎么办？',a:'价格没优势、评价少、没买家秀、规格选项不吸引人。补评价、做优惠券/满减/买家秀/运费险、优化商品规格引导转化。',kw:['不转化','转化低','有流量没单','转化']},
+ {cat:'养护运营',q:'运营要避哪些坑？',a:'不刷单、不导流到站外、不售假；不虚标原价/先涨后降；特殊类目必备资质；不频繁改标题主图改价；杜绝虚假发货/物流异常。',kw:['避坑','违规','刷单','虚假发货','导流','比价','坑']},
+ {cat:'养护运营',q:'怎么用数据复盘？',a:'每日看生意参谋：点击率（低则改主图）、转化率（低则改详情/价格）、UV价值（低则调SKU）、推广ROI、退款率。数据异常24小时内排查干预。',kw:['数据','复盘','生意参谋','指标','ROI','分析']},
+ {cat:'资料清单',q:'开店要准备哪些资料？',a:'个人店：身份证正反面+手机号+人脸核验+同名银行卡。个体店：身份证+有效期内营业执照。企业店：三证合一营业执照+法人身份证+对公账户信息。特殊类目另需许可证/备案（食品经营许可证、美妆备案、数码质检等）。',kw:['资料','准备','需要什么','清单','材料','证件']},
+ {cat:'资料清单',q:'店铺信息要设置哪些？',a:'店招（店名带品类关键词）、Logo、店铺简介（写清发货/售后/包邮）、真实经营地址、绑定手机与客服账号、客服电话。信息完整有助于活动报名与流量扶持。',kw:['店铺信息','店招','logo','简介','设置','资料']},
+ {cat:'资料清单',q:'商品发布要注意什么？',a:'填完整属性、上传实拍图（禁用网图）、标注真实产地与规格；虚拟/医疗器械/食品等特殊类目额外提供许可证。违反《商品发布规范》会下架扣分。',kw:['商品发布','上架','实拍图','属性','规范','发布']},
+ {cat:'常见问题',q:'可以用微信/QQ跟买家交易吗？',a:'不可以。平台严禁诱导非官方交易，引导买家去微信/QQ等会被处罚甚至限流封店。一切交易走平台。',kw:['微信','QQ','导流','场外交易','站外']},
+ {cat:'常见问题',q:'主图/标题经常改会有影响吗？',a:'会。频繁改标题、主图、改价会触发比价与权重波动，导致降权。优化要小步快跑、避免大改；改价浮动别太大。',kw:['改标题','改主图','改价','权重','影响','频繁改']},
+ {cat:'常见问题',q:'保证金和0元入驻有什么区别？',a:'0元入驻是「先开店后补保证金」的宽松政策，发布特定类目或提现前再补缴，闭店可退；普通入驻是审核通过后即缴保证金。两者保证金都可退。',kw:['0元入驻','保证金','区别','先用后付']},
+ {cat:'常见问题',q:'发货超时会有什么处罚？',a:'普通订单超48小时未揽收会触发自动赔付（向买家赔付）、店铺被限流，严重时扣分降权。务必用电子面单、设置合理发货时效。',kw:['发货','超时','48小时','处罚','赔付','限流']}
+];
+var pddCat='全部';
+var PDD_CATS=['全部','开店流程','养护运营','资料清单','常见问题'];
+function pddNorm(s){return String(s||'').toLowerCase();}
+function pddScore(e,q){q=pddNorm(q.trim());if(!q)return 0;var hay=pddNorm(e.q+' '+e.a+' '+e.kw.join(' '));var sc=0;if(hay.indexOf(q)>=0)sc+=12;e.kw.forEach(function(k){var kk=pddNorm(k);if(q.indexOf(kk)>=0||kk.indexOf(q)>=0)sc+=6;});var ql=q;for(var i=0;i<ql.length-1;i++){if(hay.indexOf(ql.substr(i,2))>=0)sc+=1;}return sc;}
+function pddInit(){var c=$('pddCats');if(!c)return;c.innerHTML=PDD_CATS.map(function(cat){return '<button type="button" data-c="'+cat+'" class="'+(cat===pddCat?'on':'')+'" onclick="pddSetCat(\''+cat+'\')">'+cat+'</button>';}).join('');pddSearch();}
+function pddSetCat(cat){pddCat=cat;pddInit();}
+function pddCard(e){return '<div class="ec-var" style="margin-bottom:10px"><div class="hd2"><span class="tag clay">'+esc(e.cat)+'</span></div><div class="bodytx" style="font-weight:700;margin:4px 0">'+esc(e.q)+'</div><div class="bodytx" style="color:var(--ink2)">'+esc(e.a)+'</div></div>';}
+function pddSearch(){var box=$('pddResults');if(!box)return;var q=$('pddSearch')?$('pddSearch').value.trim():'';var pool=PDD_KB.filter(function(e){return pddCat==='全部'||e.cat===pddCat;});
+  if(!q){if(!pool.length){box.innerHTML='<div class="empty">该分类暂无内容</div>';return;}box.innerHTML='<div class="mut2" style="margin-bottom:8px">'+(pddCat==='全部'?'📚 知识库总览（在上方输入问题可精准检索）：':'【'+pddCat+'】条目：')+'</div>'+pool.map(pddCard).join('');return;}
+  var ranked=pool.map(function(e){return {e:e,s:pddScore(e,q)};}).filter(function(x){return x.s>0;}).sort(function(a,b){return b.s-a.s;}).slice(0,8);
+  if(!ranked.length){box.innerHTML='<div class="empty">没找到相关内容，换个说法试试，如「保证金」「发货超时」「怎么定价」</div>';return;}
+  box.innerHTML=ranked.map(function(x){return pddCard(x.e);}).join('');}
 // ===== 今日热度榜 =====
 var HOT_LIST=[['weibo','微博热搜'],['zhihu','知乎热榜'],['douyin','抖音热点'],['toutiao','头条热榜'],['bilibili','B站热榜'],['baidu','百度热搜']];
 // 60s 直连（浏览器端取，免服务端/令牌）：微博/知乎/抖音/头条 已验证支持跨域
@@ -3069,7 +3139,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260815q';
+var APP_VER='20260815r';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -3228,7 +3298,7 @@ async function dbGenImg2ImgUI(){
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded',function(){
   document.querySelectorAll('nav.tabs button,.mbar button').forEach(function(b){b.addEventListener('click',function(){switchTab(this.dataset.t);});});
-  applyAppMode();renderAppModeToggle();
+  applyAppMode();renderAppModeToggle();pddInit();
   initStatPlat();switchCat();
   var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;
   if(restoreSession()){if(!isTokenExpired()){enterApp();}else{refreshToken().then(function(ok){if(ok)enterApp();else showAuth();});}}
