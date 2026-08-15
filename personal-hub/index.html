@@ -605,6 +605,15 @@ input.datepick{cursor:pointer;background:var(--card)}
 <div class="grid g2">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 14l3-4 3 3 4-6"/></svg><h3>电商运营看板</h3><div class="sp"><span class="mut2" id="ecBoardSub"></span></div></div><div class="bd ec-board"><div class="stats" id="ecStats"></div><div id="ecBoard"></div></div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>拼多多开店知识库</h3><div class="sp"><span class="mut2">开店流程 · 养护运营 · 资料清单 · 常见问题（联网整理，本地搜索）</span></div></div><div class="bd"><div class="form"><input class="fw" id="pddSearch" placeholder="输入问题，如：个人店怎么开？保证金能退吗？发货超时怎么办？" oninput="pddSearch()"></div><div class="hot-src" id="pddCats" style="margin:8px 0"></div><div id="pddResults"></div></div></div>
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M3 3h18v18H3z" fill="currentColor"/></svg><h3>电商 AI 助手</h3><div class="sp"><span class="mut2">专用拼多多运营助手 · 实时读取知识库 · 多轮记忆 · 可补充资料</span></div></div><div class="bd"><div class="ai-wrap" style="border:none;padding:0;background:none">
+<div class="ai-bar"><button class="btn xs ghost" type="button" onclick="ecAiClear()">清空</button><button class="btn xs ghost" type="button" onclick="ecAiOpenAdd()">＋ 补充资料</button><button class="btn xs ghost" type="button" onclick="ecAiSaveAsKb()">💾 存为知识</button><select id="ecAiKbCat" class="f1" style="max-width:120px;min-height:32px;font-size:13px;border-radius:8px;border:1px solid var(--line)"></select></div>
+<div class="ai-chat" id="ecAiChat" style="min-height:200px;height:46vh;overflow:auto;background:var(--sand2);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:8px"></div>
+<div class="ai-input" style="display:flex;align-items:flex-end;gap:8px;margin-top:8px;padding:8px;background:var(--card);border:1px solid var(--line);border-radius:12px">
+<textarea id="ecAiInput" placeholder="问电商助手：发货超时罚多少？无货源怎么选品？客服话术怎么写？" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ecAiSend()}" oninput="aiAutoResize(this)" style="flex:1;min-height:48px;max-height:160px;resize:none;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:15px;line-height:1.5;box-sizing:border-box"></textarea>
+<button class="btn pri" onclick="ecAiSend()" style="flex:none;align-self:flex-end;padding:12px 16px"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+</div>
+<div class="mut2" style="font-size:12px;margin-top:6px">记忆超长会自动压缩为摘要（避免占满上下文）；点「补充资料」可把你的店铺经验实时加进知识库；点「存为知识」把本轮问答存档。</div>
+</div></div></div>
 </div>
 </div></section>
 <section class="panel" id="p-hot"><div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3s5 4 5 9a5 5 0 0 1-10 0c0-2 1-3.5 1-3.5S8 12 9.5 12c0-3 2.5-6 2.5-9z"/></svg><h3>今日热度榜</h3><div class="sp"><span class="mut2" id="hotUpd"></span></div></div><div class="bd">
@@ -632,6 +641,11 @@ input.datepick{cursor:pointer;background:var(--card)}
 <div class="ai-hist" id="aiHist" style="display:none"></div>
 <div class="ai-chips"><button class="ai-chip" onclick="aiQuick('总结一下今天要处理的事')">总结今天</button><button class="ai-chip" onclick="aiQuick('分析我这个月的支出情况，哪些可以省')">分析支出</button><button class="ai-chip" onclick="aiQuick('看看我的选题库，给我几个新选题建议')">选题建议</button><button class="ai-chip" onclick="aiQuick('帮我回顾一下最近的自媒体数据趋势')">数据复盘</button><button class="ai-chip" onclick="aiQuick('我有哪些逾期的任务？帮我排个优先级')">逾期处理</button><button class="ai-chip" onclick="aiQuick('分析我的分镜脚本和导演成片进度，哪些镜头还没拍、建议怎么排期')">🎬 分镜/成片</button></div>
 <div class="ai-ctx" id="ai_ctx"><svg class="ico s" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.1"/></svg><span>AI助手可以查看你的待办、记账、选题、分镜、成片和习惯数据，给出针对性建议；可附图片让它<b>看图分析</b>，用 🎨 <b>生成图片</b>（文生图），或用 🖼️ <b>按你的要求改图</b>（都借用豆包 Seedream 模型）。附图后写「改成…」会自动走改图，写「分析/这是什么」会走看图分析。</span></div>
+<details class="kb-panel" style="margin:10px 0;background:var(--sand2);border:1px solid var(--line);border-radius:12px;padding:10px 12px"><summary style="cursor:pointer;font-weight:700;color:var(--ac-ecom)">🛒 拼多多运营知识库（点击展开，可一键喂给 AI）</summary>
+<div class="form" style="margin-top:8px"><input class="fw" id="paiKbSearch" placeholder="搜索知识库，如：保证金 / 发货超时 / 无货源选品" oninput="paiKbSearch()"></div>
+<div class="hot-src" id="paiKbCats" style="margin:8px 0"></div>
+<div id="paiKbResults"></div>
+</details>
 <div class="ai-chat" id="ai_chat" style="min-height:220px;height:52vh;overflow:auto"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>和你的AI助手聊聊吧<br>它能看图、能改图、也懂你工作台上的所有数据</div></div></div>
 <div class="ai-atts" id="ai_atts" style="display:none"></div>
 <div class="ai-toolbar" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><button class="btn xs ghost" type="button" onclick="aiGenImageT2I()" title="文生图">🎨 文生图</button><button class="btn xs ghost" type="button" onclick="aiImg2Img()" title="图生图改图">🖼️ 图生图</button></div>
@@ -706,6 +720,12 @@ input.datepick{cursor:pointer;background:var(--card)}
 <div class="notes-grid" id="notesGrid"></div>
 </div></div>
 </div></section>
+<div class="mask" id="ecAddMask" style="display:none;z-index:300"><div class="set-card" style="max-width:480px"><div class="set-hd"><b>补充资料到知识库</b><button class="x" onclick="ecAiCloseAdd()"><svg class="ico s" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div><div class="set-bd">
+<div class="form"><span class="mut2">分类</span><select id="ecAddCat" class="f1" style="min-height:38px"><option>补充资料</option><option>开店入驻</option><option>商品发布</option><option>发货物流</option><option>售后退款</option><option>客服规则</option><option>推广工具</option><option>评分流量</option><option>资金费用</option><option>处罚申诉</option><option>无货源选品</option><option>2026新规活动</option></select></div>
+<input id="ecAddQ" class="fw" placeholder="问题/主题，如：拼多多保证金怎么退？" style="margin-top:8px">
+<textarea id="ecAddA" class="fw" rows="5" placeholder="答案/资料内容（支持多行）" style="margin-top:8px;min-height:100px;font-size:15px"></textarea>
+<div class="form" style="margin-top:10px;justify-content:flex-end"><button class="btn ghost" onclick="ecAiCloseAdd()">取消</button><button class="btn pri" onclick="ecAiSaveAdd()">保存进知识库</button></div>
+</div></div></div>
 <footer>数据云端自动备份+本地存储双保险<br>换设备登录即可同步，导出JSON可离线备份</footer>
 </div>
 <div class="mbar"><div class="in">
@@ -1954,51 +1974,197 @@ async function sendHotFollow(key){var inp=$('hotFollow_'+key);if(!inp)return;var
 function hotPickImg(key){if(!hotImgInput){hotImgInput=document.createElement('input');hotImgInput.type='file';hotImgInput.accept='image/*';hotImgInput.onchange=function(){var f=hotImgInput.files&&hotImgInput.files[0];if(!f)return;var rd=new FileReader();rd.onload=function(){aiAnalyzeHot(key,'',rd.result);};rd.readAsDataURL(f);};}hotImgInput._key=key;hotImgInput.click();}
 
 // ===== 拼多多开店知识库（联网整理，本地搜索，无需运行时联网）=====
-var PDD_KB=[
- {cat:'开店流程',q:'个人店怎么开？需要什么资料？',a:'拼多多支持个人店，只需中国大陆居民身份证+手机号+人脸核验，门槛最低、审核最快（约1-2个工作日）。在「拼多多商家版」App 或商家后台点「0元开店/立即入驻」，选个人店，填店铺名（禁用「旗舰/官方」等词）、上传身份证、人脸认证，审核通过即可上架。',kw:['个人店','个人','身份证','开店','入驻','0元开店','怎么开']},
- {cat:'开店流程',q:'企业店/公司店怎么开？',a:'企业店需营业执照（三证合一）+法人身份证+对公账户。流程：选「企业店」→填店铺信息→上传营业执照高清扫描件→对公账户小额打款验证或法人授权核验→审核（普通2个工作日，旗舰/专卖/专营店3个工作日）→签署协议+缴保证金→上架。',kw:['企业店','公司店','营业执照','对公账户','企业','法人','怎么开']},
- {cat:'开店流程',q:'个体工商户店怎么开？',a:'个体店需营业执照+身份证（可用法人私人银行卡）。比个人店类目更全、营销工具更多，适合本地实体商家转线上。',kw:['个体','个体工商户','个体户','营业执照']},
- {cat:'开店流程',q:'开店要多少钱？保证金多少？',a:'无加盟费、无扣点。保证金可退：个人/企业普通类目约500元起（2026新政下调），特殊类目1000–10000元（食品、数码、美妆等）。支持「0元入驻」，先上架运营、提现时补缴。技术服务费成交后扣：普通订单0.6%，先用后付1%。',kw:['费用','保证金','多少钱','0元','扣点','技术服务费','成本','收费']},
- {cat:'开店流程',q:'保证金能退吗？怎么退？',a:'可以退。闭店且无未完结纠纷、违规欠款、未发货订单后，在商家后台申请退还，通常全额退。建议确认店铺无售后纠纷再申请。',kw:['保证金','退还','退保证金','退钱','退款','退']},
- {cat:'开店流程',q:'开店审核要多久？',a:'个人店/普通企业店约1-2个工作日；旗舰店/专卖店/专营店约3个工作日。资料清晰无反光、四角完整可避免驳回。',kw:['审核','多久','时间','通过','几天']},
- {cat:'开店流程',q:'店铺类型怎么选？',a:'新手试水选个人店（权重也不低）；有营业执照、想长期做选企业店（活动提报优先、流量权重更高）；品牌方/授权经销商选旗舰/专卖/专营店（需商标或授权）。',kw:['店铺类型','选哪种','类型','个人店','企业店','旗舰店','选']},
- {cat:'开店流程',q:'特殊类目（食品/美妆/数码/医疗器械）要什么资质？',a:'食品需《食品经营许可证》；美妆需备案/化妆品生产或经营许可证；数码需质检报告；医疗器械需备案或许可证；图书音像需出版物经营许可证。缺资质会被下架扣分。',kw:['特殊类目','食品','美妆','数码','医疗器械','资质','许可证','备案','类目']},
- {cat:'开店流程',q:'0元入驻是真的吗？',a:'是真的。拼多多支持「0元开店/0元入驻」，前期先上架运营，发布特定类目或提现前再补缴保证金，闭店可退。',kw:['0元入驻','0元开店','真的吗','免费']},
- {cat:'养护运营',q:'新店怎么运营/起步？',a:'五大思路：1)选款——刚需高频低客单低售后（百货/收纳/清洁最稳）；2)推广——先报无门槛「新品活动」，再开搜索推广测款；3)测款——看点击率/转化率；4)优化——主图/详情页/关键词持续迭代（勿频繁改价）；5)售后——客服及时回复、差评第一时间处理。',kw:['新店','运营','起步','怎么做','新手','思路','怎么弄']},
- {cat:'养护运营',q:'选品有什么建议？',a:'刚需、高频、低客单、低售后的百货/收纳/清洁最稳；引流款对标同行TOP略低价拿搜索加权，利润款赚钱；做组合装避免直接比价；标题60字符写满=核心词+属性词+营销词。',kw:['选品','选款','什么好卖','品类','卖什么']},
- {cat:'养护运营',q:'怎么定价？引流款和利润款怎么搭？',a:'采用「引流款+利润款+搭配款」矩阵。引流款略低于市场均价获取搜索加权（限制购买数量防亏损）；利润款赚钱；组合装提升客单。严禁低价SKU作弊、虚标原价（比价系统会降权）。',kw:['定价','价格','引流款','利润款','sku','定价策略','怎么定价']},
- {cat:'养护运营',q:'流量怎么来？推广怎么开？',a:'自然流量靠搜索SEO+活动；付费先开「多多搜索」测关键词，稳定后切「多多场景/全站推广」放大；积极报「9.9特卖/限时秒杀/百亿补贴/领券中心」。ROI达标再加预算。',kw:['流量','推广','搜索推广','场景推广','全站推广','多多进宝','活动','没流量']},
- {cat:'养护运营',q:'要报哪些活动？',a:'新手必做：9.9特卖、限时秒杀、领券中心；冲量可报百亿补贴。报名前备足库存、保证发货时效，避免缺货/DSR下滑导致资格取消。',kw:['活动','9.9','秒杀','百亿补贴','领券中心','报名','大促']},
- {cat:'养护运营',q:'发货有什么要求和底线？',a:'普通订单须48小时内揽收，超时触发自动赔付+限流；必须用拼多多电子面单（否则无权重）；不引导买家去微信/QQ交易；设置合理发货时间（新手建议48小时内）。',kw:['发货','48小时','电子面单','时效','超时','物流','发货慢']},
- {cat:'养护运营',q:'DSR评分是什么？怎么维护？',a:'DSR=描述相符+物流服务+服务态度三项评分，直接决定活动资格与自然流量权重。综合健康分≥4.6、买家售后打分≥4.7较安全。每日监控，任一项飘绿立即排查整改。',kw:['DSR','评分','评分低','健康分','描述相符','评分']},
- {cat:'养护运营',q:'客服回复率有什么要求？',a:'拼多多考核严格：5分钟回复率需>90%（部分场景要求3分钟回复率达标），低于标准会限制推广、影响权重与活动报名。配置自动回复+快捷短语，人工保持在线。',kw:['客服','回复率','5分钟','3分钟','自动回复','响应']},
- {cat:'养护运营',q:'评价怎么维护？怎么处理差评？',a:'从第一单起抓质量/包装/物流；用合规方式（如「扫码联系客服领福利」而非直接「好评返现」）引导好评。差评第一时间联系买家真诚解决（补发/退款）争取修改，并在差评下诚恳回复展示方案。监控DSR。',kw:['评价','差评','好评','好评返现','评价维护','评分']},
- {cat:'养护运营',q:'爆款30天节奏怎么排？',a:'0-7天：破零、测款、做基础评价；8-30天：报活动、开推广、冲销量提权重；30天+：稳转化、做复购、布局多爆款。大促前7-15天测款备素材。',kw:['爆款','30天','节奏','破零','冲销量','起量']},
- {cat:'养护运营',q:'被限流/降权了怎么办？',a:'常见原因：改标题/主图、发货慢、客服回复低、退款率高。应对：停止改标题主图、稳定发货、提升客服回复、降低退款率，通常7-14天可恢复。',kw:['限流','降权','恢复','没流量','权重下降','没曝光']},
- {cat:'养护运营',q:'没有流量怎么办？',a:'检查主图点击率、标题精准度、发货速度、评分。优化主图+标题+保证48小时发货；报活动拉曝光；用搜索推广测款。',kw:['没流量','流量少','曝光低','没访客']},
- {cat:'养护运营',q:'有流量不转化怎么办？',a:'价格没优势、评价少、没买家秀、规格选项不吸引人。补评价、做优惠券/满减/买家秀/运费险、优化商品规格引导转化。',kw:['不转化','转化低','有流量没单','转化']},
- {cat:'养护运营',q:'运营要避哪些坑？',a:'不刷单、不导流到站外、不售假；不虚标原价/先涨后降；特殊类目必备资质；不频繁改标题主图改价；杜绝虚假发货/物流异常。',kw:['避坑','违规','刷单','虚假发货','导流','比价','坑']},
- {cat:'养护运营',q:'怎么用数据复盘？',a:'每日看生意参谋：点击率（低则改主图）、转化率（低则改详情/价格）、UV价值（低则调SKU）、推广ROI、退款率。数据异常24小时内排查干预。',kw:['数据','复盘','生意参谋','指标','ROI','分析']},
- {cat:'资料清单',q:'开店要准备哪些资料？',a:'个人店：身份证正反面+手机号+人脸核验+同名银行卡。个体店：身份证+有效期内营业执照。企业店：三证合一营业执照+法人身份证+对公账户信息。特殊类目另需许可证/备案（食品经营许可证、美妆备案、数码质检等）。',kw:['资料','准备','需要什么','清单','材料','证件']},
- {cat:'资料清单',q:'店铺信息要设置哪些？',a:'店招（店名带品类关键词）、Logo、店铺简介（写清发货/售后/包邮）、真实经营地址、绑定手机与客服账号、客服电话。信息完整有助于活动报名与流量扶持。',kw:['店铺信息','店招','logo','简介','设置','资料']},
- {cat:'资料清单',q:'商品发布要注意什么？',a:'填完整属性、上传实拍图（禁用网图）、标注真实产地与规格；虚拟/医疗器械/食品等特殊类目额外提供许可证。违反《商品发布规范》会下架扣分。',kw:['商品发布','上架','实拍图','属性','规范','发布']},
- {cat:'常见问题',q:'可以用微信/QQ跟买家交易吗？',a:'不可以。平台严禁诱导非官方交易，引导买家去微信/QQ等会被处罚甚至限流封店。一切交易走平台。',kw:['微信','QQ','导流','场外交易','站外']},
- {cat:'常见问题',q:'主图/标题经常改会有影响吗？',a:'会。频繁改标题、主图、改价会触发比价与权重波动，导致降权。优化要小步快跑、避免大改；改价浮动别太大。',kw:['改标题','改主图','改价','权重','影响','频繁改']},
- {cat:'常见问题',q:'保证金和0元入驻有什么区别？',a:'0元入驻是「先开店后补保证金」的宽松政策，发布特定类目或提现前再补缴，闭店可退；普通入驻是审核通过后即缴保证金。两者保证金都可退。',kw:['0元入驻','保证金','区别','先用后付']},
- {cat:'常见问题',q:'发货超时会有什么处罚？',a:'普通订单超48小时未揽收会触发自动赔付（向买家赔付）、店铺被限流，严重时扣分降权。务必用电子面单、设置合理发货时效。',kw:['发货','超时','48小时','处罚','赔付','限流']}
-];
-var pddCat='全部';
-var PDD_CATS=['全部','开店流程','养护运营','资料清单','常见问题'];
+/* ===== 拼多多运营知识库（数据由生成脚本注入 PDD_KB） ===== */
+var PDD_KB=[{"cat":"开店入驻","t":"店铺类型对比","a":"| 维度 | 个人店 | 个体工商户店 | 企业店 |\n| --- | --- | --- | --- |\n| 资质 | 身份证 | 身份证 + 个体户营业执照 | 营业执照 + 法定代表人身份证 |\n| 保证金 | 2000 元起 | 同个人店档位 | 1000 元起（部分类目 500 元档） |\n| 类目范围 | 常规类目，部分类目受限 | 同个人店 | 更广，可做品牌授权、专卖/专营/旗舰 |\n| 扶持与曝光 | 基础 | 基础 | 相对更多流量扶持与信任背书 |\n| 命名 | 不能含“旗舰/专营/官方/授权”等 | 同个人店 | 可按类型命名（旗舰/专营/专卖） |\n\n- 一个身份证可开 2 家个人店（含个体工商户店）；一个手机号对应一个店铺账号；同一企业三证可开多家（每主营类目 5 家左右），以平台现行规则为准。\n- 个人店/个体户店适合起步；企业店适合有营业执照、想做品牌或类目更全的商家。","kw":["店铺类型","对比","开店入驻","2000元","1000元","500元"]},
+{"cat":"开店入驻","t":"开店步骤","a":"1. 访问拼多多商家后台 mms.pinduoduo.com，用手机号/微信注册登录。\n2. 选择店铺类型（个人/个体工商户/企业），按提示上传资质：身份证正反面；个体工商户或企业还需营业执照；特殊类目需食品经营许可证等。\n3. 提交审核，等待平台审核通过（一般 1~2 个工作日，特殊类目更久）。\n4. 设置店铺名称、logo、经营类目。\n5. 缴纳类目保证金（后台：账户资金 → 保证金 → 店铺保证金 → 充值；支持支付宝/微信，约 0.6% 手续费）。\n6. 完善发货地址、运费模板、退货地址，然后发布商品。","kw":["开店步骤","开店入驻","2个","0.6%"]},
+{"cat":"开店入驻","t":"保证金要点","a":"- 档位（非海淘）：个人店一般 2000 元；企业店一般 1000 元；水果生鲜、美容护肤等类目 10000 元；平台已把部分类目基础保证金从最低 1000 元下调至 500 元（以后台实际显示为准）。\n- 不缴保证金的限制：无法提现货款、无法新建推广计划、活动报名/竞价受限、流量受限。\n- 保证金不计息、不属于账户余额；正常经营后可随退店申请退还（约 30 天内到账）。\n- 退店条件：下架全部商品、所有订单完结、可提现余额提空、最后一笔订单确认收货后一定期限内无投诉纠纷。","kw":["保证金要","开店入驻","2000元","1000元","10000元","500元","30天"]},
+{"cat":"开店入驻","t":"提现与结算","a":"- 货款：一般买家确认收货后约 15 天进入可提现余额（信誉/等级不同可能有差异）。\n- 提现：到银行卡 1~3 个工作日；到支付宝约 24 小时内。\n- 未交保证金时提现受限；0 元开店有极少量免保证金提现次数（历史规则，以后台为准）。","kw":["提现与结","开店入驻","15天","3个","24小时","0元"]},
+{"cat":"商品发布","t":"标题","a":"- 突出核心词：品牌/属性 + 类目词 + 卖点词 + 场景词，避免堆砌无关词。\n- 不要用极限词、夸大词、违禁词（先跑 `scripts/pdd_check_words.py`）。\n- 预售商品必须在标题标注发货时限；承诺“当日发/24小时/48小时发”要与实际能力一致。\n- 一个店铺不要重复铺货相同商品（重复铺货会被处理）。","kw":["标题","商品发布","24小时","48小时"]},
+{"cat":"商品发布","t":"图片","a":"- 主图：建议 800×800，最小 400×400，最大 2000×2000；格式 JPG/PNG/GIF；单张不超过 2MB；白底为主、商品居中、清晰不模糊。\n- 轮播图/详情图：建议 750×352 或按平台规范；数量 10 张以内。\n- SKU 图/预览图：正方形、像素大于 480，不大于 1MB。\n- 活动图/白底图：纯白背景，不带品牌文字或标记（以平台具体要求为准）。\n- 不要盗用他人图片、不要放联系方式/二维码/其他平台水印。","kw":["图片","商品发布","10张"]},
+{"cat":"商品发布","t":"商品信息红线","a":"- 如实描述：材质、规格、尺码、色差、功效等与实物一致，避免“描述不符”退款。\n- 功效类描述必须有权威检测报告/资质支撑，禁止疾病治疗、保健夸大表述。\n- 禁售类目（药品、烟草、违禁品、未授权品牌等）不要碰；品牌商品需要授权。\n- 不要设置 0 元/超低价引流后涨价（低价引流违规），SKU 不能挂羊头卖狗肉。","kw":["商品信息","红线","商品发布","0元"]},
+{"cat":"商品发布","t":"上架前检查清单","a":"1. 标题、详情、SKU 文案跑违禁词检测。\n2. 图片尺寸与格式合规、无水印无二维码。\n3. 库存设置合理（避免爆单缺货）。\n4. 运费模板覆盖全国且价格合理。\n5. 价格覆盖成本 + 0.6% 技术服务费 + 运费 + 退货损耗。\n6. 承诺的发货时限（当日/24h/48h）可兑现。","kw":["上架前检","查清单","商品发布","0.6%"]},
+{"cat":"发货物流","t":"发货时限","a":"- 常规商品：默认 48 小时内上传物流单号；商家可承诺当日发/24 小时发/48 小时发。\n- 直邮、直供：发货时限 120 小时。\n- 预售：必须在商品标题/详情标注发货时限。\n- 发货后：24 小时内要有揽件信息；运输中 48 小时内要有物流更新；派件后尽快签收。","kw":["发货时限","发货物流","48小时","24小时","120小时"]},
+{"cat":"发货物流","t":"违规情形与处罚（金额以平台最新规则为准）","a":"| 情形 | 判定 | 处罚参考 |\n| --- | --- | --- |\n| 延迟发货 | 超出发货时限未上传单号 | 每单 3 元起（以现金券赔给买家）；或按成交金额比例（约 5% 上限 30 元）主动赔付 |\n| 虚假发货 | 24 小时无揽件；物流被签收但 24 小时无更新；物流异常/重复；单号地址与收货地址不符 | 按客单价分级每单 5~20 元，最高 100 元/单；余额提现限制 7 天；自动确认收货延长 15 天；年度多次递增处罚（下架 15~30 天） |\n| 缺货 | 3 天未发货，或上传单号后 5 天未真实发货 | 客单价 <300 元：5 元/单；≥300 元：2%，最高 100 元/单 |\n| 欺诈发货 | 发空包或与商品不符的物品 | 关闭交易退款，订单金额 1 倍赔偿，资金限制 15 天等 |\n| 超时不发货（买家投诉成立） | 投诉成立且未主动赔付 | 双份违约金（赔买家 + 赔平台），并扣分 |\n\n- 30 天不发货等极端情形：按实际成交金额 10% 违约金（24 小时内同一买家合计最低 5 元、最高 100 元）等，平台还可能直接退款关单。","kw":["违规情形","与处罚","金额以平","台最新规","则为准","发货物流","3元","5%","30元","24小时","20元","100元/单","7天"]},
+{"cat":"发货物流","t":"物流异常与降权","a":"- 物流异常率持续高于行业平均值 5 倍 → 店铺二级限制、商品降权。\n- 快递爆仓、遗失、疫情等不可控情况：及时联系买家说明、同步物流信息，必要时先退款，避免被判虚假发货。","kw":["物流异常","与降权","发货物流","5倍"]},
+{"cat":"发货物流","t":"避免处罚 SOP","a":"1. 库存不足立即改库存/下架，不硬接单。\n2. 每天定时查看“待发货”，在时限内上传真实单号。\n3. 用官方/第三方物流监控工具盯异常件。\n4. 电子面单发货，防止单号录错。\n5. 出现异常主动赔付（主动赔比投诉成立双份赔划算）。\n6. 大促前预判爆单，备足人手和面单。","kw":["避免处罚","SOP","发货物流"]},
+{"cat":"售后退款","t":"七天无理由退货","a":"- 所有商品默认支持七天无理由退货（定制类、生鲜等除外），买家签收后 7 天内可申请。\n- 商家无正当理由不得拒绝符合规则的七天无理由申请。\n- 运费：质量问题/错发/漏发 → 商家承担往返运费；无理由退货 → 买家承担退货运费；开通“退货包运费/消费者体验提升计划”的订单，平台补贴首重运费。\n- 买家拒收：无理由拒收运费买家承担；商品破损、错发等合理拒收由商家负责。","kw":["七天无理","由退货","售后退款","7天"]},
+{"cat":"售后退款","t":"仅退款","a":"- “仅退款”= 只退款不退货，一般出现在商品质量问题、描述不符、虚假发货、物流异常等场景。\n- 商家处理：先协商退货退款或补发/部分退款；不同意时准备证据（聊天记录、发货凭证、物流凭证）申请平台介入。\n- 恶意仅退款：收集完整证据后向平台申诉/举报，不要与买家对骂（会触发客服违规罚款）。\n- 平台介入后一般按证据和规则判定，商家要积极举证。","kw":["仅退款","售后退款"]},
+{"cat":"售后退款","t":"退款时限与考核","a":"- 买家申请退款后及时处理（平台有响应时限，超时自动同意风险高）。\n- 同意退货后：买家寄回，商家收到退货后尽快退款；换货一般 3 日内安排发出，逾期平台可能介入。\n- 品质退款率（退款原因为质量/描述不符）计入考核，过高影响权重和活动。\n- 售后处理不当会同时影响 DSR、体验分和纠纷率。","kw":["退款时限","与考核","售后退款"]},
+{"cat":"售后退款","t":"应对恶意/争议订单","a":"1. 保留全部证据：聊天、发货、物流签收、开箱视频。\n2. 平台规则内拒绝无理要求（如超出七天无理由、影响二次销售）。\n3. 拒绝无效 → 申请平台介入并提交证据。\n4. 绝不线下转账/私了，避免被套“引导线下交易”违规。","kw":["应对恶意","争议订单","售后退款"]},
+{"cat":"客服规则","t":"回复率","a":"- 核心指标：3 分钟人工回复率 =（咨询人数 − 3 分钟未人工回复人数）/ 咨询人数；考核时段 08:00–23:00。\n- 有效回复动作包括：手动发送文字/表情/图片/视频、发送商品卡片、小额打款卡片、拼团卡片等系统卡片消息。\n- 红线：当日咨询人数超过 100 且有效回复率低于 50%，可能按 1000 元/天处罚；回复率过低还会影响活动报名和店铺权重。\n- 提升方法：设置机器人自动回复兜底（部分场景算有效回复）、开启消息提醒、高峰加人、快捷回复话术。","kw":["回复率","客服规则","3分钟","50%","1000元/天"]},
+{"cat":"客服规则","t":"禁止行为","a":"- 辱骂、讽刺、骚扰消费者（含“小妹妹”等被认为不尊重的称呼）→ 罚款 100 元/次且无申诉机会。\n- 导流：出现 QQ、微信、淘宝、京东、蘑菇街、手机号、线下、转账、到付、刷单等字眼（含缩写、谐音）→ 严重处罚（可能要求 10 万保证金或封店）。\n- 泄露买家完整手机号/地址到聊天里 → 平台警告处罚；核对地址用系统工具。\n- 引导好评：好评返现、返现、加微信好评、晒图返现等 → 违规，平台严查。","kw":["禁止行为","客服规则","100元","10万"]},
+{"cat":"客服规则","t":"话术模板（合规）","a":"- 欢迎：亲，您好~欢迎光临小店，请问有什么可以帮您？\n- 议价：亲，这个价格已经是活动价啦，薄利多销，还请您理解~\n- 物流：亲，您的订单已按承诺时限发出，物流单号 XXXX，我帮您留意物流进度。\n- 缺货：亲，非常抱歉，这款暂时缺货了，这边先为您办理退款/换款，您看可以吗？\n- 售后：亲，抱歉给您带来不好的体验，请您拍下商品和包装照片，我们核实后按平台规则为您处理~\n- 注意：全程使用“亲”或“您”，商品只说“商品/产品”，不说“宝贝”。","kw":["话术模板","合规","客服规则"]},
+{"cat":"推广工具","t":"三种主流推广","a":"| 工具 | 逻辑 | 适合场景 |\n| --- | --- | --- |\n| 多多搜索 | 关键词竞价，买家搜词触达（人找货） | 转化意图强，测款、拉精准流量 |\n| 多多场景 | 按人群/商品位推荐展示（货找人） | 拉曝光、测图、老客召回 |\n| 全站推广 | 平台自动在全站找流量，按 ROI 目标跑 | 成熟链接放量、省心托管 |\n\n- 搜索流量准、转化高但贵；场景流量便宜但转化慢；全站推广适合跑量阶段。","kw":["三种主流","推广","推广工具"]},
+{"cat":"推广工具","t":"新手建议","a":"1. 先免费流量打底：优化标题、主图、价格、评价，把基础转化率做出来再付费放大。\n2. 测款：小预算测主图点击率与转化率（搜索推广小词精准测，场景推广测图）。\n3. 预算：初期日预算从几十元开始，跑 3~7 天看数据，ROI 达不到目标就降预算或换词换图。\n4. 关注 ROI = 成交金额 / 推广花费；结合利润表算可承受 ROI（亏本推广不可持续）。\n5. 活动与推广配合：报名平台活动（限时秒杀、百亿补贴类目等）拿自然流量，再决定要不要付费。","kw":["新手建议","推广工具","7天"]},
+{"cat":"推广工具","t":"常见坑","a":"- 盲目大预算冲量，ROI 为负 → 亏本。\n- 关键词太泛（大词）烧钱不转化。\n- 主图点击率低时砸推广 = 浪费钱，先换图。\n- 推广期间 DSR/回复率/发货掉链子 → 花钱买差评，恶性循环。\n- 新店先别碰高客单竞争激烈类目，选蓝海小类目起步更稳。","kw":["常见坑","推广工具"]},
+{"cat":"评分流量","t":"DSR（店铺动态评分）","a":"- 定义：近 90 天消费者给出的动态评分，统计维度：商品描述相符、物流服务、服务质量。\n- 门槛：近 90 天有效评价达到 50 条以上才统计（系统会过滤异常订单的评价）。\n- 影响：订单转化率、商品排名/权重、店铺流量、官方活动报名门槛。\n- 数据：DSR 越高订单量通常越高，评分对买家决策影响大（95% 买家购物前看评价）。","kw":["DSR","店铺动态","评分","评分流量","90天","95%"]},
+{"cat":"评分流量","t":"提升 DSR","a":"- 描述分：如实描述（材质、尺码、色差、功效），优化详情页，下架差评集中的 SKU。\n- 物流分：按时发货、选靠谱快递、预售/缺货提前说明。\n- 服务分：客服回复快（3 分钟回复率）、态度好、售后处理快。\n- 品质退款率：退款原因为质量/描述不符的订单会计入，退货率过高拉低权重，尽量在源头（选品、品控、详情）解决。","kw":["提升","DSR","评分流量","3分钟"]},
+{"cat":"评分流量","t":"体验分/消费者体验指标","a":"- 平台用“消费者体验提升计划”和体验指标评估店铺综合体验，影响流量扶持和活动。\n- 纠纷率、回复率、发货时效、退款率都是体验指标，按平台后台公示口径为准。","kw":["体验分","消费者体","验指标","评分流量"]},
+{"cat":"评分流量","t":"流量与权重常识","a":"- 新品期：平台给一定曝光测试，点击率（主图）、转化率（价格/评价/详情）、GMV 决定后续流量。\n- 不要用刷单/低价引流骗流量，被识别后降权、罚款、封店。\n- 权重是综合值：销量、DSR、服务、复购、退款率、违规记录都在内。","kw":["流量与权","重常识","评分流量"]},
+{"cat":"资金费用","t":"平台收费","a":"- 技术服务费：每笔交易约 0.6%（含支付渠道手续费，按成交金额扣除，无论是否交易成功都有争议案例；以后台账单为准）。先用后付订单技术服务费曾为 1%，后下调至 0.6%。\n- 消费者体验提升计划（退货包运费）：按单扣费，订单成团后从货款扣除单笔服务费（发货后才扣、无订单不扣）；费用由平台按店铺近期交易/售后/服务体验定价。\n- 保证金充值：支付宝/微信充值约 0.6% 手续费。\n- 推广费：多多搜索/场景/全站推广按点击或成交扣费，需自行充值。\n- 其他：活动保证金、处罚性扣款（见 处罚申诉.md）。","kw":["平台收费","资金费用","0.6%","1%"]},
+{"cat":"资金费用","t":"货款结算与提现","a":"- 结算周期：一般买家确认收货后约 15 天进入可提现余额（不同类目/等级有差异）。\n- 提现：银行卡 1~3 个工作日；支付宝约 24 小时内。\n- 未缴保证金：无法提现（0 元开店历史上有极少量免保证金提现次数）。\n- 货款被限制：虚假发货、售假嫌疑、违规处理期间会限制提现（7 天~30 天不等，售假冻结更久）。","kw":["货款结算","与提现","资金费用","15天","3个","24小时","0元","7天","30天"]},
+{"cat":"资金费用","t":"消费者体验提升计划（退货包运费）","a":"- 作用：商品带“退货包运费”标识、活动优先权、流量支持；免费附赠发货无忧、售后无忧（运费补贴）。\n- 补贴：符合规则的订单在退换货审核通过后，平台按发货/退货地址测算并补贴消费者首重运费；有效期为订单发货后 90 天内。\n- 不支持类目：部分虚拟类目（网络服务/软件等）不参与；有套利风险的订单不补贴。\n- 查询：后台 → 消费者体验提升计划 → 扣费记录。\n- 商家注意：开通后每单扣费侵蚀利润，定价时要把该费用计入成本（见 pdd_profit.py）。","kw":["消费者体","验提升计","退货包运","资金费用","90天"]},
+{"cat":"资金费用","t":"成本计算建议","a":"单件成本项：进货价 + 发出运费 + 退货率×退货运费 + 技术服务费 0.6%×成交价 + 体验提升计划/单 + 推广费/单 + 包装耗材。","kw":["成本计算","建议","资金费用","0.6%"]},
+{"cat":"处罚申诉","t":"常见罚款一览（金额以平台最新规则为准）","a":"| 违规 | 处罚参考 |\n| --- | --- |\n| 延迟发货 | 每单 3 元起；主动赔付约成交额 5%（上限 30 元） |\n| 虚假发货 | 每单 5~20 元（按客单价），最高 100 元；提现限制、确认收货延长、多次下架 |\n| 缺货 | <300 元 5 元/单；≥300 元 2%（最高 100 元） |\n| 欺诈发货 | 订单金额 1 倍赔偿、资金限制 15 天 |\n| 客服辱骂 | 100 元/次，无申诉 |\n| 回复率 <50%（当日咨询 >100 人） | 1000 元/天 |\n| 售假 | 累计销售额 10 倍罚款、冻结资金、下架全店、封店、涉刑移交 |\n| 刷单/套券 | 套取金额 10 倍违约金、限制资金/功能、退店 |\n| 贿赂官方人员 | 5 万元/次 |\n| 取消已报名活动 | 活动保证金被扣 |","kw":["常见罚款","一览","金额以平","台最新规","则为准","处罚申诉","3元","5%","30元","20元","100元","300元","5元/单"]},
+{"cat":"处罚申诉","t":"售假处理流程（平台规则）","a":"1. 疑似假货当日：限制提现、商品下架、临时提高保证金（疑似商品历史销售额 10 倍）、通知举证。\n2. 商家 12 日内举证（合同/订单/发票/授权书），两次举证仍不能证明正品 → 平台可先行赔付并继续冻结。\n3. 官方（工商、品牌方）鉴定或商家自认售假 → 直接认定；商家不认可但 90 日未有效举证 → 按售假处理。\n4. 认定后：永久下架、扣保证金/货款赔付、下架全店、终止合作、移交司法。","kw":["售假处理","流程","平台规则","处罚申诉","10倍"]},
+{"cat":"处罚申诉","t":"封店高风险情形","a":"- 售假（尤其重复、大量）；恶意刷单套券；客服违禁词/导流多次；缺货或假货单数超自然年规定次数；贿赂平台人员。\n- 封店影响：全店下架、资金冻结（解冻需较长时间）、投入归零；封店后重新起店代价高。","kw":["封店高风","险情形","处罚申诉"]},
+{"cat":"处罚申诉","t":"申诉流程","a":"1. 入口：商家后台 → 违规中心 / 订单投诉与维权 → 我要申诉。\n2. 选对申诉类型，填订单号、申诉原因。\n3. 证据要硬：物流轨迹截图、面单、采购凭证、授权书、聊天记录、开箱视频等。\n4. 时效：在通知的申诉期内提交（逾期失效）；一次不通过可补充证据再申诉（通常限次数）。\n5. 无效申诉的坑：只写文字不交证据、理由与违规项不匹配、证据模糊。\n6. 被误判也要申诉，误判确实存在，申诉成功可撤销处罚。","kw":["申诉流程","处罚申诉"]},
+{"cat":"无货源选品","t":"一、无货源模式现状与合规风险（先说红线）","a":"- 拼多多对“无货源店群/第三方软件铺货”有明确规则：\n  1. 使用第三方软件发布商品，必须准确、完整填写“商品映射关系”，平台持续考核填写率与准确率。\n  2. 定价必须公平合理、符合市场规律，禁止高额加价损害消费者利益、扰乱平台秩序。\n  3. 违反规则的处罚：屏蔽、下架、删除商品、限制店铺经营（严重封店）。\n- 拍A发B（用其他商品冒充发货）= 欺诈发货，是重罚红线，缺货时宁可退款也不要乱发货。\n- 批量软件采集铺货容易被识别为店群，提现可能被限制（表现为“网络繁忙”）。\n- 结论：无货源能做，但要“合规轻量”：少量精选、手动精细化上架、合理加价（不是翻倍）、真实代发、填好映射关系。","kw":["无货源模","式现状与","合规风险","先说红线","无货源选"]},
+{"cat":"无货源选品","t":"二、货源渠道清单","a":"| 渠道 | 说明 | 适合 |\n| --- | --- | --- |\n| 1688 | 首选。选“一件代发/代销”标签、实力商家、深度验厂、48小时发货的供应商 | 全品类 |\n| 多多批发（拼多多官方批发） | 商家后台可开通分销，拼多多体系内货源，代发链路顺畅 | 全品类 |\n| 淘宝/天猫分销 | 部分店铺支持代销，可与 1688 对比价格 | 补充 |\n| 垂直货源站 | 义乌购（小商品）、搜款网（广州女装）、网商园（杭州女装）、开山网（鞋）、包牛牛（箱包）、53货源网（综合）等 | 对应品类 |\n| 一件代发工具 | 拼多多商家后台“服务市场”：妙手、甩手、大淘客等 ERP 工具（注意别用纯采集铺货玩法） | 上货效率 |\n\n选供应商必谈：是否支持一件代发、发货时效（能否 48 小时内出单号）、用什么快递、售后谁承担（运费/质量问题）、能否改价改规格、有没有库存同步。","kw":["货源渠道","清单","无货源选","48小时"]},
+{"cat":"无货源选品","t":"三、选品方法论（核心）","a":"1. 蓝海词法：找“买家搜得多、在售商品少、卖家少”的词/品类。特征：需求旺盛、利润率高、竞争小、用户粘性强。例子：孵化器、cosplay 道具、古伞/武士伞等小众品。\n2. 同行法：盯 3~5 家同领域做得好的店铺，看他们每天上什么新、什么卖得好；新品按上新时间排序找机会。\n3. 淘宝搭配法：看淘宝/1688 卖得好的商品，找它的配套产品一起上（关联销售）。\n4. 人群/场景法：男人好色、女人爱美、老人要健康、小孩要聪明；场景：烧烤、露营、厨房、通勤、养宠、开学季、冬季保暖。\n5. 季节法：提前 1~2 个月布局（夏：防晒/灭蚊/凉席；冬：帽子围巾；开学季：文具水杯书包）。\n6. 细分切入：别碰服装、女鞋、家电这类大类目红海；从大类目下的细分切入（宠物用品 → 宠物服饰/窝垫/出行；眼镜 → 老花镜/儿童防蓝光/墨镜收纳；玩具 → 按年龄细分）。\n7. 数据验证：用选品工具（多多情报通、多多参谋等，拼多多商家后台推广工具里的关键词数据）看：搜索人气、点击率、转化率、在线商品数、商城占比、竞争度。","kw":["选品方法","核心","无货源选","2个"]},
+{"cat":"无货源选品","t":"四、不拼价格的差异化玩法","a":"1. 选品差异化：非标品、信息差品、新奇特小件，避开“人人都在卖、成本透明”的标准品。\n2. 标题差异化：蓝海词 + 属性词 + 场景词组合，不跟爆款标题抄。\n3. 主图/详情差异化：自己拍/做卖点图、对比图、场景图（不要直接盗用供应商图，平台查重）。\n4. 组合装/套装：多件组合、礼盒装提高客单价，避开单品比价。\n5. 价格卡位：不跟最低价。同行最低 28，你就卖 35 卡中间，用主图/详情/评价撑价值。\n6. 服务差异化：承诺并兑现 48 小时发货、退货包运费、及时售后，转化率不输低价。\n7. 新品节奏：持续上新测款，留下出单的，淘汰滞销的（每天至少 5 单为标准筛选）。\n8. 关联销售：搭配购买（数据线 + 收纳包 + 支架），提高客单价。","kw":["不拼价格","的差异化","玩法","无货源选","48小时"]},
+{"cat":"无货源选品","t":"五、对“数码配件/杂货铺”的具体建议","a":"- 数码配件（数据线、充电头、钢化膜等）是典型红海：1688 成本透明、价格战惨烈，纯铺货没优势。\n- 破局方向：\n  1. 细分机型：老旧机型、冷门品牌的专用配件（壳、膜、支架），竞争小。\n  2. 功能性新奇特：磁吸、车载、桌面理线、便携收纳类数码周边。\n  3. 组合套装：壳+膜+支架、线+头+收纳包，抬客单价。\n  4. 杂货铺策略：以 1~2 个“引流款”带流量，靠“利润款”（差异化小件）赚钱，别全店低价。\n- 放弃类目（新手无货源）：食品（保质期/认证）、带电大件（售后多）、易燃易爆危险品、专利保护产品（外观专利、设计专利）、未授权品牌。","kw":["数码配件","杂货铺","的具体建","无货源选","2个"]},
+{"cat":"无货源选品","t":"六、无货源落地 SOP","a":"1. 定类目方向（结合上述方法论，先选 2~3 个细分方向）。\n2. 1688/多多批发找 2~3 家支持代发的供应商，谈好发货时效与售后。\n3. 用工具数据验证蓝海词，选出 5~10 个候选品。\n4. 手动精细化上架：差异化标题 + 合规图片 + 合理加价（参考同行中位价，不跟最低）。\n5. 上架前跑 `scripts/pdd_check_words.py` 检查违禁词。\n6. 上架后测款：看曝光/点击/转化，出单的留，滞销的下架换品。\n7. 用 `scripts/pdd_profit.py` 算每款利润，利润不行直接淘汰。","kw":["无货源落","SOP","无货源选","3个","10个"]},
+{"cat":"2026新规活动","t":"一、2026 年规则动态","a":"- 先用后付订单技术服务费：已从 1% 下调至 0.6%（平台“百亿减免”计划，全部降至 6 折）。\n- 保证金：平台将部分类目基础保证金最低档从 1000 元下调至 500 元（首批覆盖近 70 个类目，以后台显示为准）。\n- 严查方向（持续）：\n  1. 第三方软件铺货必须准确填写“商品映射关系”，平台考核填写率与准确率。\n  2. 禁止高额加价损害消费者利益；禁止拍A发B（欺诈发货）。\n  3. 无货源店群特征店铺：限流、降权、提现限制（表现为“网络繁忙”），严重封店。\n- 税务合规（新趋势）：平台依法向税务机关报送商家涉税信息；个体户/企业须依法登记、如实申报纳税，违规可能面临税务处罚。个人店也应按《电子商务法》要求办理市场主体登记（个别豁免情形除外）。\n- 高频处罚话题（2026 公开文章高频出现，具体标准以后台为准）：延迟发货阶梯赔付、重复铺货限制周期、品质退款率处罚、客服回复率/体验分清退活动。","kw":["2026","年规则动","新规活动","1%","0.6%","1000元","500元","70个"]},
+{"cat":"2026新规活动","t":"二、消费者服务体验分","a":"- 定义：平台综合衡量消费者服务体验的指标，0~5 分，分数越高越好；每天更新（通常由 1 天前数据决定）。\n- 查看：商家后台 → 数据中心 → 服务数据 → 消费者体验指标。\n- 考核数据（近 30 天）：商品求助率、发货求助率、物流求助率、3 分钟人工回复率、纠纷退款率等。\n- 影响：\n  1. 店铺考核：体验分低可能触发二级限制（移除资源位、禁止上新、禁止上架、移除广告）。\n  2. 活动报名/清退：报名百亿补贴、砍价/签到等活动需要体验分达标；已在活动中的商品不达标会被清退。\n  3. 流量：体验分已纳入推荐流量权重，分高获得更多自然流量倾斜。\n  4. 售后：体验分低的店铺，售后单更容易被平台介入处理。\n- 提升：压商品/发货/物流求助率（提前在详情页写清安装、发货时间等）、3 分钟回复率拉满、纠纷单尽早协商解决不升级到平台。","kw":["消费者服","务体验分","2026","新规活动","1天","30天","3分钟"]},
+{"cat":"2026新规活动","t":"三、百亿补贴活动规则","a":"- 报名入口：商家后台 → 店铺营销 → 营销活动 → 百亿补贴（可自主申报，不通过可看原因）。\n- 常见报名条件（公开资料整理）：\n  1. 店铺运营满 3 个月左右；DSR 综合评分较高（公开经验值 4.8 以上）；近 30 天无严重违规。\n  2. 商品为正品，能提供进货凭证/授权证明；商品近 30 天评价高于行业及全站综合值。\n  3. 配送区域覆盖 24 个省区市以上；商品价格不高于其他活动同款。\n- 缺货赔付标准（百亿补贴商品）：\n  - 缺货订单金额 100 元以内：10 元/单；100 元及以上：订单金额 10%/单，最高 300 元（以长期有效无门槛现金券赔付）。\n  - 延迟发货届满后 3 天仍未发货：平台赔付前主动沟通完成发货且无缺货投诉，可酌情减免；赔付前有消费者投诉额外赔 5%（10~100 元）；赔付后仍有投诉额外赔 15%（10~300 元）。\n- 活动期动态考核：平台从咨询、物流、商品、售后、纠纷 5 个维度考核，任一异常可能被要求整改或取消活动资格/移除资源位。\n- 参加活动前必须备足库存与客服人手，避免活动爆单后缺货、回复率崩盘。","kw":["百亿补贴","活动规则","2026","新规活动","3个","30天","24个","100元","10元/单","10%"]},
+{"cat":"2026新规活动","t":"四、配件/小商品类目运营思路（公开经验）","a":"- 选款：选“平台或淘宝上升幅度大”的商品；已经很爆、大家都在卖的款直接放弃（竞争大、利润薄）。\n- 新款优先：能做新款、做风格的不要跟别人的节奏；多留意淘宝上升期商品，拼多多爆款常先在淘宝验证。\n- 新品定价：不要一上架就高价“割新品红利”，容易死在测试期；有货源支撑时可用低利润跑量冲爆款，低价会劝退想跟卖的同行。\n- 低价引流是坑：用 SKU 低价引流（如 9.9 手机壳另设 5.6 挂绳 SKU 拉低展示价）属于违规引流，容易被处罚，别玩。\n- 配件类（数码配件）破局：细分机型、功能性新奇特、组合套装、差异化主图详情，避开标准品比价（详见 无货源选品.md）。","kw":["配件","小商品类","目运营思","公开经验","2026","新规活动"]},
+{"cat":"运营总览","t":"使用流程","a":"1. 若存在店铺档案 `D:\\Codex\\拼多多店铺助手\\店铺档案.md`，先读取（记录类目、保证金、成本、定价、货源、库存等背景），回答时结合档案中的实际情况。\n2. 按问题类型选择处理方式：\n   - 规则、处罚、流程问题 → 查阅 `references/` 对应文档，回答时给出具体数字（金额、时限、次数），并注明以商家后台最新规则为准。\n   - 定价、利润、保本价 → 运行 `scripts/pdd_profit.py` 计算。\n   - 标题、详情、客服文案 → 先运行 `scripts/pdd_check_words.py` 检测违禁词，通过后再交付。\n   - 客服回复率、发货时限是否超时 → 运行 `scripts/pdd_reply_rate.py` 计算。\n   - 日常运营问题 → 按 `references/` 中对应工作流给出分步清单。\r\n- 选品、货源、无货源、差异化、避价格战 → 查 `references/无货源选品.md`，结合店铺档案给方案。\r\n- 体验分、百亿补贴、先用后付、新规动态、配件运营 → 查 `references/2026新规与活动.md`。\n3. 回答风格：先给结论，再给依据和操作步骤；金额、时限、次数必须给明确数字。","kw":["使用流程","运营总览"]},
+{"cat":"运营总览","t":"高风险规则速查（详见 references/）","a":"- 发货：常规商品默认 48 小时内上传物流单号；发货后 24 小时内需有揽件记录，运输中 48 小时内需有物流更新。超时/虚假发货按单罚款（3~10 元起步，按客单价分级，单笔最高 100 元），并影响流量、活动与店铺权重。\n- 客服：3 分钟人工回复率（考核 08:00–23:00）；当日咨询人数超过 100 且有效回复率低于 50% 可能罚 1000 元；辱骂顾客罚 100 元且无申诉机会。\n- 违禁词：最/全网/第一/顶级/唯一/极致等极限词，疾病治疗与保健功效词，好评返现，第三方平台词（QQ、微信、淘宝、京东、手机号等），导流词（线下、到付、转账等），以及“宝贝”等平台特定禁用表述。\n- 售假：疑似假货先限制提现、下架、临时提高保证金（疑似商品历史销售额 10 倍）；认定售假最高按累计销售额 10 倍罚款、冻结资金、封店，涉刑移交司法。\n- 刷单套券：套取平台券按套取金额 10 倍违约金，限制资金或直接退店。\n- 保证金：个人店 2000 元起（平台已把部分类目最低档从 1000 元下调至 500 元）；生鲜水果、美容护肤等类目 10000 元；海淘 10000 元。不缴保证金无法提现、报活动、开推广计划。\n- 资金：每笔交易约 0.6% 技术服务费（先用后付订单同为 0.6%）；货款一般买家确认收货后约 15 天结算；提现到银行卡 1~3 个工作日、支付宝约 24 小时内。\n- 售后：必须支持七天无理由退货；质量问题退货运费商家承担，无理由退货买家承担（开通退货包运费/消费者体验提升计划的按计划补贴）；退货须在收到退货后及时处理，超时平台可能介入。","kw":["高风险规","则速查","详见","references","运营总览","48小时","24小时","10元","100元","3分钟","50%","1000元"]},
+{"cat":"运营总览","t":"脚本","a":"- `python scripts/pdd_profit.py`：利润与定价计算（成本、运费、技术服务费、退货率、推广费 → 单件净利、保本价、目标利润售价）。\n- `python scripts/pdd_check_words.py \"文案\"`：违禁词检测（极限词、功效词、第三方平台词、导流词、好评诱导等）。\n- `python scripts/pdd_reply_rate.py`：客服 3 分钟回复率计算与 50% 红线检查。","kw":["脚本","运营总览","3分钟","50%"]},
+{"cat":"运营总览","t":"数据时效性","a":"本技能内容基于 2026 年公开资料整理，平台规则经常调整。涉及保证金、罚款、申诉、活动等重大操作时，务必以商家后台（mms.pinduoduo.com）与平台公告为准。","kw":["数据时效","运营总览"]},
+{"cat":"脚本工具","t":"pdd_profit.py 利润与定价计算","a":"用途：算单件净利、保本价、目标利润售价。参数：--price 售价 --cost 进货成本 --ship 发出运费 --refund-rate 退货率% --refund-ship 退货运费 --fee-rate 技术服务费率(默认0.6%) --extra-fee 每单其他费(体验提升/包装) --ad-fee 每单推广费 --margin 目标利润率% --qty 日销量。示例：python pdd_profit.py --price 15 --cost 6 --ship 3 --refund-rate 10 --ad-fee 0.5。输出含技术服务费、单件净利、净利率、保本售价、目标利润售价。","kw":["利润","定价","保本价","pdd_profit","成本","技术服务费","0.6%","净利率","退货率","推广费"]},
+{"cat":"脚本工具","t":"pdd_check_words.py 违禁词检测","a":"用途：检测标题/详情/客服文案中的拼多多违禁词。词库分组：极限词(最/全网/第一/唯一/顶级/绝对等)、价格促销诱导(跳楼价/清仓/亏本等)、医疗疾病功效(治疗/治愈/消炎/降血压等)、保健美容功效(减肥/美白/祛斑等)、第三方平台导流(qq/微信/淘宝/京东/手机号/线下/转账/到付等)、好评诱导(好评返现/返现等)、违禁品资质(枪支/假币/处方药等)。用法：python pdd_check_words.py 文案 或 --file 文件 或 echo 文案 | python pdd_check_words.py。客服语境额外提示：不说宝贝说商品/产品。","kw":["违禁词","极限词","导流","好评返现","微信","qq","宝贝","检测","pdd_check_words","第三方平台","功效"]},
+{"cat":"脚本工具","t":"pdd_reply_rate.py 回复率与发货时限检查","a":"用途：算客服3分钟人工回复率、检查50%红线、发货时限风险。指标：3分钟人工回复率=(咨询人数-3分钟未回复人数)/咨询人数，考核08:00-23:00；当日咨询>100且回复率<50%有1000元/天罚款风险；常规商品48小时未上传单号=延迟发货风险(每单3元起)；发货后24小时无揽件=虚假发货风险。参数：--consulted 咨询人数 --late 未回复人数 --rate 直接指定率% --ship-hours 距下单小时 --no-pickup 已发无揽件。","kw":["回复率","3分钟","50%","1000元","发货时限","虚假发货","延迟发货","pdd_reply_rate","咨询人数","揽件"]}];
+var PDD_CATS=['全部','运营总览','开店入驻','商品发布','发货物流','售后退款','客服规则','推广工具','评分流量','资金费用','处罚申诉','无货源选品','2026新规活动','脚本工具'];
 function pddNorm(s){return String(s||'').toLowerCase();}
-function pddScore(e,q){q=pddNorm(q.trim());if(!q)return 0;var hay=pddNorm(e.q+' '+e.a+' '+e.kw.join(' '));var sc=0;if(hay.indexOf(q)>=0)sc+=12;e.kw.forEach(function(k){var kk=pddNorm(k);if(q.indexOf(kk)>=0||kk.indexOf(q)>=0)sc+=6;});var ql=q;for(var i=0;i<ql.length-1;i++){if(hay.indexOf(ql.substr(i,2))>=0)sc+=1;}return sc;}
-function pddInit(){var c=$('pddCats');if(!c)return;c.innerHTML=PDD_CATS.map(function(cat){return '<button type="button" data-c="'+cat+'" class="'+(cat===pddCat?'on':'')+'" onclick="pddSetCat(\''+cat+'\')">'+cat+'</button>';}).join('');pddSearch();}
+function pddScore(e,q){
+  q=pddNorm(q.trim());if(!q)return 0;
+  var hay=pddNorm((e.t||'')+' '+(e.a||'')+' '+((e.kw||[]).join(' ')));
+  var sc=0;
+  if(hay.indexOf(q)>=0)sc+=12;
+  (e.kw||[]).forEach(function(k){var kk=pddNorm(k);if(q.indexOf(kk)>=0||kk.indexOf(q)>=0)sc+=6;});
+  var ql=q;
+  for(var i=0;i<ql.length-1;i++){if(hay.indexOf(ql.substr(i,2))>=0)sc+=1;}
+  return sc;
+}
+var pddCat='全部';
+function pddInit(){
+  var c=$('pddCats');if(!c)return;
+  c.innerHTML=PDD_CATS.map(function(cat){return '<button type="button" data-c="'+cat+'" class="'+(cat===pddCat?'on':'')+'" onclick="pddSetCat(\''+cat+'\')">'+cat+'</button>';}).join('');
+  pddSearch();
+}
 function pddSetCat(cat){pddCat=cat;pddInit();}
-function pddCard(e){return '<div class="ec-var" style="margin-bottom:10px"><div class="hd2"><span class="tag clay">'+esc(e.cat)+'</span></div><div class="bodytx" style="font-weight:700;margin:4px 0">'+esc(e.q)+'</div><div class="bodytx" style="color:var(--ink2)">'+esc(e.a)+'</div></div>';}
-function pddSearch(){var box=$('pddResults');if(!box)return;var q=$('pddSearch')?$('pddSearch').value.trim():'';var pool=PDD_KB.filter(function(e){return pddCat==='全部'||e.cat===pddCat;});
+function pddCard(e){return '<div class="ec-var" style="margin-bottom:10px"><div class="hd2"><span class="tag clay">'+esc(e.cat)+'</span>'+(e.t?' <b>'+esc(e.t)+'</b>':'')+'</div><div class="bodytx" style="color:var(--ink2);white-space:pre-wrap;line-height:1.55">'+esc(e.a||'')+'</div>'+(e.kw&&e.kw.length?'<div class="mut2" style="font-size:11px;margin-top:4px">'+e.kw.slice(0,10).map(esc).join(' · ')+'</div>':'')+'</div>';}
+function pddSearch(){
+  var box=$('pddResults');if(!box)return;
+  var q=$('pddSearch')?$('pddSearch').value.trim():'';
+  var pool=PDD_KB.filter(function(e){return pddCat==='全部'||e.cat===pddCat;});
   if(!q){if(!pool.length){box.innerHTML='<div class="empty">该分类暂无内容</div>';return;}box.innerHTML='<div class="mut2" style="margin-bottom:8px">'+(pddCat==='全部'?'📚 知识库总览（在上方输入问题可精准检索）：':'【'+pddCat+'】条目：')+'</div>'+pool.map(pddCard).join('');return;}
-  var ranked=pool.map(function(e){return {e:e,s:pddScore(e,q)};}).filter(function(x){return x.s>0;}).sort(function(a,b){return b.s-a.s;}).slice(0,8);
+  var ranked=pool.map(function(e){return {e:e,s:pddScore(e,q)};}).filter(function(x){return x.s>0;}).sort(function(a,b){return b.s-a.s;}).slice(0,10);
   if(!ranked.length){box.innerHTML='<div class="empty">没找到相关内容，换个说法试试，如「保证金」「发货超时」「怎么定价」</div>';return;}
-  box.innerHTML=ranked.map(function(x){return pddCard(x.e);}).join('');}
+  box.innerHTML=ranked.map(function(x){return pddCard(x.e);}).join('');
+}
+
+/* ===== 电商 AI 助手（专用，实时引用 PDD_KB，多轮+压缩+可补充） ===== */
+function loadPddExtra(){try{return JSON.parse(localStorage.getItem('ph_pdd_extra')||'[]');}catch(e){return [];}}
+function savePddExtra(arr){try{localStorage.setItem('ph_pdd_extra',JSON.stringify(arr));}catch(e){}}
+function pddAll(){return PDD_KB.concat(loadPddExtra());}
+function pddKbRetrieve(q,k){
+  q=(q||'').trim();var pool=pddAll();
+  var sel=$('ecAiKbCat');var cat=sel?sel.value:'全部';
+  pool=pool.filter(function(e){return cat==='全部'||e.cat===cat;});
+  if(!q)return [];
+  return pool.map(function(e){return {e:e,s:pddScore(e,q)};}).filter(function(x){return x.s>0;}).sort(function(a,b){return b.s-a.s;}).slice(0,k||5).map(function(x){return x.e;});
+}
+function pddKbText(q,k){return pddKbRetrieve(q,k).map(function(e){return '【'+e.cat+' · '+e.t+'】\n'+e.a;}).join('\n\n');}
+function ecAiInit(){
+  var sel=$('ecAiKbCat');if(sel&&!sel.dataset.filled){sel.innerHTML=PDD_CATS.map(function(c){return '<option value="'+c+'">'+c+'</option>';}).join('');sel.dataset.filled='1';}
+  ecAiRender();
+}
+function tsShort(){return new Date().toTimeString().slice(0,5);}
+function ecAiRender(){
+  var chat=$('ecAiChat');if(!chat)return;
+  var arr=D.ecomChat||[];
+  if(!arr.length){chat.innerHTML='<div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>电商 AI 助手已就绪<br>它读得懂你这份拼多多运营知识库，随时问：发货超时罚多少？无货源怎么选品？客服话术怎么写？</div></div>';return;}
+  chat.innerHTML='';
+  arr.forEach(function(c){
+    if(c.__summary)return;
+    var d=document.createElement('div');d.className='ai-row '+(c.role==='user'?'me':'bot');
+    var av=document.createElement('div');av.className='av';
+    av.innerHTML=c.role==='bot'?'<svg class="ico" viewBox="0 0 24 24"><path d="M3 3h18v18H3z" fill="currentColor"/></svg>':'<svg class="ico" viewBox="0 0 24 24"><path d="M12 12c2.2 0 4-1.8 4-4s-1.8-4-4-4-4 1.8-4 4 1.8 4 4 4zm0 2c-2.7 0-8 1.3-8 4v2h16v-2c0-2.7-5.3-4-8-4z" fill="currentColor"/></svg>';
+    var bub=document.createElement('div');bub.className='bubble';
+    var tag=document.createElement('div');tag.className='ai-tag';tag.textContent='# 电商助手';
+    var body=document.createElement('div');body.className='ai-body';body.textContent=c.content||'';
+    bub.appendChild(tag);bub.appendChild(body);d.appendChild(av);d.appendChild(bub);chat.appendChild(d);
+  });
+  if(D.ecomChat&&D.ecomChat.__summary){var sd=document.createElement('div');sd.className='ai-row bot';sd.innerHTML='<div class="av"><svg class="ico" viewBox="0 0 24 24"><path d="M3 3h18v18H3z" fill="currentColor"/></svg></div><div class="bubble"><div class="ai-tag"># 记忆摘要</div><div class="ai-body" style="color:var(--ink3);font-size:13px">'+esc(D.ecomChat.__summary)+'</div></div>';chat.appendChild(sd);}
+  chat.scrollTop=chat.scrollHeight;
+}
+function ecAiShowTyping(){var chat=$('ecAiChat');if(!chat)return;var d=document.createElement('div');d.className='ai-row bot';d.id='ecAiTyping';d.innerHTML='<div class="av"><svg class="ico" viewBox="0 0 24 24"><path d="M3 3h18v18H3z" fill="currentColor"/></svg></div><div class="bubble"><div class="ai-tag"># 电商助手</div><div class="ai-body"></div></div>';chat.appendChild(d);chat.scrollTop=chat.scrollHeight;}
+function ecAiHideTyping(){var t=$('ecAiTyping');if(t)t.remove();}
+var ecAiBusy=false;
+async function ecAiSend(){
+  if(ecAiBusy)return;
+  var inp=$('ecAiInput');if(!inp)return;var m=inp.value.trim();if(!m)return;inp.value='';
+  if(!(await agnesEnsureReady()))return;
+  D.ecomChat=D.ecomChat||[];
+  D.ecomChat.push({role:'user',content:m,ts:tsShort()});
+  ecAiRender();ecAiShowTyping();ecAiBusy=true;
+  await ecAiCompressIfNeeded();
+  var kb=pddKbText(m,6);
+  var sys='你是「电商 AI 助手」，专门服务拼多多商家，不是通用助手。你只读【拼多多运营知识库】和对话上下文回答，不编造平台规则数字；涉及金额/时限/处罚必须给明确数字并注明「以商家后台 mms.pinduoduo.com 最新规则为准」。回答先给结论，再给依据与操作步骤，语气像有经验的老电商人。\n\n';
+  if(kb)sys+='【拼多多运营知识库（实时检索，仅作参考依据）】\n'+kb+'\n';
+  var messages=[{role:'system',content:sys}];
+  if(D.ecomChat.__summary)messages.push({role:'system',content:'【之前对话要点摘要】\n'+D.ecomChat.__summary});
+  (D.ecomChat||[]).slice(-14).forEach(function(c){if(c.role==='user'||c.role==='assistant')messages.push({role:c.role,content:c.content});});
+  var acc='';
+  try{
+    await vdirChatSend(messages,function(d){acc+=d;var t=$('ecAiTyping');var b=t?t.querySelector('.ai-body'):null;if(b)b.textContent=acc;var ch=$('ecAiChat');if(ch)ch.scrollTop=ch.scrollHeight;},
+      function(full){ecAiHideTyping();D.ecomChat.push({role:'assistant',content:full,ts:tsShort()});ecAiRender();saveLocal();ecAiBusy=false;});
+  }catch(e){ecAiHideTyping();D.ecomChat.push({role:'assistant',content:'出错了：'+(e.message||e)});ecAiRender();ecAiBusy=false;}
+}
+async function ecAiCompressIfNeeded(){
+  var arr=D.ecomChat||[];
+  if(arr.length<=24)return;
+  var toSum=arr.slice(0,arr.length-16);
+  var rest=arr.slice(arr.length-16);
+  var text=toSum.map(function(c){return (c.role==='user'?'用户':'助手')+'：'+(c.content||'');}).join('\n');
+  var prompt=(D.ecomChat.__summary?('此前摘要：\n'+D.ecomChat.__summary+'\n\n'):'')+'请将以下电商助手对话压缩为简明要点摘要（保留关键结论、用户店铺背景、待办、重要数字），用于后续对话记忆：\n'+text;
+  try{var s=await vdirChatSend([{role:'system',content:'你是记忆压缩器，只输出摘要要点，不要解释。'},{role:'user',content:prompt}],null,null);D.ecomChat.__summary=(D.ecomChat.__summary?D.ecomChat.__summary+'\n':'')+(s||'');D.ecomChat=rest;}catch(e){D.ecomChat=rest;}
+}
+function ecAiClear(){D.ecomChat=[];saveLocal();ecAiRender();toast('已清空电商助手对话');}
+function ecAiOpenAdd(){var m=$('ecAddMask');if(m)m.style.display='flex';}
+function ecAiCloseAdd(){var m=$('ecAddMask');if(m)m.style.display='none';}
+function ecAiSaveAdd(){
+  var cat=$('ecAddCat')?$('ecAddCat').value:'补充资料';
+  var t=$('ecAddQ')?$('ecAddQ').value.trim():'';
+  var a=$('ecAddA')?$('ecAddA').value.trim():'';
+  if(!t||!a){toast('请填全问题和答案');return;}
+  var extra=loadPddExtra();extra.push({cat:cat||'补充资料',t:t.slice(0,40),a:a,kw:t.split(/[\s，,。？?！!；;]/).filter(function(w){return w.length>=2;}).slice(0,10)});
+  savePddExtra(extra);
+  ecAiCloseAdd();
+  if($('ecAddQ'))$('ecAddQ').value='';if($('ecAddA'))$('ecAddA').value='';
+  toast('已补充进知识库（实时生效）');
+}
+function ecAiSaveAsKb(){
+  var arr=D.ecomChat||[];var lastU=null,lastA=null;
+  for(var i=arr.length-1;i>=0;i--){if(arr[i].role==='user'&&!lastU)lastU=arr[i].content;if(arr[i].role==='assistant'&&!lastA){lastA=arr[i].content;break;}}
+  if(!lastU||!lastA){toast('先和助手聊一轮再存');return;}
+  var extra=loadPddExtra();extra.push({cat:'补充资料',t:lastU.slice(0,40),a:lastA,kw:lastU.split(/[\s，,。？?！!；;]/).filter(function(w){return w.length>=2;}).slice(0,10)});savePddExtra(extra);toast('已把本轮问答存为知识库条目');
+}
+
+/* ===== AI 助手板块：内嵌拼多多知识库，可“喂给 AI” ===== */
+var paiKbCat='全部';
+function paiKbInit(){var c=$('paiKbCats');if(!c)return;c.innerHTML=PDD_CATS.map(function(cat){return '<button type="button" data-c="'+cat+'" class="'+(cat===paiKbCat?'on':'')+'" onclick="paiKbSetCat(\''+cat+'\')">'+cat+'</button>';}).join('');paiKbSearch();}
+function paiKbSetCat(cat){paiKbCat=cat;paiKbInit();}
+function paiKbCard(e){var t=esc(e.t||'').replace(/'/g,"\\'");var a=esc(e.a||'').replace(/'/g,"\\'");return '<div class="ec-var" style="margin-bottom:10px;cursor:pointer" onclick="ecAiFeedToAi(\''+esc(e.cat)+'\',\''+t+'\',\''+a+'\')"><div class="hd2"><span class="tag clay">'+esc(e.cat)+'</span> '+(e.t?'<b>'+esc(e.t)+'</b>':'')+'</div><div class="bodytx" style="color:var(--ink2);white-space:pre-wrap;line-height:1.55">'+esc((e.a||'').slice(0,160))+((e.a||'').length>160?'…':'')+'</div><div class="mut2" style="font-size:11px;margin-top:4px">点击 → 喂给 AI 助手</div></div>';}
+function paiKbSearch(){
+  var box=$('paiKbResults');if(!box)return;
+  var q=$('paiKbSearch')?$('paiKbSearch').value.trim():'';
+  var pool=PDD_KB.filter(function(e){return paiKbCat==='全部'||e.cat===paiKbCat;});
+  if(!q){if(!pool.length){box.innerHTML='<div class="empty">该分类暂无内容</div>';return;}box.innerHTML='<div class="mut2" style="margin-bottom:8px">📚 拼多多知识库（点击任意条目可喂给 AI 助手）：</div>'+pool.map(paiKbCard).join('');return;}
+  var ranked=pool.map(function(e){return {e:e,s:pddScore(e,q)};}).filter(function(x){return x.s>0;}).sort(function(a,b){return b.s-a.s;}).slice(0,10);
+  if(!ranked.length){box.innerHTML='<div class="empty">没找到，换个说法</div>';return;}
+  box.innerHTML=ranked.map(function(x){return paiKbCard(x.e);}).join('');
+}
+function ecAiFeedToAi(cat,t,a){
+  var inp=$('ai_input');if(!inp)return;
+  inp.value='参考拼多多知识库【'+(t||cat)+'】：\n'+(a||'')+'\n\n';
+  if(inp.oninput)inp.oninput();
+  switchTab('ai');inp.focus();
+}
+
 // ===== 今日热度榜 =====
 var HOT_LIST=[['weibo','微博热搜'],['zhihu','知乎热榜'],['douyin','抖音热点'],['toutiao','头条热榜'],['bilibili','B站热榜'],['baidu','百度热搜']];
 // 60s 直连（浏览器端取，免服务端/令牌）：微博/知乎/抖音/头条 已验证支持跨域
@@ -3342,7 +3508,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260815ae';
+var APP_VER='20260816af';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -3501,7 +3667,7 @@ async function dbGenImg2ImgUI(){
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded',function(){
   document.querySelectorAll('nav.tabs button,.mbar button').forEach(function(b){b.addEventListener('click',function(){switchTab(this.dataset.t);});});
-  initFilePickers();applyAppMode();renderAppModeToggle();pddInit();
+  initFilePickers();applyAppMode();renderAppModeToggle();pddInit();ecAiInit();paiKbInit();
   // 统一把隐藏 select 渲染成美观按钮组（App WebView 友好）
   ['ec_pf','opt_pf','po_p','as_s','sd_p','pr_m','pr_s','vd_s','lg_t','td_p','nm_type','c_maxtok'].forEach(function(k){segAuto(k,k+'_btns');});
   initStatPlat();switchCat();
