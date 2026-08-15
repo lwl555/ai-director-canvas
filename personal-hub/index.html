@@ -701,6 +701,10 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
       <button class="btn sm ghost" onclick="cloudSyncDoPull()">⬇️ 从云端恢复</button>
     </div>
     <div id="illSyncHint" class="mut2" style="font-size:12px;margin-top:6px">首次：设一个口令 → 填好各 Key 后点「同步到云端」。换设备时填同一口令 → 点「从云端恢复」。</div>
+    <div style="border-top:1px dashed var(--line);margin-top:8px;padding-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <button id="appmode_toggle" class="btn sm" onclick="toggleAppMode()">我是 App 模式：关</button>
+      <span class="mut2" style="font-size:12px">开启后隐藏「上传 TXT/MD」按钮（App 里点不开），优先用链接 / 剪贴板导入；也可在网址后加 ?app=1 强制开启</span>
+    </div>
   </div>
 </div></div>
 <div class="card"><div class="hd"><h3>配图预览</h3><div class="sp" style="display:flex;gap:8px">
@@ -2712,7 +2716,7 @@ function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
 function illParseJSON(s){if(!s)return null;s=String(s).trim().replace(/^```(?:json)?/i,'').replace(/```$/,'');
   var a=s.indexOf('{'),b=s.lastIndexOf('}');if(a>=0&&b>a)s=s.slice(a,b+1);
   try{return JSON.parse(s);}catch(e){return null;}}
-function illFillKeys(){var u=$('ill_unsplash');if(u&&!u.value)u.value=illGet('unsplash');}
+function illFillKeys(){var u=$('ill_unsplash');if(u&&!u.value)u.value=illGet('unsplash');renderAppModeToggle();}
 function illSaveKeys(){illSet('unsplash',$('ill_unsplash').value.trim());var h=$('illKeyHint');if(h){h.style.color='#3aa655';h.textContent='已保存（仅本机）';}toast('搜索源 Key 已保存');cloudSyncPush();}
 /* ===== 密钥云同步（存 Supabase，换设备可恢复） ===== */
 function cloudSyncPwd(){try{return localStorage.getItem('wb_personal_hub_sync_pwd')||'personal-hub-default';}catch(e){return 'personal-hub-default';}}
@@ -2746,8 +2750,8 @@ async function illLoadLink(){
     toast('已导入链接内容');
   }catch(e){setIllStatus('导入失败：'+(e&&e.message||e)+'（链接需允许跨域访问）');}
 }
-function isAppMode(){try{var ua=navigator.userAgent||'';var f=new URLSearchParams(location.search).get('app');if(f==='1')return true;if(/wv|WebView|; wv\)/i.test(ua))return true;return false;}catch(e){return false;}}
-function applyAppMode(){if(isAppMode()){var lbl=$('ill_file_label');if(lbl)lbl.style.display='none';}}
+function isAppMode(){try{var ua=navigator.userAgent||'';var f=new URLSearchParams(location.search).get('app');if(f==='1')return true;if(/wv|WebView|; wv\)/i.test(ua))return true;if(localStorage.getItem('wb_personal_hub_appmode')==='1')return true;return false;}catch(e){return false;}}
+function applyAppMode(){var lbl=$('ill_file_label');if(lbl)lbl.style.display=isAppMode()?'none':'';}
 function illPasteLink(){
   try{
     if(navigator.clipboard&&navigator.clipboard.readText){
@@ -2755,6 +2759,9 @@ function illPasteLink(){
     }else{toast('当前环境不支持剪贴板读取，请手动粘贴链接');}
   }catch(e){toast('读取剪贴板失败，请手动粘贴链接');}
 }
+function appModeState(){try{return localStorage.getItem('wb_personal_hub_appmode')==='1';}catch(e){return false;}}
+function renderAppModeToggle(){var b=$('appmode_toggle');if(!b)return;var on=appModeState();b.textContent='我是 App 模式：'+(on?'开':'关');if(on)b.classList.add('pri');else b.classList.remove('pri');}
+function toggleAppMode(){try{localStorage.setItem('wb_personal_hub_appmode',appModeState()?'':'1');}catch(e){}renderAppModeToggle();applyAppMode();toast(appModeState()?'已开启 App 模式（已隐藏电脑端上传按钮）':'已关闭 App 模式');}
 function setIllStatus(m){var el=$('illStatus');if(el)el.textContent=m;}
 async function illChat(messages,maxTok){
   maxTok=maxTok||3000;
@@ -3062,7 +3069,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260815p';
+var APP_VER='20260815q';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -3221,7 +3228,7 @@ async function dbGenImg2ImgUI(){
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded',function(){
   document.querySelectorAll('nav.tabs button,.mbar button').forEach(function(b){b.addEventListener('click',function(){switchTab(this.dataset.t);});});
-  applyAppMode();
+  applyAppMode();renderAppModeToggle();
   initStatPlat();switchCat();
   var today=todayStr();$('po_d').value=today;$('lg_d').value=today;$('sd_d').value=today;$('sh_dd').value=today;$('td_d').value=today;if($('dr_d'))$('dr_d').value=today;
   if(restoreSession()){if(!isTokenExpired()){enterApp();}else{refreshToken().then(function(ok){if(ok)enterApp();else showAuth();});}}
