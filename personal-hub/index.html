@@ -214,6 +214,17 @@ label.lb{font-size:13px;color:var(--ink2);font-weight:600}
 .ai-empty{text-align:center;padding:40px 20px;color:var(--ink3)}
 .ai-empty .ico{width:48px;height:48px;opacity:.3;margin-bottom:12px}
 .ai-atts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:9px}
+/* AI 助手板块 豆包风简约布局（.pai 专属，隔离电商 AI 卡片的 .ai-wrap/.ai-bar） */
+.pai{max-width:880px;margin:0 auto;padding:14px 12px 20px;display:flex;flex-direction:column;gap:12px}
+.pai-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pai-brand{display:flex;align-items:center;gap:8px;font-size:17px;color:var(--ink)}
+.pai-brand .ico{width:24px;height:24px;color:var(--clay)}
+.pai-top .spacer{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.pai-top .ai-cur{font-size:12px;color:var(--ink3)}
+.pai-tools{display:flex;flex-direction:column;gap:10px;background:var(--sand2);border:1px solid var(--line);border-radius:14px;padding:12px}
+.pai-tools .ai-chips{margin:0}
+.pai-tools .ai-toolbar{margin-top:0}
+.pai .ai-chat{flex:1 1 auto;max-height:none;min-height:60vh;height:auto;background:var(--card)}
 .ai-att{position:relative;width:64px;height:64px;border-radius:10px;overflow:hidden;border:1.5px solid var(--line2)}
 .ai-att img{width:100%;height:100%;object-fit:cover;display:block}
 .ai-att .x{position:absolute;top:2px;right:2px;width:19px;height:19px;border-radius:50%;background:rgba(36,31,27,.82);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
@@ -623,33 +634,39 @@ input.datepick{cursor:pointer;background:var(--card)}
 <div id="hotProducts"></div>
 </div></div></section>
 <!-- 数据参谋面板已合并进「AI视频制作」标签页的「数据参谋」模式 -->
-<section class="panel" id="p-ai"><div class="grid">
-<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><h3>AI 助手 · 数据参谋</h3><div class="sp"><span class="mut2">读懂你的待办/记账/选题/分镜/成片，给针对性建议 · 也能看图 · 图生图改图</span></div></div><div class="bd"><div class="ai-wrap">
-<div class="ai-bar">
-  <button class="btn xs ghost" type="button" onclick="toggleChatHist('ai','aiHist')">🗂 历史对话</button>
-  <button class="btn xs ghost" type="button" onclick="newChat('ai')">＋ 新对话</button>
-  <button class="btn xs ghost" type="button" onclick="clearChat('ai')">清空</button>
-  <span class="ai-cur" id="curSessTx"></span>
+<section class="panel" id="p-ai"><div class="pai">
+<div class="pai-top">
+<div class="pai-brand"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg><b>AI 助手</b></div>
+<span class="ai-cur" id="curSessTx"></span>
+<div class="spacer">
+<button class="btn xs ghost" type="button" id="aiToolsBtn" onclick="aiToggleTools()">⊕ 工具箱</button>
+<button class="btn xs ghost" type="button" onclick="toggleChatHist('ai','aiHist')">🗂 历史</button>
+<button class="btn xs ghost" type="button" onclick="newChat('ai')">＋ 新对话</button>
+<button class="btn xs ghost" type="button" onclick="clearChat('ai')">清空</button>
 </div>
-<div class="ai-hist" id="aiHist" style="display:none"></div>
+</div>
+
+<div class="pai-tools" id="aiTools" style="display:none">
+<div class="ai-ctx" id="ai_ctx"><svg class="ico s" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.1"/></svg><span>AI 助手可以查看你的待办、记账、选题、分镜、成片和习惯数据，给出针对性建议；可附图片让它<b>看图分析</b>，用 🎨 <b>生成图片</b>（文生图），或用 🖼️ <b>按你的要求改图</b>（都借用豆包 Seedream 模型）。附图后写「改成…」会自动走改图，写「分析/这是什么」会走看图分析。</span></div>
 <div class="ai-chips"><button class="ai-chip" onclick="aiQuick('总结一下今天要处理的事')">总结今天</button><button class="ai-chip" onclick="aiQuick('分析我这个月的支出情况，哪些可以省')">分析支出</button><button class="ai-chip" onclick="aiQuick('看看我的选题库，给我几个新选题建议')">选题建议</button><button class="ai-chip" onclick="aiQuick('帮我回顾一下最近的自媒体数据趋势')">数据复盘</button><button class="ai-chip" onclick="aiQuick('我有哪些逾期的任务？帮我排个优先级')">逾期处理</button><button class="ai-chip" onclick="aiQuick('分析我的分镜脚本和导演成片进度，哪些镜头还没拍、建议怎么排期')">🎬 分镜/成片</button></div>
-<div class="ai-ctx" id="ai_ctx"><svg class="ico s" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.1"/></svg><span>AI助手可以查看你的待办、记账、选题、分镜、成片和习惯数据，给出针对性建议；可附图片让它<b>看图分析</b>，用 🎨 <b>生成图片</b>（文生图），或用 🖼️ <b>按你的要求改图</b>（都借用豆包 Seedream 模型）。附图后写「改成…」会自动走改图，写「分析/这是什么」会走看图分析。</span></div>
-<details class="kb-panel" style="margin:10px 0;background:var(--sand2);border:1px solid var(--line);border-radius:12px;padding:10px 12px"><summary style="cursor:pointer;font-weight:700;color:var(--ac-ecom)">🛒 拼多多运营知识库（点击展开，可一键喂给 AI）</summary>
+<div class="ai-toolbar" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><button class="btn xs ghost" type="button" onclick="aiGenImageT2I()" title="文生图">🎨 文生图</button><button class="btn xs ghost" type="button" onclick="aiImg2Img()" title="图生图改图">🖼️ 图生图</button></div>
+<details class="kb-panel" style="margin:4px 0;background:var(--sand2);border:1px solid var(--line);border-radius:12px;padding:10px 12px"><summary style="cursor:pointer;font-weight:700;color:var(--ac-ecom)">🛒 拼多多运营知识库（点击展开，可一键喂给 AI）</summary>
 <div class="form" style="margin-top:8px"><input class="fw" id="paiKbSearch" placeholder="搜索知识库，如：保证金 / 发货超时 / 无货源选品" oninput="paiKbSearch()"></div>
 <div class="hot-src" id="paiKbCats" style="margin:8px 0"></div>
 <div id="paiKbResults"></div>
 </details>
-<div class="ai-chat" id="ai_chat" style="min-height:220px;height:52vh;overflow:auto"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>和你的AI助手聊聊吧<br>它能看图、能改图、也懂你工作台上的所有数据</div></div></div>
+</div>
+
+<div class="ai-hist" id="aiHist" style="display:none"></div>
+<div class="ai-chat" id="ai_chat" style="min-height:62vh;overflow:auto"><div class="ai-empty"><svg class="ico" viewBox="0 0 24 24"><path d="M21 12c0 4.4-4 8-9 8a9.8 9.8 0 0 1-4-.8L3 21l1.8-4.8A7.9 7.9 0 0 1 3 12c0-4.4 4-8 9-8s9 3.6 9 8z"/></svg><div>和你的AI助手聊聊吧<br>它能看图、能改图、也懂你工作台上的所有数据</div></div></div>
 <div class="ai-atts" id="ai_atts" style="display:none"></div>
-<div class="ai-toolbar" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><button class="btn xs ghost" type="button" onclick="aiGenImageT2I()" title="文生图">🎨 文生图</button><button class="btn xs ghost" type="button" onclick="aiImg2Img()" title="图生图改图">🖼️ 图生图</button></div>
 <div class="ai-input" style="display:flex;align-items:flex-end;gap:8px;margin-top:8px;padding:8px;background:var(--sand2);border:1px solid var(--line);border-radius:12px">
-  <button class="ai-attbtn" type="button" onclick="aiPickImage()" title="附图片（让 AI 看图 / 用于图生图）" style="flex:none"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="2"/><path d="M21 15l-5-5L5 21"/></svg></button>
-  <textarea id="ai_input" placeholder="输入消息…（Enter 发送，Shift+Enter 换行；附图后写要求可让 AI 看图；🎨/🖼️ 在上方工具条）" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSendFromInput()}" oninput="aiAutoResize(this)" style="flex:1;min-height:52px;max-height:180px;resize:none;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:15px;line-height:1.5;box-sizing:border-box"></textarea>
-  <button class="btn pri ai-send" onclick="aiSendFromInput()" style="flex:none;align-self:flex-end;padding:12px 16px"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
+<button class="ai-attbtn" type="button" onclick="aiPickImage()" title="附图片（让 AI 看图 / 用于图生图）" style="flex:none"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="9.5" r="2"/><path d="M21 15l-5-5L5 21"/></svg></button>
+<textarea id="ai_input" placeholder="输入消息…（Enter 发送，Shift+Enter 换行；点「⊕ 工具箱」可文生图 / 图生图 / 查看拼多多知识库）" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSendFromInput()}" oninput="aiAutoResize(this)" style="flex:1;min-height:52px;max-height:180px;resize:none;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:15px;line-height:1.5;box-sizing:border-box"></textarea>
+<button class="btn pri ai-send" onclick="aiSendFromInput()" style="flex:none;align-self:flex-end;padding:12px 16px"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
 </div>
 <div class="vdir-gallery" id="aiGallery" style="margin-top:10px"></div>
 <input type="file" id="ai_file" accept="image/*" multiple style="display:none" onchange="aiOnImage(event)">
-</div></div></div>
 </div></section>
 <section class="panel" id="p-doubao"><div class="grid">
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 17l-5-5L5 21"/></svg><h3>豆包文生图</h3><div class="sp"><span class="mut2">火山引擎豆包（Doubao）独立生图</span></div></div><div class="bd"><div class="mut2" style="font-size:13px;background:var(--sand2);border:1px dashed var(--ac);border-radius:10px;padding:8px 10px;margin-bottom:12px;color:var(--ink)">💡 不想配 Key？用「AI视频制作-小林」或「AI助手」也能<b>免 Key 直接出图/出视频</b>。豆包通道适合需要火山引擎 Seedream 专属模型的场景。</div>
@@ -1730,6 +1747,7 @@ function aiUpdateContext(s){var html='<svg class="ico s" viewBox="0 0 24 24" sty
 function curSession(scope){scope=scope||'ai';if(typeof D.curSid!=='object'||D.curSid===null){var _o=D.curSid;D.curSid={};if(_o)D.curSid.ai=_o;}D.curSid=D.curSid||{};if(!D.curSid[scope]){D.curSid[scope]=uid();D.sessions.push({id:D.curSid[scope],title:'新对话',created:todayStr(),msgs:[],scope:scope});}var s=D.sessions.find(function(x){return x.id===D.curSid[scope];});if(!s){s={id:D.curSid[scope],title:'新对话',created:todayStr(),msgs:[],scope:scope};D.sessions.push(s);}return s;}
 function recordChat(role,content,ts,images,scope){scope=scope||'ai';D.chats=D.chats||[];D.chats.push({id:uid(),role:role,content:content,ts:ts,images:images||[]});var s=curSession(scope);if(!s.title||s.title==='新对话'){if(role==='user'&&content)s.title=content.slice(0,18);}s.msgs=D.chats.slice();s.updated=ts;saveLocal();}
 function toggleChatHist(scope,elId){var h=$(elId);if(h.style.display==='none'){renderChatSessions(scope,elId);h.style.display='block';}else h.style.display='none';}
+function aiToggleTools(){var t=$('aiTools');if(!t)return;t.style.display=(t.style.display==='none'?'block':'none');var b=$('aiToolsBtn');if(b)b.classList.toggle('on',t.style.display!=='none');}
 function renderChatSessions(scope,elId){var h=$(elId);if(!D.sessions||!D.sessions.length){h.innerHTML='<div class="empty">还没有历史对话</div>';return;}
   h.innerHTML='<div class="hist-list">'+D.sessions.filter(function(s){return (s.scope===scope)||(!s.scope&&scope==='ai');}).slice().reverse().map(function(s){return '<div class="hist-item" onclick="openSession(\''+s.id+'\')"><div class="t">'+esc(s.title||'对话')+'</div><div class="s">'+(s.msgs?s.msgs.length:0)+' 条 · '+(s.created||'')+'</div></div>';}).join('')+'</div>';}
 function openSession(id){var s=D.sessions.find(function(x){return x.id===id});if(!s)return;var sc=s.scope||'ai';D.curSid=D.curSid||{};D.curSid[sc]=id;D.chats=(s.msgs||[]).map(function(m){return{id:m.id||uid(),role:m.role,content:m.content,ts:m.ts,images:m.images||[]};});if(sc==='ai')renderChatHistory();else renderVdirChatHistory();var ht=$('aiHist');if(ht)ht.style.display='none';if($('curSessTx'))$('curSessTx').textContent='当前：'+(s.title||'对话');toast('已载入历史对话');}
@@ -3503,7 +3521,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260816ah';
+var APP_VER='20260816ai';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
