@@ -204,6 +204,15 @@ label.lb{font-size:13px;color:var(--ink2);font-weight:600}
 .ai-msg.user .bubble .ts{color:rgba(255,255,255,.6)}
 .ai-typing{display:flex;gap:5px;padding:4px 0}
 .stream-caret{display:inline-block;width:2px;height:1.05em;background:var(--ac-ai);margin-left:1px;vertical-align:-2px;animation:caretBlink 1s steps(2,start) infinite;border-radius:1px}
+.md-h{font-weight:800;line-height:1.4;margin:10px 0 4px;color:var(--ink)}
+.md-h1{font-size:17px}.md-h2{font-size:16px}.md-h3{font-size:15px}.md-h4{font-size:14px}
+.md-tbl{border-collapse:collapse;width:100%;margin:8px 0;font-size:13px;background:var(--card2);border-radius:8px;overflow:hidden}
+.md-tbl td{border:1px solid var(--line);padding:5px 8px;vertical-align:top}
+.md-li{margin:3px 0 3px 14px;text-indent:-8px;line-height:1.55}
+.md-quote{margin:6px 0;padding:6px 10px;border-left:3px solid var(--clay);color:var(--ink3);background:var(--card2);border-radius:6px;line-height:1.55}
+.md-p{margin:4px 0;line-height:1.6}
+.md-sp{height:8px}
+code.md-code{background:var(--card2);padding:1px 5px;border-radius:4px;font-size:12px;font-family:ui-monospace,Menlo,Consolas,monospace}
 @keyframes caretBlink{0%,100%{opacity:1}50%{opacity:0}}
 nav.tabs button[data-t="theme"]{border-color:var(--ac-ai);color:var(--ac-ai)}
 nav.tabs button[data-t="theme"]:hover{background:var(--ac-ai-l)}
@@ -1733,7 +1742,7 @@ function aiAddMsg(role,content,ts,images){images=Array.isArray(images)?images:[]
   var av=role==='user'?'<svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>':'<svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>';
   var imgHtml='';if(images&&images.length)imgHtml=images.map(function(s){var a=esc(s);return '<img class="shot" src="'+a+'" alt="图片" data-u="'+a+'" onclick="showLightbox(this.getAttribute(\'data-u\'))">'}).join('');
   var tag=role==='bot'?'<div class="ai-tag"># 小林</div>':'';
-  div.innerHTML='<div class="av">'+av+'</div><div class="bubble">'+tag+imgHtml+esc(content).replace(/\n/g,'<br>')+'<div class="ts">'+(ts||'')+'</div></div>';
+  div.innerHTML='<div class="av">'+av+'</div><div class="bubble">'+tag+imgHtml+mdLite(content)+'<div class="ts">'+(ts||'')+'</div></div>';
   chat.appendChild(div);chat.scrollTop=chat.scrollHeight;}
 function aiTypeOut(text,ts){var chat=$('ai_chat');if(!chat)return;aiHideTyping();var empty=chat.querySelector('.ai-empty');if(empty)empty.remove();
   var div=document.createElement('div');div.className='ai-msg bot';
@@ -1742,7 +1751,7 @@ function aiTypeOut(text,ts){var chat=$('ai_chat');if(!chat)return;aiHideTyping()
   chat.appendChild(div);chat.scrollTop=chat.scrollHeight;
   var box=div.querySelector('.ai-stream');if(!text){recordChat('assistant','',ts,'ai');return;}
   var i=0,step=Math.max(1,Math.round(text.length/90)),done=false;
-  function tick(){if(i<text.length){var p=text.slice(0,i);box.innerHTML=esc(p).replace(/\n/g,'<br>')+'<span class="stream-caret"></span>';chat.scrollTop=chat.scrollHeight;i+=step;setTimeout(tick,14);}else if(!done){done=true;box.innerHTML=esc(text).replace(/\n/g,'<br>');recordChat('assistant',text,ts,null,'ai');}}
+  function tick(){if(i<text.length){var p=text.slice(0,i);box.innerHTML=esc(p).replace(/^#+\s+/gm,'').replace(/\|/g,' ').replace(/\*\*/g,'').replace(/\n/g,'<br>')+'<span class="stream-caret"></span>';chat.scrollTop=chat.scrollHeight;i+=step;setTimeout(tick,14);}else if(!done){done=true;box.innerHTML=mdLite(text);recordChat('assistant',text,ts,null,'ai');}}
   tick();}
 function aiShowTyping(){var chat=$('ai_chat');var empty=chat.querySelector('.ai-empty');if(empty)empty.remove();
   var div=document.createElement('div');div.className='ai-msg bot';div.id='aiTyping';
@@ -1988,12 +1997,44 @@ var HOT_SEED={
  '拼多多':[{n:'9.9收纳盒',h:83,price:'9.9元',sales:'月销50万+',tag:'家居'},{n:'农家土特产',h:76,price:'19.9-59元',sales:'月销20万+',tag:'食品'},{n:'露营折叠椅',h:73,price:'29-99元',sales:'月销8万+',tag:'户外'},{n:'厨房神器',h:69,price:'9.9-49元',sales:'月销30万+',tag:'厨具'},{n:'数据线',h:65,price:'5.9-19元',sales:'月销100万+',tag:'数码'},{n:'宝宝辅食机',h:62,price:'39-99元',sales:'月销5万+',tag:'母婴'},{n:'老花镜',h:59,price:'9.9-39元',sales:'月销15万+',tag:'银发'}],
  '视频号':[{n:'知识付费课',h:80,price:'9.9-999元',sales:'可见热度',tag:'教育'},{n:'本地生活团购',h:73,price:'9.9-199元',sales:'可见热度',tag:'到店'},{n:'银发养生',h:69,price:'19-199元',sales:'可见热度',tag:'健康'},{n:'非遗手作',h:65,price:'39-399元',sales:'可见热度',tag:'文创'},{n:'社区团购',h:62,price:'9.9-99元',sales:'可见热度',tag:'生鲜'},{n:'亲子研学',h:59,price:'99-999元',sales:'可见热度',tag:'教育'}]
 };
-function mdLite(t){t=esc(t||'');
- t=t.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
- t=t.replace(/^[\s]*([0-9]+)[.、)]\s+(.+)$/gm,'<div style="font-weight:700;margin:6px 0 2px">$1. $2</div>');
- t=t.replace(/^[\s]*[-*]\s+(.+)$/gm,'<div style="margin:2px 0 2px 12px">· $1</div>');
- t=t.replace(/\n{2,}/g,'<div style="height:6px"></div>').replace(/\n/g,'<br>');
- return t;}
+function mdLite(t){
+ t=(t||'').replace(/\r\n/g,'\n');
+ t=esc(t);
+ var lines=t.split('\n'),out=[],i=0,table=null;
+ function flushTable(){if(table){out.push('<table class="md-tbl"><tbody>'+table+'</tbody></table>');table=null;}}
+ while(i<lines.length){
+   var ln=lines[i];
+   var bars=(ln.match(/\|/g)||[]).length;
+   if(bars>=2){
+     // 分隔行 |---|---|（仅 | - : 空格）
+     if(/^[\s|:-]+$/.test(ln)&&/-/.test(ln)){i++;continue;}
+     var cells=ln.split('|').map(function(s){return s.trim();});
+     if(cells.length&&cells[0]==='')cells.shift();
+     if(cells.length&&cells[cells.length-1]==='')cells.pop();
+     if(!table)table='';
+     table+='<tr>'+cells.map(function(c){return '<td>'+c+'</td>';}).join('')+'</tr>';
+     i++;continue;
+   }
+   flushTable();
+   var h=ln.match(/^(#{1,4})\s+(.*)$/);
+   if(h){out.push('<div class="md-h md-h'+h[1].length+'">'+h[2]+'</div>');i++;continue;}
+   var ol=ln.match(/^\s*\d+[.、)]\s+(.*)$/);
+   if(ol){out.push('<div class="md-li">'+ol[1]+'</div>');i++;continue;}
+   var ul=ln.match(/^\s*[-*]\s+(.*)$/);
+   if(ul){out.push('<div class="md-li">· '+ul[1]+'</div>');i++;continue;}
+   var q=ln.match(/^>\s?(.*)$/);
+   if(q){out.push('<div class="md-quote">'+q[1]+'</div>');i++;continue;}
+   if(ln.trim()===''){out.push('<div class="md-sp"></div>');i++;continue;}
+   out.push('<div class="md-p">'+ln+'</div>');
+   i++;
+ }
+ flushTable();
+ var html=out.join('');
+ html=html.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+ html=html.replace(/`([^`]+?)`/g,'<code class="md-code">$1</code>');
+ html=html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+ return html;
+}
 var hotPlat='抖音';
 var hotChats={};
 var hotImgInput=null;
@@ -3645,7 +3686,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260817c';
+var APP_VER='20260817d';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
