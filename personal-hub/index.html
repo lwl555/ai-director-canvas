@@ -795,7 +795,7 @@ input.datepick{cursor:pointer;background:var(--card)}
     <button class="btn sm" onclick="illSaveKeys()">保存</button>
     <span id="illKeyHint" class="mut2" style="font-size:12px"></span>
   </div>
-  <div class="mut2" style="font-size:12px;margin-top:6px">① 联网搜索 / 事实核查：已改为 <b>Wikipedia 官方 API</b>，<b>免 Key、免绑卡</b>，自动中英文检索。② 网络配图：默认走 <b>Wikimedia Commons</b>（免 Key、免绑卡）；若填了 Unsplash Key 则优先用它（更精准）。所有 Key 仅存本机，不上传。</div>
+  <div class="mut2" style="font-size:12px;margin-top:6px">① 联网搜索 / 事实核查：已改为 <b>Wikipedia 官方 API</b>，<b>免 Key、免绑卡</b>，自动中英文检索。② 网络配图：默认走 <b>Wikimedia Commons</b> 与 <b>Wikipedia 文章插图</b>（均免 Key、免绑卡）；若填了 Unsplash Key 则优先用它（更精准）。<b>不填任何 Key 也能用</b>：未配置 AI Key 时自动进入「联网搜图」模式，从 Wikimedia / Wikipedia 检索真实图片。所有 Key 仅存本机，不上传。</div>
   <div style="border-top:1px dashed var(--line);margin-top:8px;padding-top:8px">
     <div class="hd" style="margin-bottom:6px"><h3 style="font-size:14px">🔁 密钥云同步</h3><span class="sp mut2">存你 Supabase，换设备不用重填</span></div>
     <div class="form" style="gap:8px;flex-wrap:wrap">
@@ -3325,6 +3325,65 @@ async function illCommons(q){
     return {url:ii.thumburl||ii.url,author:author,page:'https://commons.wikimedia.org/wiki/File:'+encodeURIComponent((pick.title||'').replace(/^File:/,'').replace(/ /g,'_'))};
   }catch(e){return null;}
 }
+// ===== 无 AI Key 自动降级：规则分段 + 关键词提取 + Wikimedia 免 Key 搜图 =====
+var ILL_STOP=['的','了','是','在','和','与','及','也','都','就','而','我','你','他','她','它','这','那','有','为','对','等','把','被','让','给','上','下','中','里','个','们','很','更','最','不','没','吗','呢','吧','啊','呀','之','其','以','于','将','从','到','又','还','但','却','因为','所以','如果','我们','你们','他们','自己','这个','那个','一个','一些','可以','这样','那样','这些','那些','通过','由于','以及','或者','一种','进行','成为','已经','可能','就是','没有','不是','还是','怎么','什么','为什么','如何','是否'];
+function illExtractKeywords(text){
+  var raw=String(text||'').replace(/[^\u4e00-\u9fa5a-zA-Z0-9]+/g,' ').trim();
+  if(!raw)return '图片';
+  // 中文：按单字停用词切分为短语
+  var segs=[],buf='';
+  for(var i=0;i<raw.length;i++){
+    var ch=raw[i];
+    if(ILL_STOP.indexOf(ch)>=0){if(buf.length>=2)segs.push(buf);buf='';}
+    else buf+=ch;
+  }
+  if(buf.length>=2)segs.push(buf);
+  // 英文/数字词优先提取
+  var en=(String(text||'').match(/[a-zA-Z0-9]{2,}/g)||[]).filter(function(w){return ILL_STOP.indexOf(w.toLowerCase())<0;});
+  var all=en.concat(segs),seen={},uniq=[];
+  all.forEach(function(t){if(!seen[t]){seen[t]=1;uniq.push(t);}});
+  if(uniq.length)return uniq.slice(0,4).join(' ');
+  return raw.slice(0,16)||'图片';
+}
+function illAutoPlan(art){
+  var lines=String(art||'').split(/\n|\r/).map(function(x){return x.trim();}).filter(function(x){return x.length>0;});
+  var paras=[];
+  if(lines.length<2){
+    var sent=[],buf='';var raw=String(art||'');
+    for(var c=0;c<raw.length;c++){buf+=raw[c];if(/[。！？；.!?;]/.test(raw[c])){sent.push(buf.trim());buf='';}}
+    if(buf.trim())sent.push(buf.trim());
+    sent=sent.filter(function(x){return x.length>0;});
+    if(sent.length<2)paras=[String(art||'').trim()];
+    else for(var k=0;k<sent.length;k+=2)paras.push(sent.slice(k,k+2).join(''));
+  }else{
+    for(var i=0;i<lines.length;i++){if(paras.length&&paras[paras.length-1].length<10)paras[paras.length-1]+='\n'+lines[i];else paras.push(lines[i]);}
+  }
+  var title=paras.length?paras[0].replace(/\n/g,'').slice(0,24):'';
+  if(title.length>20)title=title.slice(0,20)+'…';
+  var paragraphs=paras.map(function(t){
+    var clean=t.replace(/\n/g,' ').trim();
+    return {text:clean, needsImage:true, imgType:'web', query:illExtractKeywords(clean)||title, aiPrompt:'', caption:''};
+  });
+  return {title:title,paragraphs:paragraphs,facts:[]};
+}
+async function illWikiImages(q){
+  try{
+    var u='https://zh.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent(q)+'&gsrlimit=6&prop=pageimages&piprop=original&format=json&origin=*';
+    var r=await fetch(u,{headers:{'Accept':'application/json'}});
+    if(!r.ok)return null;
+    var j=await r.json();var pages=(j&&j.query&&j.query.pages)||{};
+    var arr=Object.keys(pages).map(function(k){return pages[k];}).filter(function(p){return p.original&&p.original.source;});
+    if(!arr.length)return null;
+    var pick=arr[Math.floor(Math.random()*arr.length)];
+    return {url:pick.original.source,author:'Wikipedia',page:pick.canonicalurl||('https://zh.wikipedia.org/wiki/'+encodeURIComponent((pick.title||'').replace(/ /g,'_')))};
+  }catch(e){return null;}
+}
+async function illWebImage(q,idx){
+  var w=await illWikiImages(q);if(w)return w;
+  w=await illCommons(q);if(w)return w;
+  if(illGet('unsplash'))w=await illUnsplash(q);
+  return w;
+}
 async function illFactCheck(claim,q){
   var res=await illWikiSearch(q,2);
   var ctx=res.slice(0,8).map(function(x){return '- '+x.title+': '+x.desc;}).join('\n');
@@ -3399,35 +3458,42 @@ async function illStart(){
   var b=$('illBtn');if(b)b.disabled=true;
   try{
     if(agnesProxyOk===null){try{await agnesEnsureReady();}catch(e){}}
-    if(!(agnesProxyOk||agnesKey())){setIllStatus('⚠️ 请先在设置填入 Agnes Key 或部署后端代理');return;}
-    setIllStatus('① 分析文章结构…');
-    var plan=await illAnalyze(art);
-    if(!plan||!plan.paragraphs||!plan.paragraphs.length){setIllStatus('分析失败：AI 未返回有效结构（检查 Agnes Key）');return;}
-    var need=(plan.paragraphs||[]).filter(function(p){return p.needsImage;}).length;
-    setIllStatus('② Wikipedia 联网检索 + 事实核查…');
-    var facts=[];
-    for(var fi=0;fi<(plan.facts||[]).length;fi++){
-      setIllStatus('② 核查事实 '+(fi+1)+'/'+(plan.facts.length));
-      facts.push(await illFactCheck(plan.facts[fi].claim,plan.facts[fi].query));
-      await sleep(250);
+    var hasAI=(agnesProxyOk||agnesKey());
+    var plan, facts=[], autoMode=!hasAI;
+    if(hasAI){
+      setIllStatus('① AI 分析文章结构…');
+      plan=await illAnalyze(art);
+      if(!plan||!plan.paragraphs||!plan.paragraphs.length){setIllStatus('分析失败：AI 未返回有效结构（检查 Agnes Key）');return;}
+      setIllStatus('② Wikipedia 联网检索 + 事实核查…');
+      for(var fi=0;fi<(plan.facts||[]).length;fi++){
+        setIllStatus('② 核查事实 '+(fi+1)+'/'+(plan.facts.length));
+        facts.push(await illFactCheck(plan.facts[fi].claim,plan.facts[fi].query));
+        await sleep(250);
+      }
+    }else{
+      setIllStatus('① 未配置 AI Key，启动「自动联网搜图」模式（免 Key · 基于 Wikimedia 检索）…');
+      plan=illAutoPlan(art);
+      if(!plan||!plan.paragraphs||!plan.paragraphs.length){setIllStatus('无法解析文章，请确认内容不为空');return;}
     }
-    setIllStatus('③ 为各段配图（网络图 + AI 生成，共 '+need+' 张）…');
-    var imgs={},done=0;
+    var need=(plan.paragraphs||[]).filter(function(p){return p.needsImage;}).length;
+    setIllStatus('③ 为各段配图（联网检索相关图片，共 '+need+' 张）…');
+    var imgs={},done=0,_webUsed=[];
     for(var i=0;i<plan.paragraphs.length;i++){
       var p=plan.paragraphs[i];if(!p.needsImage)continue;
       done++;setIllStatus('③ 配图 '+done+'/'+need);
-      var type=p.imgType||'either',web=null,ai=null;
-      if(type==='web'||type==='either'){if(illGet('unsplash'))web=await illUnsplash(p.query);if(!web)web=await illCommons(p.query);}
+      var type=p.imgType||'web',web=null,ai=null;
+      if(type==='web'||type==='either'){web=await illWebImage(p.query,i);if(web&&_webUsed.indexOf(web.url)>=0){var w2=await illWebImage(p.query,i+7);if(w2)web=w2;}_webUsed.push(web?web.url:'');}
       if(!web&&(type==='ai'||type==='either'))ai=await illGenImage(p.aiPrompt);
       if(web)imgs[i]={type:'web',url:web.url,author:web.author,page:web.page,prompt:p.aiPrompt,caption:p.caption};
       else if(ai)imgs[i]={type:'ai',url:ai,prompt:p.aiPrompt,caption:p.caption};
-      await sleep(350);
+      await sleep(300);
     }
     setIllStatus('④ 排版完成…');
     var artHtml=illCompose(plan,imgs);
+    if(autoMode){artHtml='<div style="background:#eaf6ef;border:1px solid #bfe3cd;color:#2c7a4b;padding:8px 12px;border-radius:10px;margin-bottom:14px;font-size:13px">🤖 未配置 AI Key，已用<b>自动联网搜图</b>模式：直接从 Wikimedia / Wikipedia 检索与每段相关的真实图片（免 Key、免绑卡）。配置 Agnes Key 后可获得更精准的 AI 分段 + 事实核查。</div>'+artHtml;}
     window.__illArt=artHtml;window.__illPlan=plan;window.__illImgs=imgs;window.__illFacts=facts;
     var rb=$('illResult');if(rb)rb.innerHTML=artHtml+illFactsHTML(facts);
-    setIllStatus('✅ 完成：'+Object.keys(imgs).length+' 张图，'+facts.length+' 条事实核查（导出见右上角）');
+    setIllStatus('✅ 完成：'+Object.keys(imgs).length+' 张图'+(autoMode?'（自动联网搜图模式）':'，'+facts.length+' 条事实核查')+'（导出见右上角）');
   }catch(e){setIllStatus('出错：'+((e&&e.message)||e));}
   finally{if(b)b.disabled=false;}
 }
@@ -3579,7 +3645,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260817b';
+var APP_VER='20260817c';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
