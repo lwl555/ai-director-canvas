@@ -619,9 +619,10 @@ input.datepick{cursor:pointer;background:var(--card)}
 <textarea id="ec_ref" class="fw" placeholder="粘贴一段参考文案（任意平台均可），AI 会拆解出其结构套路，并仿写成目标平台风格"></textarea>
 <input class="fw" id="ec_prod" placeholder="要推广的商品名（选填，不填则按同品类推断）" style="margin-top:8px">
 <input class="fw" id="ec_sell" placeholder="核心卖点（选填，如：纯棉 / 39元 / 包邮）" style="margin-top:8px">
-<button class="btn pri" style="margin-top:10px" onclick="genCopy()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>生成仿写文案 + 配图</button>
+<button class="btn pri" style="margin-top:10px" onclick="genCopyText()"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>✍️ 生成仿写文案</button>
 <div id="ec_skel" class="ec-skel" style="display:none"></div>
 <div id="ec_result"></div>
+<div id="ec_imgbtn"></div>
 </div></div>
 <div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M13.5 6.5a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0z"/><path d="M17 21a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9z"/><path d="M18.5 4.5h3M20 3v3"/></svg><h3>电商文案优化</h3><div class="sp"><span class="mut2">粘贴文案 → AI 诊断 + 优化（钩子/卖点/转化/合规）</span></div></div><div class="bd"><select id="opt_pf" style="display:none"><option>拼多多</option><option>淘宝天猫</option><option>抖音</option><option>小红书</option><option>京东</option><option>视频号</option><option>公众号</option><option>亚马逊</option></select>
 <div id="opt_pf_btns" class="seg"><button type="button" data-v="拼多多" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">拼多多</button><button type="button" data-v="淘宝天猫" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">淘宝天猫</button><button type="button" data-v="抖音" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">抖音</button><button type="button" data-v="小红书" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">小红书</button><button type="button" data-v="京东" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">京东</button><button type="button" data-v="视频号" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">视频号</button><button type="button" data-v="公众号" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">公众号</button><button type="button" data-v="亚马逊" onclick="segPick('opt_pf','opt_pf_btns',this.dataset.v)">亚马逊</button></div>
@@ -637,7 +638,7 @@ input.datepick{cursor:pointer;background:var(--card)}
 <textarea id="ecAiInput" placeholder="问电商助手：发货超时罚多少？无货源怎么选品？客服话术怎么写？" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();ecAiSend()}" oninput="aiAutoResize(this)" style="flex:1;min-height:48px;max-height:160px;resize:none;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:15px;line-height:1.5;box-sizing:border-box"></textarea>
 <button class="btn pri" onclick="ecAiSend()" style="flex:none;align-self:flex-end;padding:12px 16px"><svg class="ico" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
 </div>
-<div class="mut2" style="font-size:12px;margin-top:6px">记忆超长会自动压缩为摘要（避免占满上下文）；点「补充资料」可把你的店铺经验实时加进知识库；点「存为知识」把本轮问答存档。</div>
+<div class="mut2" style="font-size:12px;margin-top:6px"><span id="ecAiMem"></span>记忆超长会自动压缩为摘要（避免占满上下文）；点「补充资料」可把你的店铺经验实时加进知识库；点「存为知识」把本轮问答存档。</div>
 </div></div></div>
 </div>
 </div></section>
@@ -670,6 +671,7 @@ input.datepick{cursor:pointer;background:var(--card)}
 <div class="hot-src" id="paiKbCats" style="margin:8px 0"></div>
 <div id="paiKbResults"></div>
 </details>
+<div class="ai-toolbar" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center"><span class="mut2" style="align-self:center">一键调用平台功能：</span><button class="btn xs ghost" type="button" onclick="paiOpenFeature('illust')">🪄 一键配图</button><button class="btn xs ghost" type="button" onclick="paiOpenFeature('ecom','ec_ref')">✍️ 电商文案仿写</button><button class="btn xs ghost" type="button" onclick="paiOpenFeature('life','lg_n','ledger')">📝 记一笔</button><button class="btn xs ghost" type="button" onclick="paiOpenFeature('life','td_t','todo')">✅ 加待办</button><button class="btn xs ghost" type="button" onclick="paiOpenFeature('media')">💡 建选题</button><button class="btn xs ghost" type="button" onclick="paiOpenFeature('video')">🎬 拆分镜</button><button class="btn xs ghost" type="button" onclick="paiOpenFeature('ecom','pd_n')">🛒 加商品</button><button class="btn xs ghost" type="button" onclick="paiOpenFeature('doubao')">🎨 文生图</button></div>
 </div>
 
 <div class="ai-hist" id="aiHist" style="display:none"></div>
@@ -1814,6 +1816,7 @@ function curSession(scope){scope=scope||'ai';if(typeof D.curSid!=='object'||D.cu
 function recordChat(role,content,ts,images,scope){scope=scope||'ai';D.chats=D.chats||[];D.chats.push({id:uid(),role:role,content:content,ts:ts,images:Array.isArray(images)?images:[]});var s=curSession(scope);if(!s.title||s.title==='新对话'){if(role==='user'&&content)s.title=content.slice(0,18);}s.msgs=D.chats.slice();s.updated=ts;saveLocal();}
 function toggleChatHist(scope,elId){var h=$(elId);if(h.style.display==='none'){renderChatSessions(scope,elId);h.style.display='block';}else h.style.display='none';}
 function aiToggleTools(){var t=$('aiTools');if(!t)return;t.style.display=(t.style.display==='none'?'block':'none');var b=$('aiToolsBtn');if(b)b.classList.toggle('on',t.style.display!=='none');}
+function paiOpenFeature(tab,sel,lt){try{switchTab(tab);}catch(e){}setTimeout(function(){if(lt&&typeof switchLifeTab==='function'){try{switchLifeTab(lt);}catch(e){}}if(sel){var e=$(sel);if(e){e.focus();try{e.scrollIntoView({block:'center'});}catch(x){}}}},160);}
 function renderChatSessions(scope,elId){var h=$(elId);if(!D.sessions||!D.sessions.length){h.innerHTML='<div class="empty">还没有历史对话</div>';return;}
   h.innerHTML='<div class="hist-list">'+D.sessions.filter(function(s){return (s.scope===scope)||(!s.scope&&scope==='ai');}).slice().reverse().map(function(s){return '<div class="hist-item" onclick="openSession(\''+s.id+'\')"><div class="t">'+esc(s.title||'对话')+'</div><div class="s">'+(s.msgs?s.msgs.length:0)+' 条 · '+(s.created||'')+'</div></div>';}).join('')+'</div>';}
 function openSession(id){var s=D.sessions.find(function(x){return x.id===id});if(!s)return;var sc=s.scope||'ai';D.curSid=D.curSid||{};D.curSid[sc]=id;D.chats=(s.msgs||[]).map(function(m){return{id:m.id||uid(),role:m.role,content:m.content,ts:m.ts,images:m.images||[]};});if(sc==='ai')renderChatHistory();else renderVdirChatHistory();var ht=$('aiHist');if(ht)ht.style.display='none';if($('curSessTx'))$('curSessTx').textContent='当前：'+(s.title||'对话');toast('已载入历史对话');}
@@ -1904,22 +1907,28 @@ function cycleShot(id){var x=D.shots.find(function(s){return s.id===id});if(!x)r
 
 function deAiify(t){if(!t)return '';return t.replace(/[—–]/g,'，').replace(/在这个(快节奏|信息爆炸|内卷|焦虑|注意力稀缺).*?的时代[，,]?/g,'').replace(/(不得不说|众所周知|总的来说|总而言之|需要注意的是|值得一提的是|首先[，,]?|其次[，,]?|最后[，,]?|此外[，,]?|另外[，,]?|其实[，,]?|说实话|说真的|家人们|绝绝子|yyds|无独有偶|毋庸置疑)/g,'').replace(/([。！？]){2,}/g,'$1').replace(/\n{3,}/g,'\n\n').replace(/[ \t]{2,}/g,' ').replace(/\s+([，。！？、])/g,'$1').trim();}
 // ===== 电商文案仿写 =====
-var ecLast={variants:[]},ecLastImg='';
-async function genCopy(){
+var ecLast={variants:[]},ecLastImg='',ecLastImgPrompt='';
+async function genCopyText(){
   var ref=$('ec_ref').value.trim();if(!ref){toast('请先粘贴一段参考文案');return;}
   if(isOffline||!session){toast('请登录后使用电商文案功能');return;}
   var platform=$('ec_pf').value;
   var count=Math.min(Math.max(parseInt($('ec_cnt').value)||3,1),5);
   var body={mode:'copy',ref:ref,platform:platform,product:$('ec_prod').value.trim(),selling:$('ec_sell').value.trim(),count:count,today:todayStr()};
-  $('ec_skel').style.display='block';$('ec_skel').textContent='AI 正在拆解爆款结构并仿写 '+count+' 个版本…';$('ec_result').innerHTML='';
+  $('ec_skel').style.display='block';$('ec_skel').textContent='AI 正在拆解爆款结构并仿写 '+count+' 个版本…';$('ec_result').innerHTML='';renderEcomImgBtn();
   try{
     var headers={'Content-Type':'application/json'};if(session&&session.access_token)headers['Authorization']='Bearer '+session.access_token;
     var r=await fetch(STUDIO_URL,{method:'POST',headers:headers,body:JSON.stringify(body)});
     var d=await r.json();if(!r.ok)throw new Error(d.error||'生成失败');
     renderEcomResult(d);
-    if(d.imagePrompt){$('ec_skel').textContent='文案已生成，正在配图…';genEcomImage(d.imagePrompt);}else{$('ec_skel').style.display='none';}
+    ecLastImgPrompt=d.imagePrompt||'';renderEcomImgBtn();
+    $('ec_skel').style.display='none';
   }catch(e){$('ec_skel').style.display='none';$('ec_result').innerHTML='<div class="ec-skel" style="border-color:#E4C3BD;background:var(--rust-l);color:var(--rust)">生成失败：'+esc(e.message)+'</div>';}
 }
+function renderEcomImgBtn(){
+  var box=$('ec_imgbtn');if(!box)return;
+  box.innerHTML=ecLastImgPrompt?'<button class="btn pri" style="margin-top:10px" onclick="genEcomImage(ecLastImgPrompt)"><svg class="ico" viewBox="0 0 24 24"><path d="M3 5h18v14H3z"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg>🖼️ 为以上文案配图</button>':'';
+}
+function genCopy(){genCopyText();}
 function renderEcomResult(d){ecLast.variants=d.variants||[];
   var h='';if(d.skeleton)h+='<div class="ec-skel" style="background:var(--olive-l);border-color:#D3DCC0;color:var(--olive)">结构套路：'+esc(d.skeleton)+'</div>';
   (d.variants||[]).forEach(function(v,i){h+='<div class="ec-var"><div class="hd2"><span class="tag clay">'+esc(v.angle||('版本'+(i+1)))+'</span>'+(v.title?'<span class="t" style="font-weight:700">'+esc(v.title)+'</span>':'')+'<span style="margin-left:auto;display:flex;gap:6px"><button class="btn xs" onclick="ecCopyText('+i+')">复制</button><button class="btn xs" onclick="ecSaveProduct('+i+')">存商品</button></span></div>';
@@ -2204,6 +2213,7 @@ function ecAiRender(){
   });
   if(D.ecomChat&&D.ecomChat.__summary){var sd=document.createElement('div');sd.className='ai-row bot';sd.innerHTML='<div class="av"><svg class="ico" viewBox="0 0 24 24"><path d="M3 3h18v18H3z" fill="currentColor"/></svg></div><div class="bubble"><div class="ai-tag"># 记忆摘要</div><div class="ai-body" style="color:var(--ink3);font-size:13px">'+esc(D.ecomChat.__summary)+'</div></div>';chat.appendChild(sd);}
   chat.scrollTop=chat.scrollHeight;
+  var mem=$('ecAiMem');if(mem){var n=(D.ecomChat||[]).filter(function(c){return c.role;}).length;mem.textContent=(D.ecomChat&&D.ecomChat.__summary)?('🧠 已记忆 '+n+' 条 · 已自动压缩为摘要 · '):('🧠 已记忆 '+n+' 条 · ');}
 }
 function ecAiShowTyping(){var chat=$('ecAiChat');if(!chat)return;var d=document.createElement('div');d.className='ai-row bot';d.id='ecAiTyping';d.innerHTML='<div class="av"><svg class="ico" viewBox="0 0 24 24"><path d="M3 3h18v18H3z" fill="currentColor"/></svg></div><div class="bubble"><div class="ai-tag"># 电商助手</div><div class="ai-body"></div></div>';chat.appendChild(d);chat.scrollTop=chat.scrollHeight;}
 function ecAiHideTyping(){var t=$('ecAiTyping');if(t)t.remove();}
@@ -2217,11 +2227,13 @@ async function ecAiSend(){
   ecAiRender();ecAiShowTyping();ecAiBusy=true;
   await ecAiCompressIfNeeded();
   var kb=pddKbText(m,6);
-  var sys='你是「电商 AI 助手」，专门服务拼多多商家，不是通用助手。你只读【拼多多运营知识库】和对话上下文回答，不编造平台规则数字；涉及金额/时限/处罚必须给明确数字并注明「以商家后台 mms.pinduoduo.com 最新规则为准」。回答先给结论，再给依据与操作步骤，语气像有经验的老电商人。\n\n';
+  var web='';try{web=await agnesSearch(m);}catch(e){web='';}
+  var sys='你是「电商 AI 助手」，专门服务拼多多商家，不是通用助手。你拥有【长期记忆】（对话摘要）+【拼多多运营知识库】+【联网搜索】三种能力。\n1）优先用「联网搜索结果」获取最新：平台规则/活动、一件代发与无货源货源、各平台（淘宝/京东/抖音/小红书/拼多多）商品与玩法信息，并尽量标注来源 URL；搜索无结果再退用知识库与自身知识。\n2）涉及金额/时限/处罚必须给明确数字并注明「以商家后台 mms.pinduoduo.com 最新规则为准」。\n3）回答先给结论，再给依据与操作步骤，语气像有经验的老电商人。\n\n';
   if(kb)sys+='【拼多多运营知识库（实时检索，仅作参考依据）】\n'+kb+'\n';
+  if(web)sys+='【联网搜索结果（最新信息，优先参考并标注来源）】\n'+web+'\n';
   var messages=[{role:'system',content:sys}];
-  if(D.ecomChat.__summary)messages.push({role:'system',content:'【之前对话要点摘要】\n'+D.ecomChat.__summary});
-  (D.ecomChat||[]).slice(-14).forEach(function(c){if(c.role==='user'||c.role==='assistant')messages.push({role:c.role,content:c.content});});
+  if(D.ecomChat.__summary)messages.push({role:'system',content:'【之前对话要点摘要（你的长期记忆）】\n'+D.ecomChat.__summary});
+  (D.ecomChat||[]).slice(-16).forEach(function(c){if(c.role==='user'||c.role==='assistant')messages.push({role:c.role,content:c.content});});
   var acc='';
   try{
     await vdirChatSend(messages,function(d){acc+=d;var t=$('ecAiTyping');var b=t?t.querySelector('.ai-body'):null;if(b)b.innerHTML=aiTypeText(acc);var ch=$('ecAiChat');if(ch)ch.scrollTop=ch.scrollHeight;},
@@ -2230,7 +2242,7 @@ async function ecAiSend(){
 }
 async function ecAiCompressIfNeeded(){
   var arr=D.ecomChat||[];
-  if(arr.length<=24)return;
+  if(arr.length<=20)return;
   var toSum=arr.slice(0,arr.length-16);
   var rest=arr.slice(arr.length-16);
   var text=toSum.map(function(c){return (c.role==='user'?'用户':'助手')+'：'+(c.content||'');}).join('\n');
@@ -2356,7 +2368,7 @@ document.documentElement.style.setProperty('--ac', AC[t]||'var(--ac-top)');
   document.querySelectorAll('section.panel').forEach(function(p){p.classList.toggle('on',p.id==='p-'+t);});
   if(t==='ai')setTimeout(function(){$('ai_input').focus();},200);
   if(t==='hot'){renderHotProducts();}
-  if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video'){renderShotTimeline();loadActiveChat('vdir');}if(t==='ai')loadActiveChat('ai');if(t==='ecom'){renderEcomBoard();renderHotTabs();renderHotProducts();}if(t==='doubao')renderDoubaoGallery();if(t==='notes')renderNotesPanel();if(t==='illust')illFillKeys();updateToolbarVisibility(t);}
+  if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video'){renderShotTimeline();loadActiveChat('vdir');}if(t==='ai')loadActiveChat('ai');if(t==='ecom'){renderEcomBoard();renderHotTabs();renderHotProducts();ecAiRender();}if(t==='doubao')renderDoubaoGallery();if(t==='notes')renderNotesPanel();if(t==='illust')illFillKeys();updateToolbarVisibility(t);}
 function closeTools(){uiFlags.showToolbar=false;saveUiFlags();updateToolbarVisibility(curTab);}
 function closeDlBar(){uiFlags.showDlBar=false;saveUiFlags();updateToolbarVisibility(curTab);}
 
@@ -3690,7 +3702,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260817e';
+var APP_VER='20260817f';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
