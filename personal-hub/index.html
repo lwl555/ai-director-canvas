@@ -646,8 +646,9 @@ input.datepick{cursor:pointer;background:var(--card)}
 </div>
 </div>
 
-<div class="pai-tools" id="aiTools" style="display:none">
 <div class="ai-ctx" id="ai_ctx"><svg class="ico s" viewBox="0 0 24 24" style="flex:none"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16v.1"/></svg><span>AI 助手可以查看你的待办、记账、选题、分镜、成片和习惯数据，给出针对性建议；可附图片让它<b>看图分析</b>，用 🎨 <b>生成图片</b>（文生图），或用 🖼️ <b>按你的要求改图</b>（都借用豆包 Seedream 模型）。附图后写「改成…」会自动走改图，写「分析/这是什么」会走看图分析。</span></div>
+
+<div class="pai-tools" id="aiTools" style="display:none">
 <div class="ai-chips"><button class="ai-chip" onclick="aiQuick('总结一下今天要处理的事')">总结今天</button><button class="ai-chip" onclick="aiQuick('分析我这个月的支出情况，哪些可以省')">分析支出</button><button class="ai-chip" onclick="aiQuick('看看我的选题库，给我几个新选题建议')">选题建议</button><button class="ai-chip" onclick="aiQuick('帮我回顾一下最近的自媒体数据趋势')">数据复盘</button><button class="ai-chip" onclick="aiQuick('我有哪些逾期的任务？帮我排个优先级')">逾期处理</button><button class="ai-chip" onclick="aiQuick('分析我的分镜脚本和导演成片进度，哪些镜头还没拍、建议怎么排期')">🎬 分镜/成片</button></div>
 <div class="ai-toolbar" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><button class="btn xs ghost" type="button" onclick="aiGenImageT2I()" title="文生图">🎨 文生图</button><button class="btn xs ghost" type="button" onclick="aiImg2Img()" title="图生图改图">🖼️ 图生图</button></div>
 <details class="kb-panel" style="margin:4px 0;background:var(--sand2);border:1px solid var(--line);border-radius:12px;padding:10px 12px"><summary style="cursor:pointer;font-weight:700;color:var(--ac-ecom)">🛒 拼多多运营知识库（点击展开，可一键喂给 AI）</summary>
@@ -1316,6 +1317,35 @@ function dpOpen(input){dpEnsure();DP.input=input;var v=input.value;if(v&&/^\d{4}
 function dpSelect(ds){if(DP.input){DP.input.value=ds;DP.input.dispatchEvent(new Event('change'));}dpClose();}
 function dpClose(){if(DP.el)DP.el.style.display='none';DP.input=null;}
 function initDatePickers(){document.querySelectorAll('input.datepick').forEach(function(inp){inp.addEventListener('click',function(){dpOpen(inp);});inp.addEventListener('focus',function(){dpOpen(inp);});});}
+// ===== 图片在 App WebView 走原生选择器（JSBridge）=====
+// 契约：App 端在 WebView 注入 window.__PH_IMAGE_PICKER = async (accept)=> File|Blob|dataURL
+//        或 window.AndroidBridge.pickImage(accept) -> 同上（Promise/值）
+// 返回 File/Blob：直接写入 file input；返回 dataURL：转 File 写入；返回 null/取消/失败：优雅降级为原生 <input type=file>
+function isImageInput(inp){var acc=(inp.getAttribute('accept')||'').toLowerCase();return acc.indexOf('image')>=0||acc==='';}
+function dataUrlToFile(dataUrl,name){
+  try{var arr=dataUrl.split(','),m=arr[0].match(/:(.*?);/),typ=m?m[1]:'image/png',b64=atob(arr[1]),n=b64.length,u=new Uint8Array(n);
+  for(var i=0;i<n;i++)u[i]=b64.charCodeAt(i);return new File([u],name,{type:typ});}catch(e){return null;}
+}
+function setInputFile(inp,file){
+  try{var dt=new DataTransfer();dt.items.add(file);inp.files=dt.files;}
+  catch(e){try{inp.files=file;}catch(e2){}}
+  inp.dispatchEvent(new Event('change'));
+}
+function phPickImage(accept){
+  return new Promise(function(resolve,reject){
+    var picker=window.__PH_IMAGE_PICKER||(window.AndroidBridge&&window.AndroidBridge.pickImage);
+    if(typeof picker!=='function'){reject(new Error('no-bridge'));return;}
+    Promise.resolve(picker(accept||'image/*')).then(function(res){
+      if(!res){reject(new Error('cancel'));return;}
+      if(res instanceof Blob){resolve(res);return;}
+      if(typeof res==='string'){
+        if(res.indexOf('data:')===0){var f=dataUrlToFile(res,'ph_picked_'+Date.now()+'.png');if(f)resolve(f);else reject(new Error('decode'));return;}
+        resolve(res);return; // content:// 或路径：交给 App 自有逻辑
+      }
+      reject(new Error('bad-type'));
+    }).catch(reject);
+  });
+}
 // 统一所有 <input type=file> 为「美观按钮 + 文件名回显」：隐藏原生 input，外套 label 触发（标准且 App WebView 兼容优于裸 input / 程序式 .click()）
 function initFilePickers(){
   document.querySelectorAll('input[type=file]').forEach(function(inp){
@@ -1324,14 +1354,26 @@ function initFilePickers(){
     var name=document.createElement('span'); name.className='fp-name'; name.style.display='none';
     inp.addEventListener('change',function(){var f=inp.files&&inp.files[0];if(f){name.textContent=f.name;name.style.display='';}else{name.style.display='none';}});
     var host=inp.parentNode;
-    if(host&&host.tagName==='LABEL'){ host.classList.add('filepick'); host.insertBefore(name, inp); }
+    var label;
+    if(host&&host.tagName==='LABEL'){ host.classList.add('filepick'); host.insertBefore(name, inp); label=host; }
     else{
-      var label=document.createElement('label'); label.className='filepick';
+      label=document.createElement('label'); label.className='filepick';
       var acc=(inp.getAttribute('accept')||'').toLowerCase();
       var btn=document.createElement('span'); btn.className='fp-btn';
       btn.textContent= acc.indexOf('image')>=0 ? '🖼️ 选择图片' : (acc.indexOf('json')>=0 ? '📄 选择 JSON' : '📎 选择文件');
       label.appendChild(btn); label.appendChild(name);
       host.insertBefore(label, inp); label.appendChild(inp);
+    }
+    if(isImageInput(inp)){
+      // App 原生选择器优先；无 bridge 时放行原生 input 兜底
+      label.addEventListener('click',function(e){
+        if(!(window.__PH_IMAGE_PICKER||(window.AndroidBridge&&window.AndroidBridge.pickImage)))return;
+        e.preventDefault();
+        phPickImage(inp.getAttribute('accept')||'image/*').then(function(file){
+          if(file instanceof Blob)setInputFile(inp,file);
+          else toast('图片选择器返回格式暂不支持，请改用系统选择');
+        }).catch(function(){try{inp.click();}catch(e){}});
+      });
     }
   });
 }
@@ -1760,7 +1802,7 @@ function loadActiveChat(scope){scope=scope||'ai';D.curSid=D.curSid||{};var sid=D
 
 // ===== AI 图片附件 =====
 var aiImages=[];
-function aiPickImage(){$('ai_file').click();}
+function aiPickImage(){var inp=$('ai_file');if(!inp)return;var picker=window.__PH_IMAGE_PICKER||(window.AndroidBridge&&window.AndroidBridge.pickImage);if(picker){phPickImage('image/*').then(function(f){if(f instanceof Blob)setInputFile(inp,f);}).catch(function(){try{inp.click();}catch(e){}});}else{inp.click();}}
 function aiOnImage(e){var files=e.target.files;if(!files)return;Array.prototype.forEach.call(files,function(f){if(!f.type||f.type.indexOf('image/')!==0)return;if(aiImages.length>=4){toast('最多附 4 张图');return;}compressImage(f,function(b64){aiImages.push(b64);renderAiAtts();});});e.target.value='';}
 function compressImage(file,cb){var reader=new FileReader();reader.onload=function(){var img=new Image();img.onload=function(){var max=800,w=img.width,h=img.height;if(w>max||h>max){if(w>=h){h=Math.round(h*max/w);w=max;}else{w=Math.round(w*max/h);h=max;}}var c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);try{cb(c.toDataURL('image/jpeg',0.82));}catch(_e){cb(reader.result);}};img.src=reader.result;};reader.readAsDataURL(file);}
 function renderAiAtts(){var box=$('ai_atts');if(!aiImages.length){box.style.display='none';box.innerHTML='';return;}box.style.display='flex';box.innerHTML=aiImages.map(function(src,i){return '<div class="ai-att"><img src="'+src+'"><div class="x" onclick="aiRmImg('+i+')"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></div></div>';}).join('');}
@@ -3377,10 +3419,11 @@ async function illStart(){
 function saveHubName(){var nm=$('hub_name');if(!nm)return;var v=nm.value.trim();try{localStorage.setItem('wb_personal_hub_name',v);}catch(e){}var hint=$('wsrcHint');if(hint){hint.style.color='#3aa655';hint.textContent=v?('已保存称呼「'+v+'」，问候已更新'):'已清除称呼';}$('greetTx').textContent=getGreeting();}
 function saveAgnesKey(){var ak=$('agnes_key');if(!ak)return;var v=ak.value.trim();agnesSetKey(v);var hint=$('agnesKeyHint');if(hint){hint.style.color='#3aa655';hint.textContent=v?'已保存 Key，AI 导演可真实生成':'已清除';}var kb=$('vdirKeyBar');if(kb&&v)kb.style.display='none';vdirGallery();cloudSyncPush();}
 // ===== 模型/参数 UI =====
-function renderModelSelects(){['chat','img','video'].forEach(function(t){var sel=$('m_'+t);if(!sel)return;sel.innerHTML=(window.__MODELS||DEFAULT_MODELS).filter(function(x){return x.type===t;}).map(function(x){return '<option value="'+esc(x.name)+'"'+(SEL[t]===x.name?' selected':'')+'>'+esc(x.label||x.name)+'</option>';}).join('');});['chat','img','video'].forEach(function(t){segAuto('m_'+t,'m_'+t+'_btns');});renderModelList();}
+function normLabel(s){return (''+ (s==null?'':s)).replace(/[\u0000-\u001f\u007f\uFFFD]/g,'').trim();}
+function renderModelSelects(){['chat','img','video'].forEach(function(t){var sel=$('m_'+t);if(!sel)return;sel.innerHTML=(window.__MODELS||DEFAULT_MODELS).filter(function(x){return x.type===t;}).map(function(x){return '<option value="'+esc(normLabel(x.name))+'"'+(SEL[t]===normLabel(x.name)?' selected':'')+'>'+esc(normLabel(x.label)||normLabel(x.name))+'</option>';}).join('');});['chat','img','video'].forEach(function(t){segAuto('m_'+t,'m_'+t+'_btns');});renderModelList();}
 function onModelSel(t,v){SEL[t]=v;saveModels();applyModels();if(t==='video')toast('视频模型：'+v+'（单镜上限 '+videoMaxFrames()+' 帧 / '+videoFps()+'fps）');}
 function toggleModelMgr(){var p=$('modelMgr');if(p)p.style.display=(p.style.display==='none'?'block':'none');renderModelList();}
-function renderModelList(){var box=$('modelList');if(!box)return;box.innerHTML=(window.__MODELS||DEFAULT_MODELS).map(function(x,i){return '<div class="hot-meta" style="margin:2px 0"><span class="tag">'+esc(x.type)+'</span><b style="font-size:12px">'+esc(x.name)+'</b>'+(x.maxFrames?' <span class="mut2">'+x.maxFrames+'帧/'+x.fps+'fps</span>':'')+' <button class="btn xs ghost" onclick="delModel('+i+')">删</button></div>';}).join('');}
+function renderModelList(){var box=$('modelList');if(!box)return;box.innerHTML=(window.__MODELS||DEFAULT_MODELS).map(function(x,i){return '<div class="hot-meta" style="margin:2px 0"><span class="tag">'+esc(normLabel(x.type))+'</span><b style="font-size:12px">'+esc(normLabel(x.name))+'</b>'+(x.maxFrames?' <span class="mut2">'+x.maxFrames+'帧/'+x.fps+'fps</span>':'')+' <button class="btn xs ghost" onclick="delModel('+i+')">删</button></div>';}).join('');}
 function addModel(){var n=$('nm_name').value.trim();var t=$('nm_type').value;if(!n){toast('填模型名');return;}var fps=parseInt($('nm_fps').value)||24;var mf=parseInt($('nm_frames').value)||0;window.__MODELS=(window.__MODELS||DEFAULT_MODELS.slice());window.__MODELS.push({name:n,label:n,type:t,maxFrames:mf,fps:fps});saveModels();renderModelSelects();$('nm_name').value='';toast('已添加 '+n);}
 function delModel(i){if(!window.__MODELS)return;window.__MODELS.splice(i,1);saveModels();renderModelSelects();}
 function fillParamsUI(){try{$('p_seed').value=GEN_PARAMS.seed||'';$('p_steps').value=GEN_PARAMS.steps||30;$('p_cfg').value=GEN_PARAMS.cfg||7.5;$('p_ratio').value=GEN_PARAMS.ratio||'16:9';$('p_w').value=GEN_PARAMS.width||1152;$('p_h').value=GEN_PARAMS.height||768;$('p_neg').value=GEN_PARAMS.negative||'';}catch(e){}}
@@ -3521,7 +3564,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260816ai';
+var APP_VER='20260817a';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
