@@ -2017,8 +2017,8 @@ function ecParseToImage(){if(!ecParseLast||!ecParseLast.imagePrompt){toast('没�
 function curShopId(){D.shops=D.shops||[];if(D.currentShop&&D.shops.some(function(x){return x.id===D.currentShop;}))return D.currentShop;if(!D.shops.length){D.shops=[{id:'shop_def',name:'我的店铺',current:true}];}D.currentShop=D.shops[0].id;return D.currentShop;}
 function curShopName(){var s=(D.shops||[]).find(function(x){return x.id===curShopId();});return s?s.name:'我的店铺';}
 function shopProducts(){return (D.products||[]).filter(function(p){return (p.shopId||'shop_def')===curShopId();});}
-function addShop(){var inp=$('shopNewName');if(!inp)return;var name=inp.value.trim();if(!name){toast('请输入店铺名');return;}var id='shop_'+uid();D.shops=D.shops||[];D.shops.forEach(function(x){x.current=false;});D.shops.push({id:id,name:name,current:true});D.currentShop=id;inp.value='';saveLocal();scheduleCloudSync();renderShops();renderProducts();renderEcomBoard();renderProductStatus();toast('已新建并切换到【'+name+'】');}
-function switchShop(id){D.currentShop=id;(D.shops||[]).forEach(function(x){x.current=(x.id===id);});saveLocal();scheduleCloudSync();renderShops();renderProducts();renderEcomBoard();renderProductStatus();}
+function addShop(){var inp=$('shopNewName');if(!inp)return;var name=inp.value.trim();if(!name){toast('请输入店铺名');return;}var id='shop_'+uid();D.shops=D.shops||[];D.shops.forEach(function(x){x.current=false;});D.shops.push({id:id,name:name,current:true});D.currentShop=id;inp.value='';saveLocal();scheduleCloudSync();renderShops();renderProducts();renderEcomBoard();renderProductStatus();renderSalesTrend();toast('已新建并切换到【'+name+'】');}
+function switchShop(id){D.currentShop=id;(D.shops||[]).forEach(function(x){x.current=(x.id===id);});saveLocal();scheduleCloudSync();renderShops();renderProducts();renderEcomBoard();renderProductStatus();renderSalesTrend();}
 function renderShops(){var box=$('shopSwitch');if(!box)return;box.innerHTML=(D.shops||[]).map(function(s){var on=(s.id===curShopId());return '<button class="btn xs '+(on?'pri':'ghost')+'" type="button" onclick="switchShop(\''+s.id+'\')">'+esc(s.name)+(on?' ✓':'')+'</button>';}).join('');}
 function statusClass(s){s=s||'在售';return s==='在售'?'ok':(s==='下架'?'off':'wait');}
 var psFilter='全部';
@@ -3761,7 +3761,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260818b';
+var APP_VER='20260818c';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
