@@ -764,11 +764,15 @@ input.datepick{cursor:pointer;background:var(--card)}
   <div class="form" style="margin:8px 0;align-items:stretch">
     <select id="db_i2i_size" class="f1" style="min-height:38px;display:none" onchange="dbSizeSelChange('i2i')"><option value="orig">📐 按参考图比例（自动）</option><option value="2048x2048" selected>2048×2048</option><option value="2816x1584">2816×1584（16:9）</option><option value="1584x2816">1584×2816（9:16）</option><option value="2368x1776">2368×1776（4:3）</option><option value="1776x2368">1776×2368（3:4）</option><option value="2496x1664">2496×1664（3:2）</option><option value="1664x2496">1664×2496（2:3）</option><option value="custom">自定义宽高…</option></select>
     <div id="db_i2i_size_btns" class="f1" style="display:flex;flex-wrap:wrap;gap:6px"><button type="button" data-v="orig" onclick="dbI2iPickSize(this.dataset.v)">📐 按参考图比例</button><button type="button" data-v="2048x2048" onclick="dbI2iPickSize(this.dataset.v)">1:1 方图</button><button type="button" data-v="2816x1584" onclick="dbI2iPickSize(this.dataset.v)">16:9 横</button><button type="button" data-v="1584x2816" onclick="dbI2iPickSize(this.dataset.v)">9:16 竖</button><button type="button" data-v="2368x1776" onclick="dbI2iPickSize(this.dataset.v)">4:3 横</button><button type="button" data-v="1776x2368" onclick="dbI2iPickSize(this.dataset.v)">3:4 竖</button><button type="button" data-v="custom" onclick="dbI2iPickSize(this.dataset.v)">自定义…</button></div>
-    <select id="db_i2i_n" class="f1" style="min-height:38px;max-width:90px;display:none"><option value="1">1 张</option><option value="2">2 张</option><option value="3">3 张</option><option value="4">4 张</option></select>
-    <div id="db_i2i_n_btns" style="display:flex;gap:6px"><button type="button" data-v="1" onclick="dbPickN('i2i',this.dataset.v)">1 张</button><button type="button" data-v="2" onclick="dbPickN('i2i',this.dataset.v)">2 张</button><button type="button" data-v="3" onclick="dbPickN('i2i',this.dataset.v)">3 张</button><button type="button" data-v="4" onclick="dbPickN('i2i',this.dataset.v)">4 张</button></div>
-    <label style="display:flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap"><input type="checkbox" id="db_i2i_chain" onchange="dbI2iChainToggle()"> 以最近生成的图为底图</label>
   </div>
   <div id="db_i2i_cur_ratio" class="mut2" style="font-size:12px;margin:2px 0 6px;color:var(--ac,#B5732C)">当前比例：2048×2048（1:1 方形）</div>
+  <div class="form" style="margin:6px 0;flex-wrap:wrap;gap:8px;align-items:center">
+    <select id="db_i2i_n" class="f1" style="min-height:38px;max-width:90px;display:none"><option value="1">1 张</option><option value="2">2 张</option><option value="3">3 张</option><option value="4">4 张</option></select>
+    <div id="db_i2i_n_btns" style="display:flex;gap:6px"><button type="button" data-v="1" onclick="dbPickN('i2i',this.dataset.v)">1 张</button><button type="button" data-v="2" onclick="dbPickN('i2i',this.dataset.v)">2 张</button><button type="button" data-v="3" onclick="dbPickN('i2i',this.dataset.v)">3 张</button><button type="button" data-v="4" onclick="dbPickN('i2i',this.dataset.v)">4 张</button></div>
+    <button type="button" id="dbI2iEachBtn" class="btn ghost sm" onclick="dbGenImg2ImgEach()" style="display:none">📚 每张各出一张</button>
+  </div>
+  <div id="db_i2i_n_hint" class="mut2" style="font-size:12px;margin:2px 0 6px;color:#b8860b"></div>
+  <label style="display:flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap;margin:4px 0"><input type="checkbox" id="db_i2i_chain" onchange="dbI2iChainToggle()"> 以最近生成的图为底图</label>
   <div id="db_i2i_custom_wrap" class="form" style="display:none;margin:6px 0"><input id="db_i2i_cw" type="number" class="f1" placeholder="宽 1-4096" min="1" max="4096" style="min-height:38px"><input id="db_i2i_ch" type="number" class="f1" placeholder="高 1-4096" min="1" max="4096" style="min-height:38px"></div>
   <div id="db_i2i_size_hint" class="mut2" style="font-size:12px;margin:6px 0"></div>
   <button class="btn pri" onclick="dbGenImg2ImgUI()">🎨 图生图（改图）</button>
@@ -3776,7 +3780,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260818e';
+var APP_VER='20260818f';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -3903,22 +3907,40 @@ async function dbI2iRefPrev(){var prev=$('db_i2i_prev');var inp=$('db_i2i_ref');
   var files=Array.prototype.slice.call(inp.files);
   prev.innerHTML='<div class="mut2" style="font-size:12px;margin-bottom:4px">已选 '+files.length+' 张参考图（可多选；原图用于改图）</div><div id="db_i2i_prevlist" style="display:flex;gap:6px;flex-wrap:wrap"></div>';
   var list=prev.querySelector('#db_i2i_prevlist');if(!list)return;
+  var eachBtn=$('dbI2iEachBtn');if(eachBtn)eachBtn.style.display=(files.length>=2 && !($('db_i2i_chain')&&$('db_i2i_chain').checked))?'inline-block':'none';
   for(var fi=0;fi<files.length;fi++){var f=files[fi];try{var raw=await fileToDataURL(f);var d=document.createElement('div');d.style.cssText='flex:1 1 30%;max-width:120px';d.innerHTML='<img src="'+raw+'" style="width:100%;border-radius:8px;border:1px solid var(--line);display:block">';list.appendChild(d);}catch(e){}}}
 // 图生图：勾选「以最近生成为底图」时显示底图预览；无底图则提示并取消
-function dbI2iChainToggle(){var prev=$('db_i2i_prev');var cb=$('db_i2i_chain');if(!cb)return;if(cb.checked){if(window.__dbLastImg){prev.innerHTML='<img src="'+window.__dbLastImg+'" alt="" style="max-width:100%;max-height:180px;border-radius:10px;border:1px solid var(--ac,#B5732C);display:block"><div class="mut2" style="font-size:12px;margin-top:4px">将以此前生成的图为底图继续改图</div>';}else{toast('还没有生成过的图，请先在「豆包文生图」生成一张');cb.checked=false;prev.innerHTML='';}}else{if(prev)prev.innerHTML='';}}
+function dbI2iChainToggle(){var prev=$('db_i2i_prev');var cb=$('db_i2i_chain');if(!cb)return;if(cb.checked){if(window.__dbLastImg){prev.innerHTML='<img src="'+window.__dbLastImg+'" alt="" style="max-width:100%;max-height:180px;border-radius:10px;border:1px solid var(--ac,#B5732C);display:block"><div class="mut2" style="font-size:12px;margin-top:4px">将以此前生成的图为底图继续改图</div>';}else{toast('还没有生成过的图，请先在「豆包文生图」生成一张');cb.checked=false;prev.innerHTML='';}var eachBtn=$('dbI2iEachBtn');if(eachBtn)eachBtn.style.display='none';}else{if(prev)prev.innerHTML='';var eb=$('dbI2iEachBtn');if(eb){var inp=$('db_i2i_ref');eb.style.display=(inp&&inp.files&&inp.files.length>=2)?'inline-block':'none';}}}
 // 图生图：把参考图按目标比例裁剪到目标宽高比（Seedream 图生图默认跟随参考图比例，size 参数常不生效，故前端预处理以保证比例可控）
 function dbSizeCn(v){if(v==='orig')return '保持参考图原比例';if(v==='custom')return '自定义宽高比例';var m=/^(\d+)x(\d+)$/.exec(v||'');if(!m)return '';var w=+m[1],h=+m[2],r=w/h;var label=w===h?'1:1 方形':(r>1?('横向 '+r.toFixed(2)+':1'):('竖向 1:'+(1/r).toFixed(2)));return '画面比例为 '+label;}
 function dbPrepRefToSize(src,sizeStr){return new Promise(function(res,rej){var im=new Image();im.onload=function(){try{var m=/^(\d+)x(\d+)$/.exec(sizeStr||'');if(!m){res(src);return;}var tw=+m[1],th=+m[2],tr=tw/th;var sw=im.naturalWidth||1024,sh=im.naturalHeight||1024,sr=sw/sh;var cw,ch;if(sr>tr){ch=sh;cw=Math.round(sh*tr);}else{cw=sw;ch=Math.round(sw/tr);}var sx=Math.round((sw-cw)/2),sy=Math.round((sh-ch)/2);var cv=document.createElement('canvas');cv.width=cw;cv.height=ch;var cx=cv.getContext('2d');cx.drawImage(im,sx,sy,cw,ch,0,0,cw,ch);var out=cv.toDataURL('image/jpeg',0.92);
       // 参考图不宜过大/过小：最短边 ≥1920（满足 Seedream 1920×1920 下限），最长边 ≤2048 控大小
       var tmp=new Image();tmp.onload=function(){try{var mw=tmp.naturalWidth||cw,mh=tmp.naturalHeight||ch,mx=Math.max(mw,mh),mn=Math.min(mw,mh);var scale=1;if(mx>2048)scale=2048/mx;if(mn<1920)scale=Math.max(scale,1920/mn);if(scale!==1){var c2=document.createElement('canvas');c2.width=Math.round(mw*scale);c2.height=Math.round(mh*scale);var c2x=c2.getContext('2d');c2x.drawImage(tmp,0,0,c2.width,c2.height);res(c2.toDataURL('image/jpeg',0.92));}else{res(out);}}catch(e2){res(out);}};tmp.onerror=function(){res(out);};tmp.src=out;
     }catch(e){rej(e);}};im.onerror=function(){rej(new Error('参考图加载失败'));};im.src=src;});}
+// 收集当前参考图（文件多选 或 chain 单图）
+async function dbI2iCollectRefs(){
+  var refs=[];var chain=($('db_i2i_chain')&&$('db_i2i_chain').checked);
+  if(chain&&window.__dbLastImg){return [window.__dbLastImg];}
+  var inpR=$('db_i2i_ref');
+  if(inpR&&inpR.files&&inpR.files.length){for(var ri0=0;ri0<inpR.files.length;ri0++){var fR=inpR.files[ri0];try{refs.push(await fileToDataURL(fR));}catch(e){}}}
+  return refs;
+}
+// 统一渲染改图结果 + 常驻「再画一张」按钮
+function dbRenderI2i(out,outs,note){
+  if(!out)return;
+  renderDoubaoGallery();
+  window.__dbAgainHistory=outs.slice();
+  var html='<div style="color:#3aa655;font-weight:600;margin-bottom:4px">改图完成 ✓ 已存入豆包图库</div>';
+  if(note)html+='<div class="mut2" style="font-size:12px;color:#b8860b;margin:4px 0 6px">'+esc(note)+'</div>';
+  html+=dbThumbGrid(outs);
+  if(outs.length)html+='<div style="margin-top:8px"><button class="btn ghost sm" onclick="dbGenAgain()">🔁 再画一张（同一组参考图）</button></div>';
+  out.innerHTML=html;
+}
 async function dbGenImg2ImgUI(){
   var key=doubaoKey(),ep=doubaoGet('ep');var out=$('db_i2i_out');
   if(!key||!ep){if(out)out.innerHTML='<span style="color:#c0392b">请先在上方「豆包文生图」填好 Key 和接入点 ID</span>';return;}
   var promptEl=$('db_i2i_prompt');var prompt=(promptEl?promptEl.value:'').trim();if(!prompt){if(out)out.textContent='先写改图要求';return;}
-  var refs=[];var chain=($('db_i2i_chain')&&$('db_i2i_chain').checked);
-  if(chain&&window.__dbLastImg){refs=[window.__dbLastImg];}
-  else{var inpR=$('db_i2i_ref');if(inpR&&inpR.files&&inpR.files.length){for(var ri0=0;ri0<inpR.files.length;ri0++){var fR=inpR.files[ri0];try{refs.push(await fileToDataURL(fR));}catch(e){}}}}
+  var refs=await dbI2iCollectRefs();
   if(!refs.length){if(out)out.textContent='先上传参考图（可多选），或勾选「以最近生成的图为底图」';return;}
   var rawSize=$('db_i2i_size')?$('db_i2i_size').value:'2048x2048';
   var refD=rawSize==='orig'?refs[0]:null;
@@ -3927,16 +3949,53 @@ async function dbGenImg2ImgUI(){
     try{var prepped=[];for(var pr=0;pr<refs.length;pr++){prepped.push(await dbPrepRefToSize(refs[pr],size));}refs=prepped;}
     catch(e){if(out)out.innerHTML='<span style="color:#c0392b">比例预处理失败：'+(e.message||e)+'</span>';return;}
   }
+  var n=Math.max(1,Math.min(4,parseInt(($('db_i2i_n')?$('db_i2i_n').value:'1')||'1',10)||1));
+  // 缓存上下文供「再画一张」复用
+  window.__dbLastRefs=refs.slice();window.__dbLastPrompt=prompt;window.__dbLastSize=size;
+  // 多张参考图 + 多张输出：豆包通常综合成 1 张，给提示
+  var note='';
+  if(refs.length>=2 && n>1){note='💡 上传多张参考图时，豆包通常会把它们综合成 1 张「风格主图」（即使选了多张）。如需每张原图各改一张，请用上方「📚 每张各出一张」。';}
   if(out)out.textContent=refs.length>1?('生成中…（'+refs.length+' 张参考图）'):'生成中…';
   try{
-    var n=Math.max(1,Math.min(4,parseInt(($('db_i2i_n')?$('db_i2i_n').value:'1')||'1',10)||1));
     var finalPrompt=prompt+(dbSizeCn(rawSize)?('，'+dbSizeCn(rawSize)):'');
     var raws=await dbGenImg2Img(refs,finalPrompt,size,n);
     var outs=[];
     for(var yi=0;yi<raws.length;yi++){var u=await fitImg(raws[yi]);storeDoubao(u,prompt);window.__dbLastImg=u;outs.push(u);}
-    renderDoubaoGallery();
-    if(out)out.innerHTML='<span style="color:#3aa655">改图完成 ✓ 已存入豆包图库</span>'+dbThumbGrid(outs);
+    dbRenderI2i(out,outs,note);
     toast('豆包图生图完成');
+  }catch(e){if(out)out.innerHTML='<span style="color:#c0392b">失败：'+(e.message||e).toString().slice(0,120)+'</span>';}
+}
+// 再画一张：复用最近一次参考图与提示词，追加到现有结果
+async function dbGenAgain(){
+  var out=$('db_i2i_out');
+  if(!window.__dbLastRefs||!window.__dbLastRefs.length){toast('没有可复用的参考图，请重新上传');return;}
+  if(out)out.textContent='再生成中…';
+  try{
+    var raws=await dbGenImg2Img(window.__dbLastRefs.slice(),window.__dbLastPrompt||'',window.__dbLastSize||'2048x2048',1);
+    var outs=[];
+    for(var yi=0;yi<raws.length;yi++){var u=await fitImg(raws[yi]);storeDoubao(u,window.__dbLastPrompt||'');window.__dbLastImg=u;outs.push(u);}
+    dbRenderI2i(out,(window.__dbAgainHistory||[]).concat(outs),'');
+  }catch(e){if(out)out.innerHTML='<span style="color:#c0392b">失败：'+(e.message||e).toString().slice(0,120)+'</span>';}
+}
+// 每张各出一张：对每张参考图单独生成 1 张
+async function dbGenImg2ImgEach(){
+  var key=doubaoKey(),ep=doubaoGet('ep');var out=$('db_i2i_out');
+  if(!key||!ep){if(out)out.innerHTML='<span style="color:#c0392b">请先在上方「豆包文生图」填好 Key 和接入点 ID</span>';return;}
+  var promptEl=$('db_i2i_prompt');var prompt=(promptEl?promptEl.value:'').trim();if(!prompt){if(out)out.textContent='先写改图要求';return;}
+  var allRefs=await dbI2iCollectRefs();
+  if(allRefs.length<2){if(out)out.textContent='需上传 ≥2 张参考图才能「每张各出一张」';return;}
+  var rawSize=$('db_i2i_size')?$('db_i2i_size').value:'2048x2048';
+  var size=await dbResolveSizeCore(rawSize, rawSize==='orig'?allRefs[0]:null, $('db_i2i_cw')?$('db_i2i_cw').value:null, $('db_i2i_ch')?$('db_i2i_ch').value:null);
+  if(rawSize!=='orig'){try{var pp=[];for(var p=0;p<allRefs.length;p++){pp.push(await dbPrepRefToSize(allRefs[p],size));}allRefs=pp;}catch(e){if(out)out.innerHTML='<span style="color:#c0392b">比例预处理失败：'+(e.message||e)+'</span>';return;}}
+  window.__dbLastRefs=allRefs.slice();window.__dbLastPrompt=prompt;window.__dbLastSize=size;
+  if(out)out.textContent='逐张生成中…（'+allRefs.length+' 张）';
+  try{
+    var all=[];
+    for(var i=0;i<allRefs.length;i++){
+      var raws=await dbGenImg2Img([allRefs[i]],prompt,size,1);
+      for(var yi=0;yi<raws.length;yi++){var u=await fitImg(raws[yi]);storeDoubao(u,prompt);window.__dbLastImg=u;all.push(u);}
+    }
+    dbRenderI2i(out,all,'💡 已为每张参考图各生成 1 张（共 '+all.length+' 张）。');
   }catch(e){if(out)out.innerHTML='<span style="color:#c0392b">失败：'+(e.message||e).toString().slice(0,120)+'</span>';}
 }
 // ===== INIT =====
