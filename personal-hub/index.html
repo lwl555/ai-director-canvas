@@ -122,6 +122,11 @@ section.panel.on{display:block;animation:panelIn .26s cubic-bezier(.22,.61,.36,1
 .card>.hd{display:flex;align-items:center;gap:11px;padding:13px 16px 13px 22px;border-bottom:2px solid var(--ac);background:var(--card);position:relative}
 .card>.hd h3{margin:0;font-size:15.5px;letter-spacing:1px;font-family:Georgia,"Songti SC",serif;font-weight:600}
 .card>.hd .sp{margin-left:auto;display:flex;gap:7px;align-items:center}
+/* 电商板块卡片默认折叠（点标题展开/收起，除 AI 助手外） */
+.ec-toggle{margin-left:8px;flex:none;display:flex;align-items:center;transition:transform .2s;color:var(--ink3)}
+.card.ec-collapsed>.bd{display:none}
+.card.ec-collapsed>.hd{border-bottom-color:transparent}
+.card.ec-collapsed .ec-toggle{transform:rotate(-90deg)}
 .card>.bd{padding:14px 16px}
 .mut{color:var(--ink2);font-size:13px}
 .mut2{color:var(--ink3);font-size:12.5px}
@@ -750,9 +755,9 @@ input.datepick{cursor:pointer;background:var(--card)}
   <div class="mut2" style="font-size:12px;margin-bottom:8px">模型填「推理接入点 ID」（形如 <code>ep-20250xxxx</code>，<b>不是</b>模型名）。创建路径：火山引擎控制台 → 方舟 Ark → 推理接入点 → 从 Seedream 图像模型新建，把得到的 ID 粘到这里。</div>
   <div id="db_out" class="db-out"><div class="mut2">填好 Key、接入点 ID 和提示词，点生成。</div></div>
 </div></div>
-<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M3 5h18v14H3z"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg><h3>豆包图生图（以图改图）</h3><div class="sp"><span class="mut2">上传参考图 + 写要求，按豆包 Seedream 改图</span></div></div><div class="bd">
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M3 5h18v14H3z"/><path d="M3 15l5-5 4 4 3-3 6 6"/></svg><h3>豆包图生图（以图改图）</h3><div class="sp"><span class="mut2">可上传多张参考图 + 写要求，按豆包 Seedream 改图</span></div></div><div class="bd">
   <div class="mut2" style="font-size:12px;margin-bottom:8px">叠加更改：勾选「以最近生成的图为底图」后，下一张会基于上一张继续改（就像豆包 App 的「继续编辑」）。比例：选「按参考图比例」则保持原图比例；选其他比例会先把参考图裁到目标比例再生成，保证出图比例就是你选的。</div>
-  <input type="file" id="db_i2i_ref" accept="image/*" onchange="dbI2iRefPrev()" style="min-height:38px;width:100%">
+  <input type="file" id="db_i2i_ref" accept="image/*" multiple onchange="dbI2iRefPrev()" style="min-height:38px;width:100%">
   <div id="db_i2i_prev" style="margin:8px 0"></div>
   <textarea id="db_i2i_prompt" class="f1" rows="3" placeholder="写你要怎么改这张图，如：把背景换成海边、保留人物" style="min-height:64px;font-size:16px"></textarea>
   <div class="form" style="margin:8px 0"><button class="btn ghost sm" onclick="dbOptimizePrompt('db_i2i_prompt')" id="dbI2iOptBtn">✨ 优化提示词</button><span id="dbI2iOptHint" class="mut2" style="font-size:12px"></span></div>
@@ -2050,6 +2055,16 @@ function renderEcomBoard(){var box=$('ecBoard');if(!box)return;var ps=D.products
   var colors=['#3B8E7C','#C56C84','#8E76AC','#D85C3C','#697A47','#C0891F','#5E7DA6'];
   var arr=Object.keys(cats).map(function(k,i){return{label:k,value:cats[k],color:colors[i%colors.length]};});
   box.innerHTML=svgBars(arr);if($('ecBoardSub'))$('ecBoardSub').textContent='按分类统计';}
+// 电商板块：卡片可折叠，默认除「电商 AI 助手」外全部折叠（手机端快速直达 AI 助手）
+function initEcomCollapse(){var panel=$('p-ecom');if(!panel)return;
+  panel.querySelectorAll('.card').forEach(function(card){if(card.__ecColInit)return;var hd=card.querySelector('.hd');if(!hd)return;card.__ecColInit=true;
+    if(!hd.querySelector('.ec-toggle')){var tog=document.createElement('span');tog.className='ec-toggle';tog.innerHTML='<svg class="ico" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';hd.appendChild(tog);}
+    hd.style.cursor='pointer';
+    hd.onclick=function(e){if(e.target.closest('button,select,input,textarea,a'))return;card.classList.toggle('ec-collapsed');};
+  });
+  if(panel.__ecColDone)return;panel.__ecColDone=true;
+  panel.querySelectorAll('.card').forEach(function(card){var h3=card.querySelector('h3');var isAi=(h3&&/电商\s*AI\s*助手/.test(h3.textContent));card.classList.toggle('ec-collapsed',!isAi);});
+}
 var HOT_SEED={
  '抖音':[{n:'多巴胺穿搭',h:96,price:'39-129元',sales:'月销10万+',tag:'女装/夏日'},{n:'智能水杯',h:88,price:'59-99元',sales:'月销3万+',tag:'数码/礼品'},{n:'桌面微景观',h:81,price:'29-69元',sales:'月销5万+',tag:'家居/解压'},{n:'国风联名盲盒',h:77,price:'49-89元',sales:'月销8万+',tag:'潮玩/IP'},{n:'露营轻装备',h:73,price:'99-399元',sales:'月销2万+',tag:'户外'},{n:'宠物自动喂食器',h:70,price:'129-299元',sales:'月销1.5万+',tag:'宠物'},{n:'复古胶片相机',h:66,price:'199-599元',sales:'月销8000+',tag:'摄影'}],
  '小红书':[{n:'桌面收纳神器',h:93,price:'19-59元',sales:'月销6万+',tag:'家居/收纳'},{n:'早C晚A护肤',h:85,price:'99-299元',sales:'月销4万+',tag:'美妆'},{n:'小众香薰',h:79,price:'49-159元',sales:'月销2万+',tag:'香氛'},{n:'通勤托特包',h:74,price:'79-259元',sales:'月销3万+',tag:'箱包'},{n:'氛围感台灯',h:70,price:'89-199元',sales:'月销1万+',tag:'家居'},{n:'手冲咖啡器具',h:67,price:'59-299元',sales:'月销9000+',tag:'咖啡'},{n:'瑜伽服套装',h:63,price:'99-199元',sales:'月销2.5万+',tag:'运动'}],
@@ -2427,7 +2442,7 @@ document.documentElement.style.setProperty('--ac', AC[t]||'var(--ac-top)');
   document.querySelectorAll('section.panel').forEach(function(p){p.classList.toggle('on',p.id==='p-'+t);});
   if(t==='ai')setTimeout(function(){$('ai_input').focus();},200);
   if(t==='hot'){renderHotProducts();}
-  if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video'){renderShotTimeline();loadActiveChat('vdir');}if(t==='ai')loadActiveChat('ai');if(t==='ecom'){curShopId();renderShops();renderEcomBoard();renderHotTabs();renderHotProducts();renderProductStatus();renderSalesTrend();ecAiRender();}if(t==='doubao')renderDoubaoGallery();if(t==='notes')renderNotesPanel();if(t==='illust')illFillKeys();updateToolbarVisibility(t);}
+  if(t==='top'){renderTop();window.scrollTo({top:0,behavior:'smooth'});}if(t==='video'){renderShotTimeline();loadActiveChat('vdir');}if(t==='ai')loadActiveChat('ai');if(t==='ecom'){curShopId();renderShops();renderEcomBoard();renderHotTabs();renderHotProducts();renderProductStatus();renderSalesTrend();ecAiRender();initEcomCollapse();}if(t==='doubao')renderDoubaoGallery();if(t==='notes')renderNotesPanel();if(t==='illust')illFillKeys();updateToolbarVisibility(t);}
 function closeTools(){uiFlags.showToolbar=false;saveUiFlags();updateToolbarVisibility(curTab);}
 function closeDlBar(){uiFlags.showDlBar=false;saveUiFlags();updateToolbarVisibility(curTab);}
 
@@ -3761,7 +3776,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260818c';
+var APP_VER='20260818d';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -3841,11 +3856,11 @@ async function aiImg2Img(instr,imgsArr){
   if(!ins){toast('写上你要怎么改这张图');return;}
   var key=doubaoKey(),ep=doubaoGet('ep');
   if(!key||!ep){toast('图生图借用豆包模型，请先在「豆包生图」填好 Key 和接入点 ID');return;}
-  var ref=atts[atts.length-1];var ts=new Date().toTimeString().slice(0,5);
+  var ts=new Date().toTimeString().slice(0,5);
   if(useDom){$('ai_input').value='';$('ai_input').style.height='auto';aiImages=[];renderAiAtts();}
   aiAddMsg('user',ins,ts,atts);recordChat('user',ins,ts,atts,'ai');aiShowTyping();
   try{
-    var raws=await dbGenImg2Img(ref,ins,'1024x1024',1);aiHideTyping();
+    var raws=await dbGenImg2Img(atts,ins,'1024x1024',1);aiHideTyping();
     for(var zi=0;zi<raws.length;zi++){var u=await fitImg(raws[zi]);storeDoubao(u,ins);aiAddMsg('bot','已按你的要求改图（豆包 Seedream）',new Date().toTimeString().slice(0,5),[u]);recordChat('assistant','已按你的要求改图：'+ins,new Date().toTimeString().slice(0,5),[u],'ai');}
     renderDoubaoGallery();toast('图生图完成，已存入豆包图库');
   }catch(e){aiHideTyping();aiAddMsg('bot','图生图失败：'+(e.message||e),new Date().toTimeString().slice(0,5));}
@@ -3865,23 +3880,26 @@ async function aiGenImageT2I(){
     renderDoubaoGallery();toast('图片已生成并存入豆包图库');
   }catch(e){aiHideTyping();aiAddMsg('bot','生成失败：'+(e.message||e),new Date().toTimeString().slice(0,5));}
 }
-// ===== 豆包 图生图底层（Ark images/generations + image 参考） =====
-async function dbGenImg2Img(ref,prompt,size,n){
+// ===== 豆包 图生图底层（Ark images/generations + image 参考，支持多张参考图） =====
+async function dbGenImg2Img(refs,prompt,size,n){
   var key=doubaoKey(),ep=doubaoGet('ep');
   if(!key||!ep)throw new Error('请先在「豆包生图」填 Key 和接入点 ID');
-  var body=JSON.stringify({model:ep,prompt:prompt,image:[ref],size:size,n:n,response_format:'b64_json'});
+  if(!Array.isArray(refs))refs=[refs];
+  refs=refs.filter(Boolean).slice(0,4);
+  if(!refs.length)throw new Error('缺少参考图');
+  var body=JSON.stringify({model:ep,prompt:prompt,image:refs,size:size,n:n,response_format:'b64_json'});
   var res=await fetch('https://ark.cn-beijing.volces.com/api/v3/images/generations',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:body}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j};});});
   if(!res.ok){var m=(res.j&&res.j.error&&res.j.error.message)||JSON.stringify(res.j);throw new Error(m);}
   var arr=(res.j&&res.j.data)||(res.j&&res.j.choices)||[];
   return arr.map(function(it){return (it.b64_json?'data:image/png;base64,'+it.b64_json:null)||(it.url||null);}).filter(Boolean);
 }
 async function fileToDataURL(f){return new Promise(function(res,rej){var rd=new FileReader();rd.onload=function(){res(rd.result);};rd.onerror=rej;rd.readAsDataURL(f);});}
-// 图生图：选参考图后平台内压缩预览
-async function dbI2iRefPrev(){var prev=$('db_i2i_prev');var f=$('db_i2i_ref')&&$('db_i2i_ref').files[0];if(!prev)return;if(!f){prev.innerHTML='';return;}
-  try{var raw=await fileToDataURL(f);
-    prev.innerHTML='<img src="'+raw+'" alt="" style="max-width:100%;max-height:200px;border-radius:10px;border:1px solid var(--line);display:block"><div class="mut2" style="font-size:12px;margin-top:4px">已选参考图（原图用于改图）</div>';
-    fitImg(raw).then(function(cmp){prev.innerHTML='<img src="'+cmp+'" alt="" style="max-width:100%;max-height:200px;border-radius:10px;border:1px solid var(--line);display:block"><div class="mut2" style="font-size:12px;margin-top:4px">已选参考图（已压缩预览，原图用于改图）</div>';}).catch(function(){});
-  }catch(e){prev.innerHTML='<div class="mut2" style="color:#c0392b">图片读取失败</div>';}}
+// 图生图：选参考图后平台内压缩预览（支持多张）
+async function dbI2iRefPrev(){var prev=$('db_i2i_prev');var inp=$('db_i2i_ref');if(!prev)return;if(!inp||!inp.files||!inp.files.length){prev.innerHTML='';return;}
+  var files=Array.prototype.slice.call(inp.files);
+  prev.innerHTML='<div class="mut2" style="font-size:12px;margin-bottom:4px">已选 '+files.length+' 张参考图（可多选；原图用于改图）</div><div id="db_i2i_prevlist" style="display:flex;gap:6px;flex-wrap:wrap"></div>';
+  var list=prev.querySelector('#db_i2i_prevlist');if(!list)return;
+  for(var fi=0;fi<files.length;fi++){var f=files[fi];try{var raw=await fileToDataURL(f);var d=document.createElement('div');d.style.cssText='flex:1 1 30%;max-width:120px';d.innerHTML='<img src="'+raw+'" style="width:100%;border-radius:8px;border:1px solid var(--line);display:block">';list.appendChild(d);}catch(e){}}}
 // 图生图：勾选「以最近生成为底图」时显示底图预览；无底图则提示并取消
 function dbI2iChainToggle(){var prev=$('db_i2i_prev');var cb=$('db_i2i_chain');if(!cb)return;if(cb.checked){if(window.__dbLastImg){prev.innerHTML='<img src="'+window.__dbLastImg+'" alt="" style="max-width:100%;max-height:180px;border-radius:10px;border:1px solid var(--ac,#B5732C);display:block"><div class="mut2" style="font-size:12px;margin-top:4px">将以此前生成的图为底图继续改图</div>';}else{toast('还没有生成过的图，请先在「豆包文生图」生成一张');cb.checked=false;prev.innerHTML='';}}else{if(prev)prev.innerHTML='';}}
 // 图生图：把参考图按目标比例裁剪到目标宽高比（Seedream 图生图默认跟随参考图比例，size 参数常不生效，故前端预处理以保证比例可控）
@@ -3894,22 +3912,22 @@ async function dbGenImg2ImgUI(){
   var key=doubaoKey(),ep=doubaoGet('ep');var out=$('db_i2i_out');
   if(!key||!ep){if(out)out.innerHTML='<span style="color:#c0392b">请先在上方「豆包文生图」填好 Key 和接入点 ID</span>';return;}
   var promptEl=$('db_i2i_prompt');var prompt=(promptEl?promptEl.value:'').trim();if(!prompt){if(out)out.textContent='先写改图要求';return;}
-  var ref=null;var chain=($('db_i2i_chain')&&$('db_i2i_chain').checked);
-  if(chain&&window.__dbLastImg){ref=window.__dbLastImg;}
-  else{var f=$('db_i2i_ref')&&$('db_i2i_ref').files[0];if(f)ref=await fileToDataURL(f);}
-  if(!ref){if(out)out.textContent='先上传参考图，或勾选「以最近生成的图为底图」';return;}
+  var refs=[];var chain=($('db_i2i_chain')&&$('db_i2i_chain').checked);
+  if(chain&&window.__dbLastImg){refs=[window.__dbLastImg];}
+  else{var inpR=$('db_i2i_ref');if(inpR&&inpR.files&&inpR.files.length){for(var ri0=0;ri0<inpR.files.length;ri0++){var fR=inpR.files[ri0];try{refs.push(await fileToDataURL(fR));}catch(e){}}}}
+  if(!refs.length){if(out)out.textContent='先上传参考图（可多选），或勾选「以最近生成的图为底图」';return;}
   var rawSize=$('db_i2i_size')?$('db_i2i_size').value:'2048x2048';
-  var refD=rawSize==='orig'?ref:null;
+  var refD=rawSize==='orig'?refs[0]:null;
   var size=await dbResolveSizeCore(rawSize,refD,$('db_i2i_cw')?$('db_i2i_cw').value:null,$('db_i2i_ch')?$('db_i2i_ch').value:null);
   if(rawSize!=='orig'){
-    try{ ref=await dbPrepRefToSize(ref,size); }
+    try{var prepped=[];for(var pr=0;pr<refs.length;pr++){prepped.push(await dbPrepRefToSize(refs[pr],size));}refs=prepped;}
     catch(e){if(out)out.innerHTML='<span style="color:#c0392b">比例预处理失败：'+(e.message||e)+'</span>';return;}
   }
-  if(out)out.textContent='生成中…';
+  if(out)out.textContent=refs.length>1?('生成中…（'+refs.length+' 张参考图）'):'生成中…';
   try{
     var n=Math.max(1,Math.min(4,parseInt(($('db_i2i_n')?$('db_i2i_n').value:'1')||'1',10)||1));
     var finalPrompt=prompt+(dbSizeCn(rawSize)?('，'+dbSizeCn(rawSize)):'');
-    var raws=await dbGenImg2Img(ref,finalPrompt,size,n);
+    var raws=await dbGenImg2Img(refs,finalPrompt,size,n);
     var outs=[];
     for(var yi=0;yi<raws.length;yi++){var u=await fitImg(raws[yi]);storeDoubao(u,prompt);window.__dbLastImg=u;outs.push(u);}
     renderDoubaoGallery();
@@ -3920,7 +3938,7 @@ async function dbGenImg2ImgUI(){
 // ===== INIT =====
 window.addEventListener('DOMContentLoaded',function(){
   document.querySelectorAll('nav.tabs button,.mbar button').forEach(function(b){b.addEventListener('click',function(){if(this.dataset.t==='theme'){toggleTheme();return;}switchTab(this.dataset.t);});});
-  initFilePickers();applyAppMode();renderAppModeToggle();pddInit();ecAiInit();paiKbInit();updateThemeBtn();
+  initFilePickers();applyAppMode();renderAppModeToggle();pddInit();ecAiInit();paiKbInit();updateThemeBtn();initEcomCollapse();
   // 统一把隐藏 select 渲染成美观按钮组（App WebView 友好）
   ['ec_pf','opt_pf','po_p','as_s','sd_p','pr_m','pr_s','vd_s','lg_t','td_p','nm_type','c_maxtok'].forEach(function(k){segAuto(k,k+'_btns');});
   initStatPlat();switchCat();
