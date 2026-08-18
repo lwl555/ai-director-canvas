@@ -3776,7 +3776,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260818d';
+var APP_VER='20260818e';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -3887,6 +3887,8 @@ async function dbGenImg2Img(refs,prompt,size,n){
   if(!Array.isArray(refs))refs=[refs];
   refs=refs.filter(Boolean).slice(0,4);
   if(!refs.length)throw new Error('缺少参考图');
+  // 兜底：每张参考图最短边放大到 ≥1920（避免 Seedream 3686400 px 拒图）
+  refs=await Promise.all(refs.map(function(r){return dbEnsureMinSize(r,1920);}));
   var body=JSON.stringify({model:ep,prompt:prompt,image:refs,size:size,n:n,response_format:'b64_json'});
   var res=await fetch('https://ark.cn-beijing.volces.com/api/v3/images/generations',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:body}).then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j};});});
   if(!res.ok){var m=(res.j&&res.j.error&&res.j.error.message)||JSON.stringify(res.j);throw new Error(m);}
@@ -3894,6 +3896,8 @@ async function dbGenImg2Img(refs,prompt,size,n){
   return arr.map(function(it){return (it.b64_json?'data:image/png;base64,'+it.b64_json:null)||(it.url||null);}).filter(Boolean);
 }
 async function fileToDataURL(f){return new Promise(function(res,rej){var rd=new FileReader();rd.onload=function(){res(rd.result);};rd.onerror=rej;rd.readAsDataURL(f);});}
+// 兜底缩放：保证图片最短边 ≥ minSide（默认 1920），避免豆包 Seedream 报"image size must be at least 3686400 pixels"（1920×1920）。规则：仅在 mn<minSide 时等比放大；mx 超大时软压到 MAX=4096（豆包上限通常更宽松）。放大和压缩不会同时进行。
+async function dbEnsureMinSize(src,minSide){minSide=minSide||1920;var MAX=4096;return new Promise(function(resolve){if(!src){resolve(src);return;}var im=new Image();im.onload=function(){try{var w=im.naturalWidth||minSide,h=im.naturalHeight||minSide;if(!w||!h){resolve(src);return;}var mn=Math.min(w,h),mx=Math.max(w,h);var scale=1;if(mn<minSide)scale=minSide/mn;else if(mx>MAX)scale=MAX/mx;if(scale===1){resolve(src);return;}var nw=Math.round(w*scale),nh=Math.round(h*scale);var cv=document.createElement('canvas');cv.width=nw;cv.height=nh;var cx=cv.getContext('2d');if(!cx){resolve(src);return;}cx.drawImage(im,0,0,nw,nh);resolve(cv.toDataURL('image/jpeg',0.9));}catch(e){resolve(src);}};im.onerror=function(){resolve(src);};im.src=src;});}
 // 图生图：选参考图后平台内压缩预览（支持多张）
 async function dbI2iRefPrev(){var prev=$('db_i2i_prev');var inp=$('db_i2i_ref');if(!prev)return;if(!inp||!inp.files||!inp.files.length){prev.innerHTML='';return;}
   var files=Array.prototype.slice.call(inp.files);
@@ -3905,8 +3909,8 @@ function dbI2iChainToggle(){var prev=$('db_i2i_prev');var cb=$('db_i2i_chain');i
 // 图生图：把参考图按目标比例裁剪到目标宽高比（Seedream 图生图默认跟随参考图比例，size 参数常不生效，故前端预处理以保证比例可控）
 function dbSizeCn(v){if(v==='orig')return '保持参考图原比例';if(v==='custom')return '自定义宽高比例';var m=/^(\d+)x(\d+)$/.exec(v||'');if(!m)return '';var w=+m[1],h=+m[2],r=w/h;var label=w===h?'1:1 方形':(r>1?('横向 '+r.toFixed(2)+':1'):('竖向 1:'+(1/r).toFixed(2)));return '画面比例为 '+label;}
 function dbPrepRefToSize(src,sizeStr){return new Promise(function(res,rej){var im=new Image();im.onload=function(){try{var m=/^(\d+)x(\d+)$/.exec(sizeStr||'');if(!m){res(src);return;}var tw=+m[1],th=+m[2],tr=tw/th;var sw=im.naturalWidth||1024,sh=im.naturalHeight||1024,sr=sw/sh;var cw,ch;if(sr>tr){ch=sh;cw=Math.round(sh*tr);}else{cw=sw;ch=Math.round(sw/tr);}var sx=Math.round((sw-cw)/2),sy=Math.round((sh-ch)/2);var cv=document.createElement('canvas');cv.width=cw;cv.height=ch;var cx=cv.getContext('2d');cx.drawImage(im,sx,sy,cw,ch,0,0,cw,ch);var out=cv.toDataURL('image/jpeg',0.92);
-      // 参考图不宜过大/过小，压缩到最长边 1536 以内，避免 Seedream 拒图或处理慢
-      var tmp=new Image();tmp.onload=function(){try{var mw=tmp.naturalWidth||cw,mh=tmp.naturalHeight||ch,mx=Math.max(mw,mh);var scale=1;if(mx>1536)scale=1536/mx;if(mx<512)scale=512/mx;if(scale!==1){var c2=document.createElement('canvas');c2.width=Math.round(mw*scale);c2.height=Math.round(mh*scale);var c2x=c2.getContext('2d');c2x.drawImage(tmp,0,0,c2.width,c2.height);res(c2.toDataURL('image/jpeg',0.92));}else{res(out);}}catch(e2){res(out);}};tmp.onerror=function(){res(out);};tmp.src=out;
+      // 参考图不宜过大/过小：最短边 ≥1920（满足 Seedream 1920×1920 下限），最长边 ≤2048 控大小
+      var tmp=new Image();tmp.onload=function(){try{var mw=tmp.naturalWidth||cw,mh=tmp.naturalHeight||ch,mx=Math.max(mw,mh),mn=Math.min(mw,mh);var scale=1;if(mx>2048)scale=2048/mx;if(mn<1920)scale=Math.max(scale,1920/mn);if(scale!==1){var c2=document.createElement('canvas');c2.width=Math.round(mw*scale);c2.height=Math.round(mh*scale);var c2x=c2.getContext('2d');c2x.drawImage(tmp,0,0,c2.width,c2.height);res(c2.toDataURL('image/jpeg',0.92));}else{res(out);}}catch(e2){res(out);}};tmp.onerror=function(){res(out);};tmp.src=out;
     }catch(e){rej(e);}};im.onerror=function(){rej(new Error('参考图加载失败'));};im.src=src;});}
 async function dbGenImg2ImgUI(){
   var key=doubaoKey(),ep=doubaoGet('ep');var out=$('db_i2i_out');
