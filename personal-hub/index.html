@@ -407,7 +407,7 @@ body.is-mobile nav.tabs{display:none}
 body.is-pc .mbar{display:none}
 /* ===== PC 专业工作台：左侧固定侧边栏 + 右侧主内容整页滚动 ===== */
 body.is-pc{overflow-x:hidden}
-body.is-pc .wrap{max-width:none;margin:0;padding:0 36px 56px 264px}
+body.is-pc .wrap{max-width:1440px;margin:0;padding:0 36px 56px 264px}
 body.is-pc header{position:static;background:transparent;box-shadow:none;padding:0;backdrop-filter:none;-webkit-backdrop-filter:none}
 body.is-pc .rule{display:none}
 body.is-pc .brand{position:fixed;left:0;top:0;width:232px;padding:16px 18px;background:var(--card);border-right:1px solid var(--line);z-index:52;box-shadow:0 1px 0 var(--line)}
@@ -423,8 +423,8 @@ body.is-pc nav.tabs button[data-t="theme"]:hover{background:var(--card)}
 body.is-pc nav.tabs button[data-t="theme"].on{background:var(--green);color:#fff}
 body.is-pc .tools{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0}
 body.is-pc .today{margin-top:18px}
-body.is-pc .panel .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-items:stretch}
-body.is-pc .panel .grid > .g2{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-items:stretch}
+body.is-pc .panel .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
+body.is-pc .panel .grid > .g2{grid-column:1 / -1;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
 body.is-pc .panel#p-life .card{grid-column:1 / -1;max-width:none}
 body.is-pc .panel#p-hot .card{grid-column:1 / -1;max-width:none}
 body.is-pc .panel#p-ai .pai{grid-column:1 / -1;max-width:1080px;margin:0 auto}
@@ -466,6 +466,30 @@ body.is-pc #ai_chat,body.is-pc #ecAiChat{min-height:360px!important}
 .is-pc .panel#p-ecom .card:has(#ecAiChat) .ai-input{padding:10px 14px}
 .is-pc .panel#p-ecom .card:has(#ecAiChat) .ai-input textarea{min-height:56px;font-size:15px}
 .is-pc .panel#p-ecom .card:has(#ecAiChat) .ai-msg .bubble{max-width:75%;font-size:14.5px;line-height:1.7}
+
+/* === PC Panel Layout Fixes === */
+
+/* p-media: kanban card full width on PC */
+.is-pc .panel#p-media > .grid > .card:first-child{grid-column:1/-1}
+
+/* p-video: script card full width, AI assistant full width */
+.is-pc .panel#p-video > .grid > .card:first-child{grid-column:1/-1}
+.is-pc .panel#p-video > .grid > .card:last-child{grid-column:1/-1}
+
+/* p-ecom: knowledge base card full width */
+.is-pc .panel#p-ecom > .grid > .card:nth-last-child(2){grid-column:1/-1}
+
+/* p-doubao: complex forms - each card full width */
+.is-pc .panel#p-doubao > .grid{grid-template-columns:1fr}
+
+/* p-illust: first card (??) full width */
+.is-pc .panel#p-illust > .grid > .card:first-child{grid-column:1/-1}
+
+/* p-notes: limit width for readability */
+.is-pc .panel#p-notes .card{max-width:900px;margin:0 auto}
+
+/* p-top: improve 2-column layout */
+.is-pc #p-top .grid .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;grid-column:1/-1}
 body.is-pc .preview-mode{top:12px;right:16px}
 
 .brand{display:flex;align-items:center;gap:12px}
@@ -3975,7 +3999,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260819g';
+var APP_VER='20260819h';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
