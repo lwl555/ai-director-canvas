@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="zh-CN"><head>
+﻿<!DOCTYPE html><html lang="zh-CN"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -402,7 +402,7 @@ input.datepick{cursor:pointer;background:var(--card)}
 .preview-mode{position:fixed;right:12px;top:10px;z-index:300;display:flex;gap:6px}
 .preview-mode button{width:34px;height:34px;border:none;background:var(--card);border-radius:10px;color:var(--ink2);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--sh);font-size:15px;line-height:1}
 .preview-mode button.on{background:var(--green);color:#fff}
-@media(max-width:767px){.preview-mode{display:none}}
+/* preview-mode visible on all devices */
 body.is-mobile nav.tabs{display:none}
 body.is-pc .mbar{display:none}
 /* ===== PC 专业工作台：左侧固定侧边栏 + 右侧主内容整页滚动 ===== */
@@ -2549,7 +2549,9 @@ var NAV_ORDER=['top','media','video','ecom','hot','life','ai','doubao','notes','
 var NAV_NAMES={top:'今日',media:'自媒体运营',video:'AI视频制作',ecom:'电商运营',hot:'今日热度',life:'生活全能',ai:'AI助手',doubao:'豆包生图',notes:'便签',illust:'一键配图',theme:'主题'};
 var NAV_DEFAULT=['top','ai','ecom','video'];
 var previewMode='auto';
-var mq = window.matchMedia ? window.matchMedia('(min-width:768px)') : {matches:(window.innerWidth>=768),addListener:function(){}};
+var mq = window.matchMedia ? window.matchMedia('(min-width:768px)') : {matches:(window.innerWidth>=768),addEventListener:function(){},addListener:function(){}};
+var hasTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+var isMobileUA = /Mobile|Android|iPhone|iPad|iPod|Windows Phone|HarmonyOS/i.test(navigator.userAgent);
 var navPins;
 try{ navPins=JSON.parse(localStorage.getItem('ph_nav_pins'))||null; }catch(e){ navPins=null; }
 if(!Array.isArray(navPins)||!navPins.length) navPins=NAV_DEFAULT.slice();
@@ -2588,7 +2590,7 @@ function openMore(){ document.getElementById('moreMask').classList.add('on'); do
 function closeMore(){ document.getElementById('moreMask').classList.remove('on'); document.getElementById('moreSheet').classList.remove('on'); }
 function syncPcTabs(){ var cur=curTabId(); document.querySelectorAll('nav.tabs button').forEach(function(b){ b.classList.toggle('on', b.dataset.t===cur); }); }
 function applyDevice(){
-  var pc = previewMode==='auto' ? mq.matches : (previewMode==='pc');
+  var pc = previewMode==='auto' ? (mq.matches && !(hasTouch && isMobileUA)) : (previewMode==='pc');
   document.body.classList.toggle('is-pc',pc);
   document.body.classList.toggle('is-mobile',!pc);
   var pa=document.getElementById('pmAuto'), pm=document.getElementById('pmManual');
@@ -2597,9 +2599,9 @@ function applyDevice(){
   if(!pc) renderMbar(); else syncPcTabs();
 }
 function togglePreview(){ var pcNow=document.body.classList.contains('is-pc'); previewMode = pcNow?'mobile':'pc'; applyDevice(); }
-if(mq.addEventListener) mq.addEventListener('change',function(){ if(previewMode==='auto') applyDevice(); });
-else if(mq.addListener) mq.addListener(function(){ if(previewMode==='auto') applyDevice(); });
-window.addEventListener('resize',function(){ if(previewMode==='auto') applyDevice(); });
+function _mqHandler(){ if(previewMode==='auto') applyDevice(); }
+if(mq.addEventListener) mq.addEventListener('change', _mqHandler);
+else if(mq.addListener) mq.addListener(_mqHandler);
 function renderNavSettings(){
   var box=document.getElementById('navSettings'); if(!box) return;
   box.innerHTML=NAV_ORDER.map(function(t){
@@ -3955,27 +3957,6 @@ function openAppDownload(){
   var ua=navigator.userAgent;
   if(ua.indexOf('MicroMessenger')>-1){ showInAppBrowserTip('微信'); return; }
   showDownloadDialog(); return;
-
-  var isWechat=/MicroMessenger/i.test(ua);
-  var isQQ=/\\bQQ\\b/i.test(ua);
-  var isWeibo=/Weibo/i.test(ua);
-  var isInAppBrowser=isWechat||isQQ||isWeibo;
-  var isIOS=/iPhone|iPad|iPod/i.test(ua);
-  // 兼容国产浏览器 UA 被精简/改写的情况：只要非 iOS 的移动设备，一律给安卓安装入口
-  var isMobile=/Mobile|Android|iPhone|iPad|iPod|Windows Phone|HarmonyOS/i.test(ua);
-  var isAndroidLike=isMobile && !isIOS;
-  if(isInAppBrowser){
-    showInAppBrowserTip(isWechat?'微信':isQQ?'QQ':'微博');
-    return;
-  }
-  if(!isMobile){
-    if(/Windows/i.test(ua) && EXE_URL){ window.open(EXE_URL,'_blank'); toast('开始下载 Windows 版安装包…'); return; }
-    dlgConfirm('获取 APP','桌面端请点上方按钮下载 Windows 版安装包（双击即用）；手机端用浏览器「添加到主屏幕」，即可获得独立全屏的真 APP。','知道了');
-    return;
-  }
-  if(isIOS){ showMobileInstall(true,false); return; }
-  // 安卓/鸿蒙/国产浏览器：直接给 APK 下载浮层（自动触发下载 + 显示手动下载按钮双保险）
-  showApkInstallGuide(true);
 }
 function showDownloadDialog(){
   var url=APK_URL||'', ex=EXE_URL||'';
@@ -3987,7 +3968,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260819e';
+var APP_VER='20260819f';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
