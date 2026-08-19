@@ -116,7 +116,7 @@ section.panel.on{display:block;animation:panelIn .26s cubic-bezier(.22,.61,.36,1
 .card:hover{transform:translateY(-3px);box-shadow:var(--sh-hi)}
 .grid{display:grid;gap:16px}
 .g2{grid-template-columns:1fr 1fr}
-.card{background:var(--card);border:none;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.card{background:var(--card);border:none;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;display:flex;flex-direction:column}
 .card>.hd{display:flex;align-items:center;gap:11px;padding:13px 16px 13px 22px;border-bottom:2px solid var(--ac);background:var(--card);position:relative}
 .card>.hd h3{margin:0;font-size:15.5px;letter-spacing:1px;font-family:inherit;font-weight:600}
 .card>.hd .sp{margin-left:auto;display:flex;gap:7px;align-items:center}
@@ -125,7 +125,7 @@ section.panel.on{display:block;animation:panelIn .26s cubic-bezier(.22,.61,.36,1
 .card.ec-collapsed>.bd{display:none}
 .card.ec-collapsed>.hd{border-bottom-color:transparent}
 .card.ec-collapsed .ec-toggle{transform:rotate(-90deg)}
-.card>.bd{padding:14px 16px}
+.card>.bd{padding:14px 16px;flex:1;min-height:0}
 .mut{color:var(--ink2);font-size:13px}
 .mut2{color:var(--ink3);font-size:12.5px}
 .form{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
@@ -2530,7 +2530,7 @@ function toggleUiFlag(k){if(k!=='showToolbar'&&k!=='showDlBar')return;uiFlags[k]
 function renderUiFlagButtons(){var a=$('set_showToolbar'),b=$('set_showDlBar');if(a)a.textContent='工具条：'+(uiFlags.showToolbar?'开':'关');if(b)b.textContent='下载APP：'+(uiFlags.showDlBar?'开':'关');}
 var toolsClosed=false;
 function switchTab(t){curTab=t;
-var AC={'top':'var(--green)','media':'var(--green)','video':'var(--green)','ecom':'var(--green)','hot':'var(--green)','life':'var(--green)','ai':'var(--green)','doubao':'var(--green)','notes':'var(--green)'};
+var AC={'top':'var(--green)','media':'var(--green)','video':'var(--green)','ecom':'var(--green)','hot':'var(--green)','life':'var(--green)','ai':'var(--green)','doubao':'var(--green)','notes':'var(--green)','illust':'var(--green)'};
 document.documentElement.style.setProperty('--ac', AC[t]||'var(--ac-top)');
   document.querySelectorAll('nav.tabs button').forEach(function(b){b.classList.toggle('on',b.dataset.t===t);});
   document.querySelectorAll('.mbar button').forEach(function(b){b.classList.toggle('on',b.dataset.t===t);});
