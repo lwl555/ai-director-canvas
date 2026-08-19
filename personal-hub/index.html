@@ -423,7 +423,10 @@ body.is-pc nav.tabs button[data-t="theme"]:hover{background:var(--card)}
 body.is-pc nav.tabs button[data-t="theme"].on{background:var(--green);color:#fff}
 body.is-pc .tools{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0}
 body.is-pc .today{margin-top:18px}
-body.is-pc .panel .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;align-items:start}
+body.is-pc .panel .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-items:stretch}
+body.is-pc .panel#p-life .card{grid-column:1 / -1;max-width:none}
+body.is-pc .panel#p-hot .card{grid-column:1 / -1;max-width:none}
+body.is-pc .panel#p-ai .pai{grid-column:1 / -1;max-width:1080px;margin:0 auto}
 
 
 body.is-pc .panel#p-top .grid{grid-template-columns:1fr 1fr;gap:16px}
@@ -432,7 +435,8 @@ body.is-pc #p-top .card.greet{grid-column:1 / -1;display:grid;grid-template-colu
 body.is-pc #p-top .card.greet .bd{padding:0}
 body.is-pc #p-top .card.greet .greet-tx{font-size:22px;font-weight:700}
 body.is-pc #p-top .card.greet .greet-sub{font-size:14px;margin-top:4px}
-body.is-pc #p-top .card.overview-stats{grid-column:1 / -1}
+body.is-pc #p-top .card.overview-stats{grid-column:1 / -1;display:flex;flex-direction:column}
+body.is-pc #p-top .card.overview-stats .bd{flex:1}
 body.is-pc #p-top .card.overview-stats .stats{grid-template-columns:repeat(5,1fr);gap:0}
 body.is-pc #p-top .card.overview-stats .st{padding:14px 16px;border-right:1px dashed var(--line)}
 body.is-pc #p-top .card.overview-stats .st:last-child{border-right:none}
@@ -2666,7 +2670,7 @@ function renderTop(){
   var tdTodo=D.todos.filter(function(x){return x.st==='pending'&&(x.d===''||x.d<=t)}).length;
   var tdDone=D.todos.filter(function(x){return x.st==='done'&&x.d===t}).length;
   var tdNotes=D.notes.filter(function(x){return (x.created||'').slice(0,10)===t}).length;
-  $('topStats').innerHTML='<div class="st"><div class="k">今日支出</div><div class="v red">¥'+tdOut.toFixed(2)+'</div></div><div class="st"><div class="k">今日收入</div><div class="v green">¥'+tdIn.toFixed(2)+'</div></div><div class="st"><div class="k">待办</div><div class="v clay">'+tdTodo+'</div></div><div class="st"><div class="k">已完成</div><div class="v green">'+tdDone+'</div></div><div class="st"><div class="k">便签</div><div class="v">'+tdNotes+'</div></div>';
+  $('topStats').innerHTML='<div class="st"><div class="k">今日支出</div><div class="v" style="color:'+(tdOut>0?'#D97706':'#9AA0A6')+'">¥'+tdOut.toFixed(2)+'</div></div><div class="st"><div class="k">今日收入</div><div class="v" style="color:'+(tdIn>0?'#07C160':'#9AA0A6')+'">¥'+tdIn.toFixed(2)+'</div></div><div class="st"><div class="k">待办</div><div class="v" style="color:'+(tdTodo>0?'#07C160':'#9AA0A6')+'">'+tdTodo+'</div></div><div class="st"><div class="k">已完成</div><div class="v" style="color:'+(tdDone>0?'#07C160':'#9AA0A6')+'">'+tdDone+'</div></div><div class="st"><div class="k">便签</div><div class="v" style="color:'+(tdNotes>0?'#1F2329':'#9AA0A6')+'">'+tdNotes+'</div></div>';
   var items=[];D.todos.forEach(function(x){if(x.st==='pending')items.push({tg:'待办',tx:x.t+(x.d?' · '+fmtDate(x.d):''),od:x.d&&x.d<t});});D.posts.forEach(function(x){if(x.st!=='done'&&x.d&&x.d<=t)items.push({tg:'选题',tx:x.t,od:x.d<t});});D.shots.forEach(function(x){if(x.st!=='已交付'&&x.dd&&x.dd<=t)items.push({tg:'分镜',tx:(x.no||'')+x.de,od:x.dd<t});});
   var html='';if(!items.length)html='<div class="empty">今天没有待处理的事项，去享受生活吧 🎉</div>';else items.forEach(function(it){html+='<div class="trow'+(it.od?' od':'')+'"><span class="tg">'+it.tg+'</span><div class="tx">'+esc(it.tx)+(it.od?' <span class="m">逾期</span>':'')+'</div></div>';});$('topToday').innerHTML=html;
   if(!weatherCache){if(D.wcity&&D.wcity.indexOf(',')>-1){fetchWeather(D.wcity,true);}else if(D.wcity){fetchWeather(D.wcity,false);}else{locateWeather();}}
@@ -3982,7 +3986,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260819d';
+var APP_VER='20260819e';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
