@@ -424,6 +424,7 @@ body.is-pc nav.tabs button[data-t="theme"].on{background:var(--green);color:#fff
 body.is-pc .tools{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0}
 body.is-pc .today{margin-top:18px}
 body.is-pc .panel .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-items:stretch}
+body.is-pc .panel .grid > .g2{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-items:stretch}
 body.is-pc .panel#p-life .card{grid-column:1 / -1;max-width:none}
 body.is-pc .panel#p-hot .card{grid-column:1 / -1;max-width:none}
 body.is-pc .panel#p-ai .pai{grid-column:1 / -1;max-width:1080px;margin:0 auto}
@@ -928,7 +929,9 @@ body.is-pc .preview-mode{top:12px;right:16px}
     </div>
   </div>
 </div>
-<div class="card"><div class="hd"><h3>搜索源设置</h3><span class="sp mut2">免费 key · 仅存本机</span></div>
+
+
+</div><div class="card"><div class="hd"><h3>搜索源设置</h3><span class="sp mut2">免费 key · 仅存本机</span></div>
 <div class="bd">
   <div class="form" style="gap:8px;flex-wrap:wrap">
     <input id="ill_unsplash" class="f1" placeholder="Unsplash Access Key（可选 · 网络配图更精准；留空也能用 Wikimedia 自动配图）" style="min-height:38px">
@@ -950,13 +953,11 @@ body.is-pc .preview-mode{top:12px;right:16px}
       <span class="mut2" style="font-size:12px">开启后隐藏「上传 TXT/MD」按钮（App 里点不开），优先用链接 / 剪贴板导入；也可在网址后加 ?app=1 强制开启</span>
     </div>
   </div>
-</div></div>
-<div class="card"><div class="hd"><h3>配图预览</h3><div class="sp" style="display:flex;gap:8px">
+</div></div><div class="card"><div class="hd"><h3>配图预览</h3><div class="sp" style="display:flex;gap:8px">
   <button class="btn ghost sm" onclick="illExportHTML()">导出 HTML</button>
   <button class="btn ghost sm" onclick="illExportMD()">导出 Markdown</button>
 </div></div>
-<div class="bd"><div id="illResult" style="line-height:1.85"></div></div></div>
-</div></div></section>
+<div class="bd"><div id="illResult" style="line-height:1.85"></div></div></div></div></section>
 <script>
 // ===== CONFIG =====
 var SB_URL='https://wcnssyiqitugqfmcbdhe.supabase.co';
