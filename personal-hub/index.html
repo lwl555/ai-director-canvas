@@ -958,6 +958,16 @@ body.is-pc .preview-mode{top:12px;right:16px}
   <button class="btn ghost sm" onclick="illExportMD()">导出 Markdown</button>
 </div></div>
 <div class="bd"><div id="illResult" style="line-height:1.85"></div></div></div></div></section>
+<!-- Card Fullscreen Modal -->
+<div class="card-modal-mask" id="cardModalMask">
+  <div class="card-modal" id="cardModal">
+    <div class="card-modal-hd" id="cardModalHd">
+      <span class="card-modal-title" id="cardModalTitle"></span>
+      <button class="card-modal-close" onclick="closeCardModal()"><svg class="ico s" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+    </div>
+    <div class="card-modal-bd" id="cardModalBd"></div>
+  </div>
+</div>
 <script>
 // ===== CONFIG =====
 var SB_URL='https://wcnssyiqitugqfmcbdhe.supabase.co';
@@ -3779,7 +3789,25 @@ function illFactsHTML(facts){
 function downloadBlob(content,name,type){try{var b=new Blob([content],{type:type});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();setTimeout(function(){URL.revokeObjectURL(a.href);},3000);}catch(e){toast('导出失败');}}
 function illExportHTML(){
   if(!window.__illArt){toast('先生成配图');return;}
-  var doc='<!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>配图文章</title><style>body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:820px;margin:24px auto;padding:0 16px;line-height:1.85;color:#222}img{max-width:100%;border-radius:10px;display:block;margin:8px 0}figure{margin:16px 0}figcaption{font-size:13px;color:#888}</style></head><body>'+window.__illArt+illFactsHTML(window.__illFacts)+'</body></html>';
+  var doc='<!doctype html><html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>配图文章</title><style>body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;max-width:820px;margin:24px auto;padding:0 16px;line-height:1.85;color:#222}img{max-width:100%;border-radius:10px;display:block;margin:8px 0}figure{margin:16px 0}figcaption{font-size:13px;color:#888}
+/* === Card Fullscreen Modal === */
+.card-modal-mask{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+.card-modal-mask.show{display:flex!important;animation:fadeIn .2s ease}
+.card-modal{width:92vw;max-width:1100px;max-height:88vh;background:var(--card);border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,.25);display:flex;flex-direction:column;overflow:hidden;animation:modalIn .25s cubic-bezier(.22,.61,.36,1) both}
+.card-modal-hd{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--card);cursor:move;user-select:none;-webkit-user-select:none;touch-action:none}
+.card-modal-title{font-size:16px;font-weight:700;color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-modal-close{width:32px;height:32px;border:none;background:var(--field);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;transition:background .15s}
+.card-modal-close:hover{background:var(--line)}
+.card-modal-bd{flex:1;overflow-y:auto;padding:18px 20px;min-height:200px}
+.card-modal-bd .card{box-shadow:none;border:1px solid var(--line);margin:0}
+.card-modal-bd .card>.bd{display:block!important}
+.card-modal-bd .card.ec-collapsed>.bd{display:block!important}
+.card-modal-bd .ec-toggle{display:none}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.card>.hd{cursor:pointer}
+.card>.hd:hover{background:var(--field)}
+</style></head><body>'+window.__illArt+illFactsHTML(window.__illFacts)+'</body></html>';
   downloadBlob(doc,'article.html','text/html');
 }
 function illExportMD(){
@@ -3987,7 +4015,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260819e';
+var APP_VER='20260819l';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -4236,6 +4264,82 @@ applyDevice();
   }
   applyUiFlags();
 });
+
+/* === Card Modal System === */
+(function(){
+  var mask=document.getElementById('cardModalMask');
+  var modal=document.getElementById('cardModal');
+  var titleEl=document.getElementById('cardModalTitle');
+  var bd=document.getElementById('cardModalBd');
+  var hd=document.getElementById('cardModalHd');
+  if(!mask||!modal||!hd) return;
+  var dragState=null;
+  window.openCardModal=function(cardEl){
+    if(!cardEl) return;
+    var hd_el=cardEl.querySelector('.hd');
+    var title=hd_el?hd_el.querySelector('h3'):null;
+    titleEl.textContent=title?title.textContent:'??';
+    bd.innerHTML='';
+    var clone=cardEl.cloneNode(true);
+    clone.classList.remove('ec-collapsed');
+    clone.style.maxWidth='none';
+    clone.style.margin='0';
+    bd.appendChild(clone);
+    mask.style.display='flex';
+    requestAnimationFrame(function(){mask.classList.add('show');});
+    document.body.style.overflow='hidden';
+  };
+  window.closeCardModal=function(){
+    mask.classList.remove('show');
+    document.body.style.overflow='';
+    setTimeout(function(){mask.style.display='none';bd.innerHTML='';},200);
+  };
+  hd.addEventListener('mousedown',function(e){
+    if(e.target.closest('.card-modal-close')) return;
+    dragState={x:e.clientX,y:e.clientY,l:modal.offsetLeft,t:modal.offsetTop};
+    modal.style.margin='0';
+    modal.style.position='fixed';
+    modal.style.left=dragState.l+'px';
+    modal.style.top=dragState.t+'px';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove',function(e){
+    if(!dragState) return;
+    modal.style.left=(dragState.l+e.clientX-dragState.x)+'px';
+    modal.style.top=(dragState.t+e.clientY-dragState.y)+'px';
+  });
+  document.addEventListener('mouseup',function(){dragState=null;});
+  hd.addEventListener('touchstart',function(e){
+    if(e.target.closest('.card-modal-close')) return;
+    var t=e.touches[0];
+    dragState={x:t.clientX,y:t.clientY,l:modal.offsetLeft,t:modal.offsetTop};
+    modal.style.margin='0';
+    modal.style.position='fixed';
+    modal.style.left=dragState.l+'px';
+    modal.style.top=dragState.t+'px';
+  });
+  document.addEventListener('touchmove',function(e){
+    if(!dragState) return;
+    var t=e.touches[0];
+    modal.style.left=(dragState.l+t.clientX-dragState.x)+'px';
+    modal.style.top=(dragState.t+t.clientY-dragState.y)+'px';
+    e.preventDefault();
+  },{passive:false});
+  document.addEventListener('touchend',function(){dragState=null;});
+  mask.addEventListener('click',function(e){if(e.target===mask) closeCardModal();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&mask.classList.contains('show')) closeCardModal();});
+  document.addEventListener('click',function(e){
+    var cardHd=e.target.closest('.card>.hd');
+    if(!cardHd) return;
+    var card=cardHd.closest('.card');
+    if(!card) return;
+    if(e.target.closest('button')||e.target.closest('input')||e.target.closest('select')||e.target.closest('textarea')||e.target.closest('a')) return;
+    if(cardHd.querySelector('.ec-toggle')) return;
+    if(card.closest('.card-modal-bd')) return;
+    e.stopPropagation();
+    openCardModal(card);
+  });
+})();
 </script>
 
 </body></html>
