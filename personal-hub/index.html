@@ -989,6 +989,18 @@ body.is-pc .preview-mode{top:12px;right:16px}
   <button class="btn ghost sm" onclick="illExportMD()">导出 Markdown</button>
 </div></div>
 <div class="bd"><div id="illResult" style="line-height:1.85"></div></div></div></div></section>
+
+<!-- Card Fullscreen Modal -->
+<div class="card-modal-mask" id="cardModalMask" style="display:none">
+  <div class="card-modal" id="cardModal">
+    <div class="card-modal-hd" id="cardModalHd">
+      <span class="card-modal-title" id="cardModalTitle"></span>
+      <button class="card-modal-close" onclick="closeCardModal()"><svg class="ico s" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+    </div>
+    <div class="card-modal-bd" id="cardModalBd"></div>
+  </div>
+</div>
+
 <script>
 // ===== CONFIG =====
 var SB_URL='https://wcnssyiqitugqfmcbdhe.supabase.co';
@@ -3828,7 +3840,8 @@ function illExportHTML(){
 .card-modal-bd .ec-toggle{display:none}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes modalIn{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
-</style></head><body>'+window.__illArt+illFactsHTML(window.__illFacts)+'</body></html>';
+</style></head><body>
+'+window.__illArt+illFactsHTML(window.__illFacts)+'</body></html>';
   downloadBlob(doc,'article.html','text/html');
 }
 function illExportMD(){
@@ -4015,7 +4028,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260819i';
+var APP_VER='20260819j';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
@@ -4357,14 +4370,4 @@ applyDevice();
 </script>
 
 
-<!-- Card Fullscreen Modal -->
-<div class="card-modal-mask" id="cardModalMask" style="display:none">
-  <div class="card-modal" id="cardModal">
-    <div class="card-modal-hd" id="cardModalHd">
-      <span class="card-modal-title" id="cardModalTitle"></span>
-      <button class="card-modal-close" onclick="closeCardModal()"><svg class="ico s" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
-    </div>
-    <div class="card-modal-bd" id="cardModalBd"></div>
-  </div>
-</div>
 </body></html>
