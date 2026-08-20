@@ -1615,9 +1615,9 @@ async function doSignup(e){e.preventDefault();$('su_err').textContent='';
     var isNet=/Failed to fetch|NetworkError|net::ERR|CORS|timeout|无法连接/i.test(m);
     $('su_err').innerHTML='<div style="margin-bottom:4px">'+(isNet?'注册服务器连不上（可能被广告拦截/公司网络/地区 DNS 拦截），你可以':'注册出错，你可以')+'<a href="javascript:offlineMode()" style="color:var(--clay);text-decoration:underline;font-weight:500">不登录，离线使用 →</a></div><div style="font-size:12px;color:var(--rust)">'+esc(m)+'</div>';
   }}
-function doLogout(){session=null;localStorage.removeItem(SK);location.reload();}
-function offlineMode(){isOffline=true;session=null;localStorage.removeItem(SK);enterApp();}
-function saveSession(){if(session)localStorage.setItem(SK,JSON.stringify(session));}
+function doLogout(){session=null;try{localStorage.removeItem(SK);}catch(e){}location.reload();}
+function offlineMode(){isOffline=true;session=null;try{localStorage.removeItem(SK);}catch(e){}enterApp();}
+function saveSession(){if(session){try{localStorage.setItem(SK,JSON.stringify(session));}catch(e){}}}
 function restoreSession(){var s=localStorage.getItem(SK);if(s){try{session=JSON.parse(s)}catch(e){session=null}}return session;}
 function isTokenExpired(){if(!session||!session.access_token)return true;try{var p=JSON.parse(atob(session.access_token.split('.')[1]));return Date.now()>=p.exp*1000-30000}catch(e){return true}}
 async function refreshToken(){if(!session||!session.refresh_token)return false;
@@ -4043,7 +4043,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260820m';
+var APP_VER='20260820n';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
