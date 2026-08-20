@@ -115,7 +115,7 @@ section.panel.on{display:block;animation:panelIn .26s cubic-bezier(.22,.61,.36,1
 .card{transition:transform .18s ease,box-shadow .18s ease}
 .card:hover{transform:translateY(-3px);box-shadow:var(--sh-hi)}
 .grid{display:grid;gap:16px}
-.g2{grid-template-columns:1fr 1fr}
+.g2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
 .card{background:var(--card);border:none;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;display:flex;flex-direction:column}
 .card>.hd{display:flex;align-items:center;gap:11px;padding:13px 16px 13px 22px;border-bottom:2px solid var(--ac);background:var(--card);position:relative}
 .card>.hd h3{margin:0;font-size:15.5px;letter-spacing:1px;font-family:inherit;font-weight:600}
@@ -327,7 +327,7 @@ mark{background:var(--mustard-l);color:var(--ink);padding:0 2px;border-radius:3p
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(14px);background:var(--ink);color:var(--paper);padding:11px 19px;border-radius:11px;font-size:14.5px;font-weight:600;z-index:300;opacity:0;pointer-events:none;transition:.24s;max-width:88vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.2)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;line-height:1.9}
-@media(max-width:900px){.g2{grid-template-columns:1fr}.kb{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.g2{grid-template-columns:1fr}.kb{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 @media(max-width:768px){body{font-size:15px}.wrap{padding:0 12px}header{padding:16px 0 6px}.brand h1{font-size:24px;letter-spacing:1px}.brand .uemail{margin-left:0;width:100%;text-align:left}nav.tabs{display:none}.mbar{display:block}.tools .btn{flex:1;min-width:calc(50% - 4px)}.form>*{width:100%}.form .w110,.form .w130,.form .w150,.form .f1,.form .f2{width:100%;flex:none}.form .half{width:calc(50% - 4px);flex:none}.kb{grid-template-columns:1fr}.item{flex-wrap:wrap}.item .acts{width:100%;justify-content:flex-start}.st .v{font-size:20px}.today .hd h2{font-size:15px}.sync-info{width:100%;justify-content:flex-start;margin-left:0}}
 @media(min-width:769px){.form .half{flex:1;min-width:120px}}
 .life-tabs{display:flex;gap:6px;margin-bottom:14px;border-bottom:1.5px solid var(--sand2);padding-bottom:4px;overflow-x:auto}
@@ -425,15 +425,24 @@ body.is-pc nav.tabs button[data-t="theme"]:hover{background:var(--card)}
 body.is-pc nav.tabs button[data-t="theme"].on{background:var(--green);color:#fff}
 body.is-pc .tools{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0}
 body.is-pc .today{margin-top:18px}
-body.is-pc .panel .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-items:stretch}
-body.is-pc .panel .grid > .g2{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;align-items:stretch}
-body.is-pc .panel#p-life .card{grid-column:1 / -1;max-width:none}
-body.is-pc .panel#p-hot .card{grid-column:1 / -1;max-width:none}
+/* PC 端统一卡片布局系统：auto-fit + 360px 最小（auto-fill 会把单卡压成 280px 窄列 + 留大片空白） */
+body.is-pc .panel .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:18px;align-items:stretch}
+body.is-pc .panel .grid > .card{min-width:0;min-height:0}
+body.is-pc .panel .grid > .g2{grid-column:1 / -1;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:18px;align-items:stretch}
+body.is-pc .panel .grid > .g2 > .card{min-width:0;min-height:0}
+/* flex form 内的 input/textarea/select 允许收缩到 0（否则 min-content 撑开 grid 列） */
+body.is-pc .panel .grid .form > *{min-width:0}
+body.is-pc .panel .grid .form{max-width:100%}
+/* 单 .grid > 单 .card 的板块：强制整行（auto-fit 也行，这里双保险 + 兼容窄屏） */
+body.is-pc .panel#p-life .card,
+body.is-pc .panel#p-hot .card,
+body.is-pc .panel#p-notes .card{grid-column:1 / -1;max-width:none}
+/* AI 助手居中容器 */
 body.is-pc .panel#p-ai .pai{grid-column:1 / -1;max-width:1080px;margin:0 auto}
 
 
 body.is-pc .panel#p-top .grid{
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
   grid-template-areas:
     "greet greet"
     "g2    g2"
@@ -442,7 +451,7 @@ body.is-pc .panel#p-top .grid{
     "tips  tips";
   gap:16px;align-items:stretch
 }
-body.is-pc #p-top .grid .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;grid-area:g2}
+body.is-pc #p-top .grid .g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;grid-area:g2}
 body.is-pc #p-top .card.greet{grid-area:greet;display:grid;grid-template-columns:1.4fr 1fr;gap:18px;padding:18px 22px}
 body.is-pc #p-top .card.greet .bd{padding:0}
 body.is-pc #p-top .card.greet .greet-tx{font-size:22px;font-weight:700}
@@ -482,6 +491,33 @@ body.is-pc #p-top #wxCard .forecast .w-desc{font-size:12.5px;color:var(--ink3)}
 body.is-pc .panel#p-top{padding-top:0}
 body.is-pc #ai_chat,body.is-pc #ecAiChat{min-height:360px!important}
 body.is-pc .preview-mode{top:12px;right:16px}
+
+/* === 各板块 PC 端显式布局（统一大改 v20260820m） === */
+/* p-media 自媒体：选题看板(整行) + 素材|数据复盘(2列) */
+body.is-pc .panel#p-media .grid:not(.g2) > .card:first-child{grid-column:1 / -1}
+body.is-pc .panel#p-media .g2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+
+/* p-video 视频：分镜脚本(整行) + 提示词|成片(2列) + 时间轴(整行) + AI助手(整行) */
+body.is-pc .panel#p-video .grid:not(.g2) > .card:first-child{grid-column:1 / -1}
+body.is-pc .panel#p-video .grid > .card.vdir{grid-column:1 / -1}
+body.is-pc .panel#p-video .g2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+body.is-pc .panel#p-video .g2 > .card:nth-child(3){grid-column:1 / -1}
+
+/* p-ecom 电商：链接解析(整行) + 仿写|优化(2列) + 商品库(整行) + g2 内 2x2 */
+body.is-pc .panel#p-ecom .grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+body.is-pc .panel#p-ecom .grid:not(.g2) > .card:nth-child(1){grid-column:1 / -1}
+body.is-pc .panel#p-ecom .grid:not(.g2) > .card:nth-child(4){grid-column:1 / -1}
+body.is-pc .panel#p-ecom .g2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+
+/* p-doubao 豆包：文生图|图生图(2列) + 图库(整行) */
+body.is-pc .panel#p-doubao .grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+body.is-pc .panel#p-doubao .grid > .card:nth-child(3){grid-column:1 / -1}
+
+/* p-illust 配图：配图|预览(2列) + 搜索源设置(整行) */
+body.is-pc .panel#p-illust .grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+body.is-pc .panel#p-illust .grid > .card:nth-child(2){grid-column:1 / -1}
+/* p-illust 被误放在 .wrap 外，PC 下补左偏移对齐侧栏 */
+body.is-pc .panel#p-illust{margin-left:264px;padding-right:36px;box-sizing:border-box}
 
 .brand{display:flex;align-items:center;gap:12px}
 .brand .avatar{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--green),#12C77A);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:19px;flex:none;box-shadow:var(--sh)}
@@ -688,7 +724,7 @@ body.is-pc .preview-mode{top:12px;right:16px}
 <div class="card vdir"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path></svg><h3>AI 助手</h3><div class="sp"><span class="mut2">通用创作助手 · 小林（聊需求·出图·出视频·导演成片）</span></div></div><div class="bd">
 <div id="vdirCreatePane">
 <style>
-.vdir-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.vdir-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
 @media(max-width:768px){.vdir-cols{grid-template-columns:1fr}}
 .vdir-col{display:flex;flex-direction:column;min-width:0}
 .vdir-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
@@ -4007,7 +4043,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260820l';
+var APP_VER='20260820m';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
