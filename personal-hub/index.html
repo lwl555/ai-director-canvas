@@ -432,9 +432,7 @@ body.is-pc .panel#p-hot .card{grid-column:1 / -1;max-width:none}
 body.is-pc .panel#p-ai .pai{grid-column:1 / -1;max-width:1080px;margin:0 auto}
 
 
-body.is-pc .panel#p-top .grid{grid-template-columns:1fr 1fr;gap:16px;align-items:stretch;grid-template-rows:auto auto 1fr auto auto;min-height:760px}
-/* 今日便签锁 col2 + 从 row1 跨到最后一行，整列拉满（避开 sparse 模式 row4-5 col2 被占导致 topTrend/topTips 跳到 row6-7 留空白） */
-body.is-pc #p-top #notesTodayCard{grid-column:2 !important;grid-row:1 / -1 !important;min-height:600px}
+body.is-pc .panel#p-top .grid{grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
 body.is-pc #p-top .grid .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;grid-column:1/-1}
 body.is-pc #p-top .card.greet{grid-column:1 / -1;display:grid;grid-template-columns:1.4fr 1fr;gap:18px;padding:18px 22px}
 body.is-pc #p-top .card.greet .bd{padding:0}
@@ -461,8 +459,7 @@ body.is-pc #p-top .tips-card .tip.warn .dot{background:var(--mustard)}
 body.is-pc #p-top .tips-card .tip .t-main{flex:1;min-width:0}
 body.is-pc #p-top .tips-card .tip .t-act{color:var(--blue);cursor:pointer;font-weight:600;flex:none}
 /* topTrend/topTips 强制横满 col1（避开 col2 被今日便签占导致跳行） */
-body.is-pc #p-top #topTrendCard{grid-column:1 / -1 !important;grid-row:4 / span 1 !important}
-body.is-pc #p-top #topTipsCard{grid-column:1 / -1 !important;grid-row:5 / span 1 !important}
+body.is-pc #p-top #topTrendCard,body.is-pc #p-top #topTipsCard{grid-column:1 / -1}
 body.is-pc .panel#p-top{padding-top:0}
 body.is-pc #ai_chat,body.is-pc #ecAiChat{min-height:360px!important}
 body.is-pc .preview-mode{top:12px;right:16px}
@@ -651,7 +648,7 @@ body.is-pc .preview-mode{top:12px;right:16px}
 <div class="form" style="margin-top:10px"><span class="mut" style="white-space:nowrap">每日日记</span><input id="rem_diary" type="time" style="width:120px;min-height:40px"><button class="btn" onclick="scheduleDiaryReminder()">设定</button><button class="btn ghost" onclick="cancelDiaryReminder()">取消</button></div>
 <div class="mut2" style="margin-top:10px;line-height:1.8" id="rem_list"></div>
 </div></div>
-<div class="card" id="notesTodayCard"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M14 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9l-7-6z"></path><path d="M14 3v6h6"></path></svg><h3>今日便签</h3><div class="sp"><span class="mut2" id="notesCount"></span></div></div><div class="bd">
+<div class="card"><div class="hd"><svg class="ico" viewBox="0 0 24 24"><path d="M14 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9l-7-6z"></path><path d="M14 3v6h6"></path></svg><h3>今日便签</h3><div class="sp"><span class="mut2" id="notesCount"></span></div></div><div class="bd">
 <div class="form" style="margin-bottom:10px"><input id="tn_title" class="f1" placeholder="标题（选填）"><textarea id="tn_body" class="fw" rows="2" placeholder="写点什么…"></textarea><div class="note-colors" id="tn_colors"><span class="note-color yellow on" data-c="yellow" onclick="pickTodayColor(this)"></span><span class="note-color pink" data-c="pink" onclick="pickTodayColor(this)"></span><span class="note-color blue" data-c="blue" onclick="pickTodayColor(this)"></span><span class="note-color green" data-c="green" onclick="pickTodayColor(this)"></span><span class="note-color purple" data-c="purple" onclick="pickTodayColor(this)"></span></div><button class="btn pri" onclick="addTodayNote()">保存便签</button></div>
 
 
@@ -4022,7 +4019,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260820g';
+var APP_VER='20260820h';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
