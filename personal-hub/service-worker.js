@@ -1,6 +1,6 @@
-﻿// 个人工作台 PWA Service Worker — ph-v6
+﻿// 个人工作台 PWA Service Worker — ph-v7
 // 关键策略：页面 HTML 永远优先走网络（保证用户看到最新版），副本仅用于离线兜底。
-const CACHE = 'ph-v6';
+const CACHE = 'ph-v7';
 self.addEventListener('install', function (e) {
   // 安装新 SW 时立即激活，不等待旧页面关闭
   self.skipWaiting();
