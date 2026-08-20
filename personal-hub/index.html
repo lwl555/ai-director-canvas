@@ -354,6 +354,7 @@ footer{margin:34px 0 10px;text-align:center;color:var(--ink3);font-size:12.5px;l
 .tools-close{margin-left:auto}
 .notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
 .today-notes-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;flex:1 1 auto;min-height:0;margin-top:auto;overflow-y:auto;align-content:start}
+.today-notes-list .empty{margin-top:auto}
 .note-card{background:var(--note-yellow,#fff8dc);border-radius:12px;padding:12px;min-height:120px;display:flex;flex-direction:column;position:relative;box-shadow:0 2px 6px rgba(0,0,0,.06);transition:transform .1s}
 .note-card.pin{box-shadow:0 0 0 2px var(--clay)}
 .note-card.yellow{background:var(--note-yellow,#fff8dc)}
@@ -430,7 +431,7 @@ body.is-pc .panel#p-hot .card{grid-column:1 / -1;max-width:none}
 body.is-pc .panel#p-ai .pai{grid-column:1 / -1;max-width:1080px;margin:0 auto}
 
 
-body.is-pc .panel#p-top .grid{grid-template-columns:1fr 1fr;gap:16px}
+body.is-pc .panel#p-top .grid{grid-template-columns:1fr 1fr;gap:16px;align-items:stretch}
 body.is-pc #p-top .grid .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;grid-column:1/-1}
 body.is-pc #p-top .card.greet{grid-column:1 / -1;display:grid;grid-template-columns:1.4fr 1fr;gap:18px;padding:18px 22px}
 body.is-pc #p-top .card.greet .bd{padding:0}
@@ -4016,7 +4017,7 @@ function showDownloadDialog(){
   h+='<p class="inst-tip" style="font-size:12px;color:var(--ink3)">说明：安卓装 APK 若提示「未知来源」，点「设置」允许一次即可；安装包来自 GitHub 官方发布，可放心安装。</p>';
   var box=$('instBody'); if(box){box.innerHTML=h;} $('installMask').classList.add('on');
 }
-var APP_VER='20260820c';
+var APP_VER='20260820d';
 function toggleTheme(){var cur=document.documentElement.getAttribute('data-theme');var nx=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',nx);try{localStorage.setItem('ph_theme',nx);}catch(e){}updateThemeBtn();}
 function updateThemeBtn(){var cur=document.documentElement.getAttribute('data-theme');var b=document.getElementById('themeTx');if(b)b.textContent=cur==='dark'?'浅色':'深色';}
 if(document.readyState!=='loading')updateThemeBtn();else document.addEventListener('DOMContentLoaded',updateThemeBtn);
