@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>中国移动 · 直达领流量链接全集</title>
+<style>
+:root{
+  --bg:#f4f5f7; --panel:#ffffff; --border:#e4e7ec; --border-strong:#d0d5dd;
+  --text:#111827; --muted:#667085; --faint:#98a2b3;
+  --brand:#1d4ed8; --brand-soft:#eef4ff; --brand-line:#c7d7fe;
+  --shadow:0 1px 2px rgba(16,24,40,.05);
+  --hot-bg:#fffbf0; --hot-line:#f0d9a8; --hot-text:#7a5b12;
+  --b:#1d4ed8; --b-bg:#eef4ff;
+  --m:#0f766e; --m-bg:#effaf8;
+  --s:#667085; --s-bg:#f2f4f7;
+  --radius:8px;
+}
+html[data-theme="dark"]{
+  --bg:#0e1116; --panel:#161a21; --border:#252b35; --border-strong:#333b47;
+  --text:#e6e9ee; --muted:#9aa4b2; --faint:#6b7480;
+  --brand:#6d9bff; --brand-soft:#18223a; --brand-line:#2b3d63;
+  --shadow:0 1px 2px rgba(0,0,0,.35);
+  --hot-bg:#221d12; --hot-line:#4a3d1d; --hot-text:#d8b76a;
+  --b:#6d9bff; --b-bg:#18223a;
+  --m:#4fd1c5; --m-bg:#122421;
+  --s:#9aa4b2; --s-bg:#1c2029;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg)}
+body{color:var(--text);
+  font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased;padding-bottom:44px}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+
+header{border-bottom:1px solid var(--border);background:var(--panel)}
+.hd{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:20px 0 18px}
+h1{font-size:19px;font-weight:600;letter-spacing:-.2px}
+.sub{color:var(--muted);font-size:13px;margin-top:5px}
+.toggle{flex:none;height:30px;padding:0 11px;border:1px solid var(--border-strong);background:var(--panel);
+  color:var(--muted);border-radius:6px;font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit}
+.toggle:hover{color:var(--text);border-color:var(--faint)}
+
+.hot{background:var(--hot-bg);border:1px solid var(--hot-line);color:var(--hot-text);
+  border-radius:var(--radius);padding:11px 13px;font-size:12.5px;line-height:1.8;margin:14px 0 0}
+.hot b{font-weight:600}
+.hot em{font-style:normal;border-bottom:1px solid currentColor;padding-bottom:1px}
+
+.toolbar{position:sticky;top:0;z-index:9;background:var(--bg);padding:14px 0 10px}
+.search{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);
+  border-radius:var(--radius);padding:0 11px;height:38px;box-shadow:var(--shadow)}
+.search:focus-within{border-color:var(--brand-line)}
+.search input{flex:1;border:0;outline:0;background:transparent;color:var(--text);font:inherit;font-size:13.5px}
+.search input::placeholder{color:var(--faint)}
+.count{color:var(--faint);font-size:12px;white-space:nowrap}
+
+.group{margin-top:22px}
+.ghead{display:flex;align-items:baseline;gap:9px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.ghead h2{font-size:14px;font-weight:600}
+.ghead span{font-size:11.5px;color:var(--faint)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(304px,1fr));gap:10px}
+.card{display:flex;flex-direction:column;gap:8px;background:var(--panel);border:1px solid var(--border);
+  border-radius:var(--radius);padding:13px;box-shadow:var(--shadow)}
+.card:hover{border-color:var(--border-strong)}
+.top{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.name{font-size:13.5px;font-weight:600;flex:1;min-width:0}
+.via{font-size:10px;line-height:1;padding:3px 5px;border-radius:4px;color:var(--faint);
+  border:1px solid var(--border);white-space:nowrap}
+.amt{font-size:10.5px;line-height:1;padding:3px 6px;border-radius:4px;font-weight:500;white-space:nowrap}
+.amt.b{color:var(--b);background:var(--b-bg)}
+.amt.m{color:var(--m);background:var(--m-bg)}
+.amt.s{color:var(--s);background:var(--s-bg)}
+.d{color:var(--muted);font-size:11.5px;line-height:1.65}
+.url{font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--faint);
+  background:var(--s-bg);border-radius:5px;padding:6px 8px;word-break:break-all;max-height:46px;overflow:hidden}
+.acts{display:flex;gap:7px;margin-top:auto}
+.btn{flex:1;height:33px;border-radius:6px;border:1px solid var(--brand-line);background:var(--brand-soft);
+  color:var(--brand);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;transition:filter .12s}
+.btn:hover{filter:brightness(.96)}
+.btn.ghost{flex:none;width:66px;border-color:var(--border-strong);background:var(--panel);color:var(--muted);font-weight:400}
+.btn.ghost:hover{color:var(--text)}
+
+.empty{color:var(--muted);font-size:13px;padding:34px 0;text-align:center}
+
+footer{margin-top:34px;border-top:1px solid var(--border);padding-top:20px}
+.box{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:15px 16px;margin-bottom:12px}
+.box h2{font-size:13.5px;font-weight:600;margin-bottom:9px}
+.box ul{list-style:none;color:var(--muted);font-size:12.5px;line-height:1.85}
+.box li{padding-left:14px;position:relative}
+.box li::before{content:"";position:absolute;left:2px;top:9px;width:4px;height:4px;border-radius:50%;background:var(--border-strong)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.disclaimer{color:var(--faint);font-size:11.5px;line-height:1.75;padding:0 2px 6px}
+
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);background:#111827;color:#fff;
+  font-size:12.5px;padding:9px 15px;border-radius:6px;opacity:0;pointer-events:none;
+  transition:opacity .18s,transform .18s;z-index:99;max-width:90vw;text-align:center;
+  box-shadow:0 6px 20px rgba(0,0,0,.22)}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:620px){
+  .grid{grid-template-columns:1fr}
+  .two{grid-template-columns:1fr}
+  h1{font-size:17px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hd">
+    <div>
+      <h1>中国移动 · 直达领流量</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <button class="toggle" id="themeBtn" type="button">切换深色</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hot">
+    <b>三条必读：</b>
+    <br>① <b>关掉 WiFi，用移动数据流量打开</b>——很多活动页有号码安全校验，WiFi / 热点 / 异网会提示"领取失败""仅限受邀用户"。
+    <br>② <b>打开位置有讲究</b>，卡片上有标注：多数链接要复制到<b>微信</b>里打开（发给自己或文件传输助手再点），浏览器打不开会提示"渠道未开放"；标「浏览器」的那几个反过来，得用手机浏览器。
+    <br>③ 领完去 <b>中国移动 App → 我的 → 我的卡券</b>核销，卡券一般 48 小时内到账，有效期多为 7 天。
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="toolbar">
+    <div class="search">
+      <input id="q" type="text" placeholder="搜索活动，如：签到 / 网龄 / 云盘 / QQ / 京东" autocomplete="off">
+      <span class="count" id="count"></span>
+    </div>
+  </div>
+  <div id="body"></div>
+  <div class="empty" id="empty" style="display:none">没找到匹配的活动</div>
+</div>
+
+<div class="wrap">
+  <footer>
+    <div class="two">
+      <div class="box">
+        <h2>打不开 / 提示不符合条件</h2>
+        <ul>
+          <li>这些都是<b>限时活动</b>，下架就失效，属正常现象</li>
+          <li>回退办法：中国移动 App 搜活动名或搜「流量」，一般有新一期</li>
+          <li>提示「渠道未开放」= 打开方式不对，换微信 / 换浏览器再试</li>
+          <li>提示「不在活动范围」= 大概率<b>省份限定</b>或仅限受邀用户</li>
+          <li>欠费、停机、携号转网期间领不了</li>
+          <li>带 qz-l.com 的是第三方短链，指向移动官方活动页</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h2>领之前看清这几点</h2>
+        <ul>
+          <li>认准<b>通用流量</b>，定向流量只能刷指定 App</li>
+          <li>日包当天 23:59 失效，月包月底清零</li>
+          <li>免费流量通常<b>优先扣减</b>，月底应急最好用</li>
+          <li>不可结转、不可分享给副卡</li>
+          <li>到账以 10086 短信为准</li>
+          <li><b>联名类每月可重复领</b>，同一个品牌有新旧期次的都要点一遍</li>
+        </ul>
+      </div>
+    </div>
+    <div class="box">
+      <h2>四条经验</h2>
+      <ul>
+        <li><b>月初第一周</b>把「每月必领」+「联名专区」全点一遍，那时库存最足、大额中奖率最高</li>
+        <li>「随心选好礼」尤其明显：月初常出 10GB / 30GB，月底只剩 2GB</li>
+        <li>打 10086 转人工说「流量不够用，申请关怀流量」，网龄 3 年以上更容易批；App 积分也能换流量，约 2000 分换 10GB</li>
+        <li>App 底部中间有「灵犀」，每周二、周五 9—10 点有话费口令，发对口令能领话费</li>
+      </ul>
+    </div>
+    <p class="disclaimer">
+      链接来自公开的活动汇总（2025—2026 年，来源含 linux.do、NodeSeek、NodeLoc、新赚吧、路口网、什么值得买、券妈妈等），均为中国移动官方域名（10086.cn / wx.10086.cn / dev.coc.10086.cn / dx.10086.cn / mcloud.139.com / cmicrwx.cn 等）或指向官方活动页的短链。活动规则、额度、有效期随时调整，具体以官方页面和 10086 短信为准。本站不代理、不代领、不索取任何个人信息；任何以"领流量"为名索要验证码、银行卡、转账的都是诈骗。
+    </p>
+  </footer>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const GROUPS = [
+  {
+    t:'每天点一次', hint:'签到类，几秒钟的事',
+    items:[
+      {n:'签到有礼', via:'微信', amt:'话费/流量随机', lv:'m',
+       d:'官方签到页，签到领随机话费或流量，做任务攒心愿金兑话费券，每日 8 点补库存。',
+       u:'https://h.app.coc.10086.cn/activity/zx/transit/transferDownload.html'},
+      {n:'每日签到 · 100M日包', via:'微信', amt:'100MB/天', lv:'m',
+       d:'官方签到页，登录后每天点一次，攒小额通用流量。',
+       u:'https://wx.10086.cn/qwhdhub/qwhdmark/1021122301'},
+      {n:'幸运三日签', amt:'2GB + 话费券', lv:'b',
+       d:'累签 3 天：首日 2GB 流量日包券，第二日 500MB 流量券或 2 元话费券，第三日 5 元 / 66 元话费券。每天 10 点还能抢 100 / 88 / 66 元话费券。',
+       u:'https://dev.coc.10086.cn/coc3/canvas/rightsmarket-h5-canvas/online/26xysrqtybld?channelCode=P00000112150&pageRecorded=true'},
+      {n:'移动云盘 · 云朵中心', amt:'1 云朵 = 2GB', lv:'b',
+       d:'中国移动云盘 App → 我的 → 云朵中心 → 福利专区。每天签到白送云朵，1 个云朵换 2GB 全国流量。库存 10:00 / 12:00 / 16:00 / 20:00 补，要卡点抢。',
+       u:'https://caiyun.139.com/'},
+      {n:'周六游戏日', via:'微信', amt:'最高 666 元话费', lv:'m',
+       d:'每周六开放，做任务攒游戏币抽流量日包、话费券，周六 18 点可兑 2GB 流量日包券。',
+       u:'https://dx.10086.cn/A/J8uQHg'},
+      {n:'每天抽奖 · 狂欢游你才行', via:'微信', amt:'1GB / 666元话费', lv:'m',
+       d:'登录每日抽奖赢 1 元 / 2 元 / 6 元话费券、1GB 流量日包；周六双倍游戏币，最高抽 666 元话费券。',
+       u:'https://wx.10086.cn/hlwyxhdhub/act-satgameday/1025071116'},
+      {n:'游戏中心 · 每日抽奖', via:'微信', amt:'1GB / 666元话费', lv:'m',
+       d:'登录每日抽奖赢话费券和 1GB 流量日包；周六最高抽 666 元话费券，18 点可兑 2GB 流量日包。',
+       u:'https://wx.10086.cn/qwhdhub/diy-client/1126036587?A_C_CODE=KlkhX1ccML&channelId=P00000112150'},
+      {n:'周日追剧盛宴', via:'微信', amt:'最高 100 元话费', lv:'m',
+       d:'每周日开放，领福利值抽流量日包、话费券、爱奇艺黄金 VIP 月卡。12 点抢 5 元话费、16 点抢 2GB 流量日包（各 1000 份）。',
+       u:'https://wx.10086.cn/hlwyxhdhub/act-sunvideo/index.html#/signup'},
+      {n:'周三充值专场', via:'微信', amt:'88折话费 / 立减券', lv:'s',
+       d:'每周三 8 点开抢：88 折话费券、12 / 13 / 15 / 18 元充值立减券、88 元充值加享券。充话费前先来领券。',
+       u:'https://wx.10086.cn/hlwyxhdhub/act-wedrecharge/index.html#/signup'},
+      {n:'全球通星动日', amt:'会员 + 加油券', lv:'m',
+       d:'全球通用户专属。连续 7 天签到得视频会员月卡、音乐会员周卡、中石油加油券；每月权益可领腾讯 / B站会员月卡、15 元加油券。',
+       u:'https://qqt.cmicrwx.cn/2016tyjf/xhmqqthy/res/wap/xdrNormal.html?sspId=74915'}
+    ]
+  },
+  {
+    t:'每月必领', hint:'月初第一件事，把这排全点一遍',
+    items:[
+      {n:'好礼月月领', amt:'至高 100 元话费券', lv:'b',
+       d:'刮奖，可中 2GB / 10GB 流量日包券、500MB 流量券、5 元 / 100 元话费兑换券。月初来，月末大概率只剩 500MB。',
+       u:'https://dev.coc.10086.cn/coc3/canvas/rightsmarket-h5-canvas/online/26hlyyltybld?channelCode=P00000112150&pageRecorded=true'},
+      {n:'网龄成长计划', amt:'至高 3GB 月包', lv:'b',
+       d:'按入网年限分层发放，V5 等级最高 3GB 全国通用流量，还能领 B站 / 爱奇艺影音会员。必须每月手动领，当月不领失效。',
+       u:'https://dev.coc.10086.cn/coc/web6/ageFeedbackV2/?pageId=1879720710683729920&channelId=P00000112150'},
+      {n:'随心选好礼', via:'微信', amt:'2GB ~ 30GB', lv:'b',
+       d:'随机出 2 张券选 1 张：2GB / 10GB / 30GB 流量日包、0.5 元 / 8 元话费券。经验：月初点基本必得 10GB，月底只剩 2GB。',
+       u:'https://wx.10086.cn/qwhdhub/diy-client/1126021706'},
+      {n:'春夏焕新 · 移动有礼', via:'微信', amt:'1GB / 2GB 日包', lv:'m',
+       d:'直领：1GB、2GB 流量日包券，1 / 2 / 4 / 9 元话费加赠券，86 折话费折扣券。',
+       u:'https://wx.10086.cn/qwhdhub/giveprize/1026050700?A_C_CODE=znHPwOdq7g&channelId=P00000112149#/'},
+      {n:'福利狂欢节', via:'微信', amt:'流量券 + 话费', lv:'m',
+       d:'礼包月月领，拆盲盒式发券，2GB~4GB 日包券常见。',
+       u:'https://wx.10086.cn/qwhdhub/giveprize/1025090424?A_C_CODE=K2PTceqLfQ'},
+      {n:'暖心回馈礼', amt:'2GB ~ 100元话费', lv:'b',
+       d:'刮奖，可领 2GB / 10GB 流量日包券、5 元话费加赠券、100 元话费兑换券。无门槛，一月一次。',
+       u:'https://dev.coc.10086.cn/coc3/canvas/rightsmarket-h5-canvas/online/tjhlld?channelCode=P00000131192'},
+      {n:'大作战 · 消消乐', via:'微信', amt:'流量券', lv:'m',
+       d:'小游戏形式，玩一局领流量券，无门槛每月一次。',
+       u:'https://wx.10086.cn/qwhdhub/xiaoxiaole/1025073118?A_C_CODE=5H5NONZ1fc'},
+      {n:'咪咕悦看随行', amt:'2GB / 30GB 定向', lv:'m',
+       d:'登录可领 2GB 流量日包券或 30GB 悦看定向流量（库存 15.5 万份），页面抽奖还能中 100 / 5 / 3 元话费加赠券。',
+       u:'https://n.cmread.com/nap/p/yksxlhlhl.jsp?z=1&cm=D0022782'},
+      {n:'移动爱家 · 月度领取', amt:'2GB 日包', lv:'m',
+       d:'移动爱家页面完成领取校验，领 2GB 流量日包。每月可领。',
+       u:'https://cloud.hjq.komect.com/h5/actOutLanding/?pageId=monthlyDataClaim'},
+      {n:'咪咕视频 · 移动福利', amt:'2GB + 50GB定向', lv:'b',
+       d:'咪咕视频 App → 我的 → 移动福利。每月领 2GB 流量，另有 0 元 50GB 咪咕定向流量包。注意：活动页不显示，得打开 App 才看得到。',
+       u:'https://m.miguvideo.com/m/provincevml/e0fa9f12a77b471c9cdbb7a439b86679'},
+      {n:'移动云盘 · 0元30G', amt:'30GB/月（定向）', lv:'m',
+       d:'全国可领，0 元领 30GB 移动云盘定向流量，按月自动续订，活动到 2026 年底。注意是定向：只在云盘 App 内上传下载时用。',
+       u:'https://caiyun.feixin.10086.cn:7071/portal/caiyunOfficialAccount/index.html?enableShare=1&path=zeroPurchase&sourceid=1010'},
+      {n:'大流量包', via:'微信', amt:'2GB 起', lv:'m',
+       d:'月月可领的大流量包活动页。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1025012314?A_C_CODE=tApqjxVygk'},
+      {n:'刮刮卡', via:'微信', amt:'随机流量', lv:'m',
+       d:'刮奖式活动页，刮开领随机流量券。',
+       u:'https://wx.10086.cn/qwhdhub/guaguaka/1024082204?A_C_CODE=4wdiegordv'},
+      {n:'移起拾秋', via:'微信', amt:'流量券', lv:'m',
+       d:'季节主题活动页，每月可点一次。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1024092502#/'}
+    ]
+  },
+  {
+    t:'移动 × 品牌联名', hint:'每月可重复领，同一个品牌新旧期次都要点',
+    items:[
+      {n:'移动 × 闲鱼 补给站', via:'微信', amt:'2GB 日包', lv:'m',
+       d:'每月一次，登录输手机号直接领，大概率 2GB，运气好能中 100 元话费兑换券。移动补给站系列每月最多能领 3 张券。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1026033134?A_C_CODE=Fi11gwHIcu'},
+      {n:'移动 × 闲鱼（另一入口）', via:'微信', amt:'2GB 日包', lv:'m',
+       d:'和上面是两个不同的活动 ID，都点一下，都中就两份。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1025020810?A_C_CODE=1DJicGPBGv'},
+      {n:'移动 × 腾讯视频', via:'微信', amt:'2GB ~ 100元话费', lv:'b',
+       d:'登录领 2GB / 10GB 流量日包券、5 元话费加赠券、100 元话费兑换券。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1025092936?A_C_CODE=6iYWLquJeo'},
+      {n:'移动 × 爱奇艺', via:'微信', amt:'2GB 日包', lv:'m',
+       d:'点开直接领，一般给 2GB，另有话费加赠券。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1025012230?A_C_CODE=cPccqjGNsY&channelId=P00000063757'},
+      {n:'移动 × 爱奇艺（另一期）', amt:'2GB 日包', lv:'m',
+       d:'另一个活动 ID 的爱奇艺联名页，同样每月可领。',
+       u:'https://dev.coc.10086.cn/coc/web1/AqiyiLaruiEvents/?channelId=P00000063757'},
+      {n:'移动 × QQ音乐', via:'微信', amt:'2GB / 10GB 日包', lv:'m',
+       d:'登录领 2GB / 10GB 流量日包券或 5 元话费加赠券。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1025052710?A_C_CODE=CfFTaXCCsY'},
+      {n:'移动 × QQ音乐（另一入口）', amt:'随机流量', lv:'m',
+       d:'活动前端页，和上面不是同一个 ID，两个都试试。',
+       u:'https://wx.10086.cn/activityFront/qqmusic/index.html'},
+      {n:'移动 × QQ会员', amt:'流量券', lv:'m',
+       d:'QQ 会员联名活动页。',
+       u:'https://wx.10086.cn/activityFront/qq/index.html'},
+      {n:'移动 × 酷狗音乐', amt:'流量券', lv:'m',
+       d:'酷狗联名活动页。',
+       u:'https://wx.10086.cn/activityFront/drawKugou/index.html'},
+      {n:'移动 × 全民K歌', amt:'流量券', lv:'m',
+       d:'全民K歌联名活动页。',
+       u:'https://wx.10086.cn/activityFront/k-music/index.html'},
+      {n:'移动 × MuMu模拟器', via:'微信', amt:'2GB 日包', lv:'m',
+       d:'每月可领 1 张 2GB 流量券。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1025062456?A_C_CODE=2zCVa27AWj'},
+      {n:'移动 × MuMu（新一期）', via:'微信', amt:'2GB 日包', lv:'m',
+       d:'另一期活动 ID 不同，同样每月可领。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1026033148?A_C_CODE=cdOYw8umTZ'},
+      {n:'移动 × 一梦江湖', via:'微信', amt:'2GB ~ 100元话费', lv:'m',
+       d:'登录领 2GB / 10GB 流量日包券、5 元 / 100 元话费加赠券。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1025062454?A_C_CODE=TE7X5lf1UW'},
+      {n:'移动 × 一梦江湖（另一期）', via:'微信', amt:'2GB 起', lv:'m',
+       d:'另一个活动 ID，同样每月可领。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1025020828?A_C_CODE=icQM5fahsK'},
+      {n:'移动 × 网易UU加速器', via:'微信', amt:'2GB 日包', lv:'m',
+       d:'进入页面登录领 2GB 流量。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1025062458?A_C_CODE=Ui7TNJZGxP'},
+      {n:'移动 × 网易UU（另一期）', via:'微信', amt:'随机流量', lv:'m',
+       d:'另一个活动 ID。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1025012340?A_C_CODE=d20cRFl06p'},
+      {n:'移动 × 网易云游戏', via:'微信', amt:'2GB 日包', lv:'m',
+       d:'每月可领 1 张 2GB 流量券。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1025062462?A_C_CODE=10YGHmoENz'},
+      {n:'移动 × 网易云（另一期）', via:'微信', amt:'随机流量', lv:'m',
+       d:'另一个活动 ID。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1025012336?A_C_CODE=JaBVwEwKHr'},
+      {n:'移动 × 天下', via:'微信', amt:'2GB 日包', lv:'m',
+       d:'页面领取 2GB 流量券，每月可领 1 张。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1025062466?A_C_CODE=4eaGoinZs2'},
+      {n:'移动 × 天下（另一期）', via:'微信', amt:'2GB 起', lv:'m',
+       d:'另一个活动 ID。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1025012342?A_C_CODE=wagxEpTfwa'},
+      {n:'移动 × 土拨鼠', via:'微信', amt:'2GB 日包', lv:'m',
+       d:'土拨鼠 IP 联名，登录领 2GB 流量券。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1024072410?A_C_CODE=xkf5i6e0wW'},
+      {n:'移动 × 拼团活动', via:'浏览器', amt:'2GB 日包', lv:'m',
+       d:'注意：这个必须用手机浏览器打开，在微信里点会提示「渠道未开放」。里面有个 1 分钱 5G 的别点，那是额外收费的。',
+       u:'https://wx.10086.cn/hlwyxhdhub/act-seasonfour-v/index.html#/signup'},
+      {n:'移动 × 西瓜', via:'微信', amt:'流量券', lv:'m',
+       d:'西瓜主题的联名活动页。',
+       u:'https://wx.10086.cn/hlwyxhdhub/act-s4pickwatermelon/1024092310'},
+      {n:'移动 × 爱购世界杯', amt:'500MB ~ 100元话费', lv:'m',
+       d:'点击足球、进球夺宝，赢 500MB / 2GB 流量日包券、5 元话费加赠券、100 元话费兑换券。',
+       u:'https://dev.coc.10086.cn/coc3/canvas/rightsmarket-h5-canvas/online/26agsjb?channelCode=P00000145029&pageRecorded=true'}
+    ]
+  },
+  {
+    t:'抽奖摇奖', hint:'中不中看运气，但次数是白给的',
+    items:[
+      {n:'流量翻翻乐', amt:'1GB ~ 100GB', lv:'b',
+       d:'翻牌抽奖，随机中 1 / 10 / 20 / 30 / 50 / 100GB 国内通用流量券，每月一次。',
+       u:'https://dev.coc.10086.cn/coc/web6/fanleDraw/?pageId=2001114227726311424&channelId=P00000005742'},
+      {n:'品牌月 · 大转盘', amt:'500MB ~ 2GB', lv:'m',
+       d:'权益市场品牌月专场，下滑找「大转盘抽奖」：2GB / 500MB 流量日包券、5 / 10 元话费加赠券，还有天猫满减券、咖啡券。',
+       u:'https://dev.coc.10086.cn/coc3/canvas/rightsmarket-h5-canvas/online/zyppybld?channelCode=P00000112150&pageRecorded=true'},
+      {n:'移动 AI 豆抽奖', amt:'500MB ~ 2GB', lv:'m',
+       d:'权益市场 AI 主题活动页，登录参与抽流量日包券和话费券。',
+       u:'https://dev.coc.10086.cn/coc3/canvas/rightsmarket-h5-canvas/online/ydyhl?channelCode=P00000112150'},
+      {n:'宝藏盲盒', amt:'流量 + 话费', lv:'m',
+       d:'权益市场盲盒活动页，开盒抽流量券、话费券。',
+       u:'https://dev.coc.10086.cn/coc3/canvas/rightsmarket-h5-canvas/online/zmpgcs?channelCode=P00000096998&pageRecorded=true'},
+      {n:'移动 AI 你', amt:'500MB ~ 2GB', lv:'m',
+       d:'下滑到「AI 你幸运礼」摇奖：2GB / 500MB 流量日包券、100 / 5 元话费加赠券、天猫满减券、咪咕视频体验会员。',
+       u:'https://qz-l.com/GNYg1a'},
+      {n:'一豆有礼', amt:'1元 ~ 88元话费', lv:'m',
+       d:'抽 1 / 2 / 10 / 88 元话费兑换券、100MB / 200MB / 1GB 流量日包券。',
+       u:'https://qz-l.com/dOJGfk'},
+      {n:'周日抽奖', amt:'流量 + 话费', lv:'m',
+       d:'周日限定抽奖，动动手指抽免费流量与话费。',
+       u:'https://qz-l.com/EznGll'},
+      {n:'AI 向新生（灵犀）', via:'微信', amt:'1GB ×2', lv:'m',
+       d:'体验任意 2 款 AI 产品，领 1GB 流量 7 天包券，每月最多 2 次。',
+       u:'https://wx.10086.cn/qwhdhub/diy-client/1125120388?A_C_CODE=wFszF601gU#/page/lyZz6K0-6c_klMpCHG1D'},
+      {n:'移动开门红', via:'微信', amt:'200MB ~ 2GB', lv:'s',
+       d:'礼包月月领，奖品有 2GB / 1GB / 200MB 流量和话费，但大概率是 200MB，自测。',
+       u:'https://wx.10086.cn/qwhdhub/giveprize/1026020608?A_C_CODE=DYANlGbeJg&token=QWHDSSOD20260217T100852951DU1026020608Hjvwl7R572419'},
+      {n:'芒果 TV 校园打榜', amt:'流量 + 会员', lv:'m',
+       d:'芒果 TV × 移动校园打榜活动页，参与打榜互动抽流量与视频会员。',
+       u:'https://h5.mgtv.com/2026/h5/6a6c562aeb326915818ca11a/?sid=ydgs'}
+    ]
+  },
+  {
+    t:'会员 / 第三方专属', hint:'有这些会员的话顺手就领',
+    items:[
+      {n:'京东 PLUS 会员', amt:'专属流量', lv:'m',
+       d:'京东 PLUS 会员专属流量券，非会员忽略。',
+       u:'https://dev.coc.10086.cn/coc/web1/plusCoupon/?pageId=1706215671194681344&channelId=P00000066751'},
+      {n:'云闪付 62VIP', via:'微信', amt:'专属流量', lv:'m',
+       d:'云闪付会员专属流量，非会员忽略。',
+       u:'https://wx.10086.cn/qwhdhub/leadin/1024092510#/'},
+      {n:'支付宝双 V 会员', amt:'每月最高 10GB', lv:'b',
+       d:'支付宝搜「双V会员」。做任务每月攒 10GB：登录移动云盘 +1G、充话费 +1G、饿了么点单 +1G、生活缴费 +1G、关注生活号 +1G，可随时分次提取 1G / 2G / 5G 日包。',
+       u:'https://caiyun.feixin.10086.cn:7071/portal/clientDL/index.html'},
+      {n:'饿了么会员', amt:'2GB 日包', lv:'m',
+       d:'饿了么 App → 我的 → 上方 XX 会员 → 去领取 → 2GB 免费流量。',
+       u:'https://www.ele.me/'},
+      {n:'优酷视频会员', amt:'2GB 日包', lv:'m',
+       d:'优酷 App → 会员 → 上方福利社 → 移动抽好礼 2GB。',
+       u:'https://www.youku.com/'},
+      {n:'拼多多省钱月卡', amt:'2GB 日包', lv:'m',
+       d:'拼多多 App → 个人中心 → 省钱月卡 → 生活特权 → 超值流量券，每月可领 2GB 日包。',
+       u:'https://mobile.yangkeduo.com/'},
+      {n:'动感地带校园活动', amt:'校园专属', lv:'s',
+       d:'动感地带校园活动页，学生号专属福利。',
+       u:'https://dev.coc.10086.cn/coc/web2/campusActivities/'}
+    ]
+  },
+  {
+    t:'用流量换流量', hint:'当月用得多，后面领得多',
+    items:[
+      {n:'流量爽翻（四川）', amt:'最高 180GB', lv:'b',
+       d:'四川移动号。无门槛每月送 1 次抽奖；当月累计用量依次达到 5 / 30 / 60 / 90 / 120 / 180GB，各再得 1 次抽奖机会，每月最多 6 次。奖品有 5 / 30 / 60 / 90 / 120 / 180GB 流量券，话费最高 888 元。流量用得多的人最划算。',
+       u:'https://dx.10086.cn/D/bbyR3D'}
+    ]
+  },
+  {
+    t:'省份专属', hint:'不是你那个省就领不了，先看归属地',
+    items:[
+      {n:'广东 · 流量月月领', amt:'10GB + 7GB', lv:'b',
+       d:'广东移动号。云盘上传一张新照片领 10GB 一天通用流量包；开启自动备份再按 2GB → 5GB 顺序领。整月同一号码全渠道限领 1 次。',
+       u:'https://m.mcloud.139.com/portal/cyActive/index.html?path=GD_MonthGift&sourceid=1039&targetSourceId=001005&enableShare=1'},
+      {n:'湖北 · 日日签到2GB', amt:'2GB/天', lv:'b',
+       d:'湖北移动号。每日打卡（上传照片 / 转存 / AI 助手）领 2GB 日流量包，当月满 10 次再送 2 元话费券。当天领当天用。',
+       u:'https://caiyun.feixin.10086.cn:7071/portal/cloudDisk/index.html?path=HB_experienceGift&sourceid=1001'},
+      {n:'甘肃 · 流量红包', amt:'最高 18GB/月', lv:'b',
+       d:'甘肃移动号。每月自动发 18GB 红包，分享给好友一起抢；被领满 3 / 5 / 8 个另有 1GB / 3GB / 2 元话费奖励。',
+       u:'https://wap.gs.10086.cn/ability/xwtecWap/springOutingRedPacket.html'},
+      {n:'江苏 · 签到有你', amt:'抽奖 / 满签礼', lv:'s',
+       d:'江苏移动生活会员。每日签到抽奖，全月满签有流量、E豆奖励。满签奖品要次月月底前领取，逾期作废。',
+       u:'https://wap.js.10086.cn/nact/resource/2204/html/activityHelp.html'}
+    ]
+  },
+  {
+    t:'兜底', hint:'上面都白搭的时候用',
+    items:[
+      {n:'中国移动 App', amt:'总入口', lv:'b',
+       d:'所有活动的老巢。首页搜「流量」「签到」「网龄」「快游」「移动补给站」，链接失效了就在这儿找新一期。底部中间有「灵犀」，每周二、周五 9—10 点有话费口令。',
+       u:'https://www.10086.cn/'},
+      {n:'10086 人工要关怀流量', amt:'不定，好使', lv:'b',
+       d:'直接打过去说流量不够用，申请关怀流量。网龄 3 年以上的号码成功率明显更高。另可发短信「网龄」到 10086 查网龄福利，最高 20GB。',
+       u:'tel:10086'}
+    ]
+  }
+];
+
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const bodyEl = document.getElementById('body');
+const qEl = document.getElementById('q');
+const countEl = document.getElementById('count');
+const emptyEl = document.getElementById('empty');
+
+function render(){
+  const q = qEl.value.trim().toLowerCase();
+  let total = 0, shown = 0, html = '';
+  GROUPS.forEach(g => {
+    const list = g.items.filter(it => {
+      total++;
+      return !q || (it.n + it.d + it.amt + g.t).toLowerCase().includes(q);
+    });
+    shown += list.length;
+    if(!list.length) return;
+    html += `<section class="group">
+      <div class="ghead"><h2>${g.t}</h2><span>${g.hint}</span></div>
+      <div class="grid">${list.map(it => `
+        <div class="card">
+          <div class="top">
+            <span class="name">${esc(it.n)}</span>
+            ${it.via ? `<span class="via">${esc(it.via)}</span>` : ''}
+            <span class="amt ${it.lv}">${esc(it.amt)}</span>
+          </div>
+          <div class="d">${esc(it.d)}</div>
+          <div class="url">${esc(it.u)}</div>
+          <div class="acts">
+            <button class="btn open" type="button" data-u="${esc(it.u)}" data-n="${esc(it.n)}">打开链接</button>
+            <button class="btn ghost copy" type="button" data-u="${esc(it.u)}">复制</button>
+          </div>
+        </div>`).join('')}</div>
+    </section>`;
+  });
+  bodyEl.innerHTML = html;
+  countEl.textContent = shown + ' / ' + total;
+  document.getElementById('sub').textContent = total + ' 个点开就领的官方活动页 · 签到 / 月包 / 联名 / 抽奖';
+  emptyEl.style.display = shown ? 'none' : 'block';
+}
+
+render();
+qEl.addEventListener('input', render);
+
+bodyEl.addEventListener('click', e => {
+  const open = e.target.closest('.open');
+  const copy = e.target.closest('.copy');
+
+  if(open){
+    const u = open.dataset.u;
+    toast('正在打开「' + open.dataset.n + '」…记得关掉 WiFi');
+    if(u.startsWith('tel:') || u.startsWith('sms:')) location.href = u;
+    else window.open(u, '_blank', 'noopener');
+    return;
+  }
+
+  if(copy){
+    const u = copy.dataset.u;
+    const done = () => toast('链接已复制，去微信里粘贴打开');
+    if(navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(u).then(done).catch(fallback);
+    } else fallback();
+    function fallback(){
+      const ta = document.createElement('textarea');
+      ta.value = u; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try{ document.execCommand('copy'); done(); }catch(err){ toast('复制失败，请手动选中复制'); }
+      ta.remove();
+    }
+  }
+});
+
+let timer;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(timer);
+  timer = setTimeout(() => t.classList.remove('on'), 2600);
+}
+
+const btn = document.getElementById('themeBtn');
+const root = document.documentElement;
+if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+  root.dataset.theme = 'dark';
+}
+function syncBtn(){ btn.textContent = root.dataset.theme === 'dark' ? '切换浅色' : '切换深色'; }
+syncBtn();
+btn.addEventListener('click', () => {
+  root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+  syncBtn();
+});
+</script>
+</body>
+</html>
